@@ -31,7 +31,7 @@ const styles = theme => {
       justifyContent: "center"
     },
     cardRoot: {
-      maxHeight: "650px",
+      maxHeight: "670px",
       maxWidth: "900px",
       alignSelf: "center",
       width: "100%",
@@ -97,44 +97,6 @@ const styles = theme => {
       padding: "16px",
       display: "flex"
     },
-    contenedorError: {
-      flex: 1,
-      overflow: "auto",
-      padding: "16px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center"
-    },
-    iconoError: {
-      fontSize: "104px"
-    },
-    textoError: {
-      marginTop: "16px",
-      maxWidth: "400px",
-      textAlign: "center"
-    },
-    contenedorOk: {
-      flex: 1,
-      overflow: "auto",
-      display: "flex",
-      flexDirection: "column"
-    },
-    contenedorOkContent: {
-      flex: 1,
-      overflow: "auto",
-      padding: "16px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center"
-    },
-    iconoOk: {
-      fontSize: "104px"
-    },
-    textoOk: {
-      marginTop: "16px",
-      maxWidth: "400px",
-      textAlign: "center"
-    }
   };
 };
 export default styles;

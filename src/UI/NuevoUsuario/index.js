@@ -13,14 +13,13 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
-//Componentes
-import { Typography } from "@material-ui/core";
-import LinearProgress from "@material-ui/core/LinearProgress";
-
 //Mis componentes
-import MiCard from "@Componentes/MiCard";
+import MiCardLogin from "@Componentes/MiCardLogin";
 import ContentSwapper from "@Componentes/ContentSwapper";
+import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import PaginaDatosBasicos from "./PaginaDatosBasicos";
+import PaginaDatosAcceso from "./PaginaDatosAcceso";
+import PaginaDatosContacto from "./PaginaDatosContacto";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -38,8 +37,10 @@ const mapStateToProps = state => {
 
 const padding = "2rem";
 
+const PAGINA_ERROR_VALIDANDO_CODIGO = "PAGINA_ERROR_VALIDANDO_CODIGO";
 const PAGINA_DATOS_BASICOS = "DATOS_BASICOS";
 const PAGINA_DATOS_ACCESO = "DATOS_ACCESO";
+const PAGINA_DATOS_CONTACTO = "DATOS_CONTACTO";
 
 class NuevoUsuario extends React.Component {
   constructor(props) {
@@ -50,8 +51,9 @@ class NuevoUsuario extends React.Component {
       validandoCodigo: true,
       errorValidandoCodigo: undefined,
       infoLogin: undefined,
+      //UI
       visible: false,
-      paginaActual: PAGINA_DATOS_BASICOS
+      paginaActual: undefined
     };
   }
 
@@ -64,94 +66,119 @@ class NuevoUsuario extends React.Component {
   }
 
   validarCodigo = () => {
-    this.setState({ validandoCodigo: true }, () => {
-      Rules_Aplicacion.getInfoLogin(this.state.codigo)
-        .then(data => {
-          this.setState({ infoLogin: data, errorValidandoCodigo: undefined });
-        })
-        .catch(error => {
-          this.setState({
-            infoLogin: undefined,
-            errorValidandoCodigo: error
+    this.setState(
+      {
+        validandoCodigo: true,
+        paginaActual: undefined
+      },
+      () => {
+        Rules_Aplicacion.getInfoLogin(this.state.codigo)
+          .then(data => {
+            this.setState({
+              infoLogin: data,
+              paginaActual: PAGINA_DATOS_BASICOS
+            });
+          })
+          .catch(error => {
+            this.setState({
+              errorValidandoCodigo: error,
+              paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO
+            });
+          })
+          .finally(() => {
+            this.setState({ validandoCodigo: false });
           });
-        })
-        .finally(() => {
-          this.setState({ validandoCodigo: false });
-        });
+      }
+    );
+  };
+
+  onCargando = cargando => {
+    this.setState({ cargando: cargando || false });
+  };
+
+  onDatosBasicosReady = datos => {
+    console.log(datos);
+
+    this.setState({
+      datosBasicos: datos,
+      paginaActual: PAGINA_DATOS_ACCESO
     });
   };
 
-  onBotonReintentarValidarCodigoClick = () => {
-    this.validarCodigo();
+  onDatosAccesoReady = datos => {
+    console.log(datos);
+
+    this.setState({
+      datosAcceso: datos,
+      paginaActual: PAGINA_DATOS_CONTACTO
+    });
+  };
+
+  onDatosContactoReady = datos => {
+    console.log(datos);
+
+    this.setState({
+      datosContacto: datos,
+      paginaActual: undefined
+    });
+  };
+
+  onPaginaDatosAccesoBotonVolverClick = () => {
+    this.setState({ paginaActual: PAGINA_DATOS_BASICOS });
+  };
+
+  onPaginaDatosContactoBotonVolverClick = () => {
+    this.setState({ paginaActual: PAGINA_DATOS_ACCESO });
   };
 
   render() {
     const { classes } = this.props;
-
-    const titulo =
-      this.state.infoLogin == undefined
-        ? ""
-        : this.state.infoLogin.aplicacionNombre;
 
     const cargando = this.state.cargando || this.state.validandoCodigo;
 
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCard
-            padding={false}
-            rootClassName={classNames(
-              classes.cardRoot,
-              this.state.visible && "visible"
-            )}
-            className={classNames(classes.cardContent)}
+          <MiCardLogin
+            cargando={cargando}
+            visible={this.state.visible}
+            rootClassName={classes.cardRoot}
+            titulo="Vecino Virtual"
+            subtitulo="Nuevo usuario"
           >
-            {/* Linea cargando */}
-            <LinearProgress
-              className={classNames(classes.progress, cargando && "visible")}
-            />
-
-            {/* Encabezado */}
-            <div
-              className={classes.header}
-              style={{ padding: padding, paddingBottom: "16px" }}
-            >
-              <div className={classes.imagenLogoMuni} />
-              <div className={classes.contenedorTextosSistema}>
-                <Typography variant="headline">Vecino Virtual</Typography>
-                <Typography variant="title">{titulo}</Typography>
-              </div>
-            </div>
-
-            {/* contenido  */}
-            <div className={classes.content}>{this.renderContent()}</div>
-
-            {/* overlay cargando */}
-            <div
-              className={classNames(
-                classes.overlayCargando,
-                this.state.cargando && "visible"
-              )}
-            />
-          </MiCard>
+            {this.renderContent()}
+          </MiCardLogin>
         </div>
       </React.Fragment>
     );
   }
 
   renderContent() {
-    if (this.state.validandoCodigo === true) return null;
-
     const { classes } = this.props;
+
+    let anim =
+      this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO
+        ? "cross-fade"
+        : "roll-up";
 
     return (
       <div className={classes.content}>
         <ContentSwapper
-          transitionName="cross-fade"
+          transitionName={anim}
           transitionEnterTimeout={500}
           transitionLeaveTimeout={500}
           className={classes.contentSwapper}
         >
+          <div
+            key="paginaErrorValidandoCodigo"
+            className={classes.contentSwapperContent}
+            visible={
+              "" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)
+            }
+          >
+            {this.renderPaginaErrorValidandoCodigo()}
+          </div>
+
           <div
             key="paginaDatosBasicos"
             className={classes.contentSwapperContent}
@@ -166,17 +193,55 @@ class NuevoUsuario extends React.Component {
           >
             {this.renderPaginaDatosAcceso()}
           </div>
+          <div
+            key="paginaDatosContacto"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_DATOS_CONTACTO)}
+          >
+            {this.renderPaginaDatosContacto()}
+          </div>
         </ContentSwapper>
       </div>
     );
   }
 
+  renderPaginaErrorValidandoCodigo() {
+    return <MiPanelMensaje error mensaje={this.state.errorValidandoCodigo} />;
+  }
+
   renderPaginaDatosBasicos() {
-    return <PaginaDatosBasicos padding={padding} />;
+    return (
+      <PaginaDatosBasicos
+        padding={padding}
+        datosIniciales={this.state.datosBasicos}
+        onCargando={this.onCargando}
+        onReady={this.onDatosBasicosReady}
+      />
+    );
   }
 
   renderPaginaDatosAcceso() {
-    return null;
+    return (
+      <PaginaDatosAcceso
+        padding={padding}
+        datosIniciales={this.state.datosAcceso}
+        onCargando={this.onCargando}
+        onReady={this.onDatosAccesoReady}
+        onBotonVolverClick={this.onPaginaDatosAccesoBotonVolverClick}
+      />
+    );
+  }
+
+  renderPaginaDatosContacto() {
+    return (
+      <PaginaDatosContacto
+        padding={padding}
+        datosIniciales={this.state.datosContacto}
+        onCargando={this.onCargando}
+        onReady={this.onDatosContactoReady}
+        onBotonVolverClick={this.onPaginaDatosContactoBotonVolverClick}
+      />
+    );
   }
 }
 

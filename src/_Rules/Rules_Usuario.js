@@ -90,6 +90,62 @@ const metodos = {
         });
     });
   },
+  validarRenaper: comando => {
+    const url = window.Config.BASE_URL_WS + "/v1/Usuario/ValidarRenaper";
+
+    console.log(comando);
+
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(comando)
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
+  },
+  validarUsername: username => {
+    const url =
+      window.Config.BASE_URL_WS +
+      "/v1/Usuario/ExisteUsername?username=" +
+      username;
+
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
+  },
   //Usuario activado
   validarUsuarioActivado: (username, password) => {
     let url =

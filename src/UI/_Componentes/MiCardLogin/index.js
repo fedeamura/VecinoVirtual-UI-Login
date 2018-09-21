@@ -23,6 +23,7 @@ class MiCardLogin extends React.PureComponent {
         padding={false}
         rootClassName={classNames(
           classes.cardRoot,
+          this.props.rootClassName,
           this.props.visible && "visible"
         )}
         className={classNames(classes.cardContent)}
@@ -44,7 +45,7 @@ class MiCardLogin extends React.PureComponent {
         >
           <div className={classes.imagenLogoMuni} />
           <div className={classes.contenedorTextosSistema}>
-            <Typography variant="headline" noWrap>
+            <Typography variant="headline" noWrap style={{ fontWeight: 200 }}>
               {this.props.titulo}
             </Typography>
             {this.props.subtitulo !== undefined && (

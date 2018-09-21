@@ -32,7 +32,7 @@ class MiCard extends React.PureComponent {
           elevation={this.props.elevation}
           className={classNames(
             classes.card,
-            this.props.className,
+            classNames(this.props.className),
             conMargin && classes.cardMagin,
             conTitulo && conMargin && classes.cardMarginTitulo
           )}
