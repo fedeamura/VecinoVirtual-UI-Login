@@ -1,16 +1,9 @@
 import _ from "lodash";
-
 const KEY_INFO_PUBLICA = "UIYAUISYNQNNWSDSS";
-
-let baseURL =
-  "https://servicios2.cordoba.gov.ar/WSVecinoVirtual_Bridge/v1/Usuario";
-baseURL = "http://localhost:7294/v1/Usuario";
-
-const baseURL_v2 =  "http://localhost:7294/v2/Usuario"
 
 const metodos = {
   getInfoPublica: username => {
-    let url = baseURL + "/InfoPublica";
+    let url = window.Config.BASE_URL_WS + "/v1/Usuario/InfoPublica";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -39,7 +32,7 @@ const metodos = {
     });
   },
   acceder: (username, password) => {
-    let url = baseURL + "/IniciarSesion";
+    let url = window.Config.BASE_URL_WS + "/v1/Usuario/IniciarSesion";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -69,8 +62,8 @@ const metodos = {
   },
   generarCuil: comando => {
     const url =
-      baseURL +
-      "/GenerarCuil?dni=" +
+      window.Config.BASE_URL_WS +
+      "/v1/Usuario/GenerarCuil?dni=" +
       comando.dni +
       "&sexoMasculino=" +
       comando.sexoMasculino;
@@ -99,7 +92,8 @@ const metodos = {
   },
   //Usuario activado
   validarUsuarioActivado: (username, password) => {
-    let url = baseURL + "/ActivacionCuenta/Validar";
+    let url =
+      window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Validar";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -128,8 +122,12 @@ const metodos = {
     });
   },
   iniciarActivacion: comando => {
-    const url = baseURL + "/ActivacionCuenta/Iniciar";
-    comando.urlServidor = "http://localhost:3000/ProcesarActivacionUsuario";
+    const url =
+      window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Iniciar";
+    comando.urlServidor =
+      window.location.origin +
+      window.Config.BASE_URL +
+      "/ProcesarActivacionUsuario";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -155,8 +153,10 @@ const metodos = {
     });
   },
   procesarActivacionUsuario: codigo => {
-    const url = baseURL_v2 + "/ActivacionCuenta/Procesar?codigo=" + codigo;
-console.log(url);
+    const url =
+      window.Config.BASE_URL_WS +
+      "/v2/Usuario/ActivacionCuenta/Procesar?codigo=" +
+      codigo;
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "PUT",
@@ -182,9 +182,12 @@ console.log(url);
   //Recuperacion cuenta
   iniciarRecuperarPassword: comando => {
     return new Promise((resolve, reject) => {
-      const url = baseURL + "/RecuperacionCuenta/Iniciar";
-      const urlServidor = "http://localhost:3000/ProcesarRecuperarPassword";
-      comando.urlServidor = urlServidor;
+      const url =
+        window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Iniciar";
+      comando.urlServidor =
+        window.location.origin +
+        window.Config.BASE_URL +
+        "/ProcesarRecuperarPassword";
 
       fetch(url, {
         method: "PUT",
@@ -210,7 +213,8 @@ console.log(url);
   },
   procesarRecuperarPassword: comando => {
     return new Promise((resolve, reject) => {
-      const url = baseURL + "/RecuperacionCuenta/Procesar";
+      const url =
+        window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Procesar";
 
       fetch(url, {
         method: "PUT",
@@ -235,7 +239,10 @@ console.log(url);
     });
   },
   getRecuperacionCuenta: codigo => {
-    const url = baseURL + "/RecuperacionCuenta/Datos?codigo=" + codigo;
+    const url =
+      window.Config.BASE_URL_WS +
+      "/v1/Usuario/RecuperacionCuenta/Datos?codigo=" +
+      codigo;
 
     return new Promise((resolve, reject) => {
       fetch(url, {

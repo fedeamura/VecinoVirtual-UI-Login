@@ -15,27 +15,16 @@ const styles = theme => {
       alignItems: "center"
       // justifyContent: "center"
     },
-    pagina: {
+    contentSwapper: {
+      height: "100%",
       flex: 1,
-      width: "100%",
-      overflow: "auto",
-      padding: "16px",
       display: "flex",
-      flexDirection: "column",
-      alignItems: "center"
+      "& > span": { width: "100%" }
     },
-    icono: {
-      fontSize: "104px"
-    },
-    texto: {
-      marginTop: "16px",
-      maxWidth: "400px",
-      textAlign: "center"
-    },
-    footer: {
-      borderTop: "1px solid rgba(0,0,0,0.1)",
-      padding: "16px",
-      display: "flex"
+    contentSwapperContent: {
+      height: "100%",
+      width: "100%",
+      flex: 1
     }
   };
 };

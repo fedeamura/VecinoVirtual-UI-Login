@@ -1,8 +1,8 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import classNames from "classnames";
 
 //Styles
+import { withStyles } from "@material-ui/core/styles";
+import classNames from "classnames";
 import "@UI/transitions.css";
 import styles from "./styles";
 
@@ -13,37 +13,13 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
-//Componentes
-import { Typography, Icon, Button } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import { Grid } from "@material-ui/core";
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import IconButton from "@material-ui/core/IconButton";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import red from "@material-ui/core/colors/red";
-import Lottie from "react-lottie";
-import * as animExito from "@Resources/animaciones/anim_success.json";
-
 //Mis componentes
-import MiCard from "@Componentes/MiCard";
+import MiCardLogin from "@Componentes/MiCardLogin";
 import ContentSwapper from "@Componentes/ContentSwapper";
+import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
-
-const opcionesAnimExito = {
-  loop: false,
-  autoplay: true,
-  animationData: animExito,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice"
-  }
-};
 
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
@@ -55,7 +31,8 @@ const mapStateToProps = state => {
   return {};
 };
 
-const padding = "2rem";
+const PAGINA_OK = "PAGINA_OK";
+const PAGINA_ERROR = "PAGINA_ERROR";
 
 class ProcesarActivacionUsuario extends React.Component {
   constructor(props) {
@@ -65,8 +42,7 @@ class ProcesarActivacionUsuario extends React.Component {
       codigo: props.location.search.split("codigo=")[1],
       validandoCodigo: true,
       visible: false,
-      paginaOkVisible: false,
-      paginaErrorVisible: false,
+      paginaActual: undefined,
       urlRetorno: ""
     };
   }
@@ -80,21 +56,19 @@ class ProcesarActivacionUsuario extends React.Component {
   }
 
   procesar = () => {
-    this.setState({ cargando: true }, () => {
+    this.setState({ cargando: true, paginaActual: undefined }, () => {
       Rules_Usuario.procesarActivacionUsuario(this.state.codigo)
         .then(data => {
           this.setState({
             urlRetorno: data,
             error: undefined,
-            paginaOkVisible: true,
-            paginaErrorVisible: false
+            paginaActual: PAGINA_OK
           });
         })
         .catch(error => {
           this.setState({
             error: error,
-            paginaOkVisible: false,
-            paginaErrorVisible: true
+            paginaActual: PAGINA_ERROR
           });
         })
         .finally(() => {
@@ -121,38 +95,14 @@ class ProcesarActivacionUsuario extends React.Component {
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCard
-            padding={false}
-            rootClassName={classNames(
-              classes.cardRoot,
-              this.state.visible && "visible"
-            )}
-            className={classNames(classes.cardContent)}
+          <MiCardLogin
+            titulo="Vecino Virtual"
+            subtitulo="Activar usuario"
+            cargando={this.state.cargando}
+            visible={this.state.visible}
           >
-            <LinearProgress
-              className={classNames(
-                classes.progress,
-                this.state.cargando && "visible"
-              )}
-            />
-
-            <div className={classes.header} style={{ padding: padding }}>
-              <div className={classes.imagenLogoMuni} />
-              <div className={classes.contenedorTextosSistema}>
-                <Typography variant="headline">Vecino Virtual</Typography>
-                <Typography variant="title">Validar e-mail</Typography>
-              </div>
-            </div>
-
             {this.renderContent()}
-
-            <div
-              className={classNames(
-                classes.overlayCargando,
-                this.state.cargando && "visible"
-              )}
-            />
-          </MiCard>
+          </MiCardLogin>
         </div>
       </React.Fragment>
     );
@@ -172,14 +122,14 @@ class ProcesarActivacionUsuario extends React.Component {
           <div
             key="paginaOk"
             style={{ height: "100%", width: "100%", display: "flex" }}
-            visible={"" + this.state.paginaOkVisible}
+            visible={"" + (this.state.paginaActual == PAGINA_OK)}
           >
             {this.renderPaginaOk()}
           </div>
           <div
             key="paginaError"
             style={{ height: "100%", width: "100%", display: "flex" }}
-            visible={"" + this.state.paginaErrorVisible}
+            visible={"" + (this.state.paginaActual == PAGINA_ERROR)}
           >
             {this.renderPaginaError()}
           </div>
@@ -188,107 +138,25 @@ class ProcesarActivacionUsuario extends React.Component {
     );
   }
 
-  renderPaginaPasswordFooter() {
-    const { classes } = this.props;
-
-    return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
-        <div style={{ flex: 1 }} />
-
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.recuperarPassword}
-        >
-          Recuperar contraseña
-        </Button>
-      </div>
-    );
-  }
-
   renderPaginaOk() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes.contenedorOk}>
-        {this.renderPaginaOkContent()}
-        {this.renderPaginaOkFooter()}
-      </div>
-    );
-  }
-
-  renderPaginaOkContent() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.contenedorOkContent} style={{ padding: padding }}>
-        <Lottie
-          options={opcionesAnimExito}
-          height={150}
-          width={150}
-          style={{ minHeight: "150px" }}
-        />
-
-        <Typography variant="headline" className={classes.textoOk}>
-          E-mail validado correctamente
-        </Typography>
-      </div>
-    );
-  }
-
-  renderPaginaOkFooter() {
-    const { classes } = this.props;
-
-    return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
-        <div style={{ flex: 1 }} />
-
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonAceptarClick}
-        >
-          Aceptar
-        </Button>
-      </div>
+      <MiPanelMensaje
+        boton="Aceptar"
+        onBotonClick={this.onBotonAceptarClick}
+        lottieExito
+        mensaje=" E-mail validado correctamente"
+      />
     );
   }
 
   renderPaginaError() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes.contenedorError} style={{ padding: padding }}>
-        <Icon className={classes.iconoError} style={{ color: red["500"] }}>
-          error
-        </Icon>
-        <Typography variant="headline" className={classes.textoError}>
-          {this.state.error || "Error procesando la solicitud"}
-        </Typography>
-        <Button
-          variant="outlined"
-          style={{ marginTop: "16px" }}
-          onClick={this.onBotonReintentarClick}
-        >
-          Reintentar
-        </Button>
-      </div>
+      <MiPanelMensaje
+        error
+        boton="Reintentar"
+        mensaje={this.state.error}
+        onBotonClick={this.onBotonReintentarClick}
+      />
     );
   }
 }

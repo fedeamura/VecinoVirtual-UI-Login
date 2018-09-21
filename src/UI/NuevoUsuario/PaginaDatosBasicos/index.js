@@ -24,6 +24,9 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
 
+//Mis componentes
+import MiPanelMensaje from "@Componentes/MiPanelMensaje";
+
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 import Rules_EstadoCivil from "@Rules/Rules_EstadoCivil";
@@ -33,12 +36,6 @@ const mapDispatchToProps = dispatch => ({});
 const mapStateToProps = state => {
   return {};
 };
-
-const options = [
-  { value: "chocolate", label: "Chocolate" },
-  { value: "strawberry", label: "Strawberry" },
-  { value: "vanilla", label: "Vanilla" }
-];
 
 class PaginaDatosBasicos extends React.Component {
   static defaultProps = {
@@ -55,7 +52,7 @@ class PaginaDatosBasicos extends React.Component {
       nombre: "",
       apellido: "",
       dni: "",
-      fechaNacimiento: undefined,
+      fechaNacimiento: new Date(1990, 0, 1),
       fechaNacimientoKeyPress: false,
       estadoCivil: undefined,
       sexo: "m"
@@ -98,6 +95,20 @@ class PaginaDatosBasicos extends React.Component {
 
   render() {
     const { classes } = this.props;
+
+    if (this.state.estadosCiviles === undefined) {
+      return (
+        <div className={classes.root}>
+          <MiPanelMensaje
+            mensaje="Error inicializando los datos"
+            icono="error"
+            iconoColor="red"
+          />
+          ;
+        </div>
+      );
+    }
+
     return (
       <div className={classes.root}>
         {this.renderContent()}
@@ -107,8 +118,6 @@ class PaginaDatosBasicos extends React.Component {
   }
 
   renderContent() {
-    if (this.state.estadosCiviles == undefined) return null;
-
     const { classes, padding } = this.props;
     return (
       <div
@@ -209,7 +218,7 @@ class PaginaDatosBasicos extends React.Component {
               value={this.state.fechaNacimiento}
               onChange={this.onInputFechaNacimientoChange}
               disableOpenOnEnter
-              animateYearScrolling={true}
+              animateYearScrolling={false}
             />
           </Grid>
           <Grid item xs={12} md={6}>

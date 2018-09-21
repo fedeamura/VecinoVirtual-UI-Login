@@ -6,7 +6,7 @@ import { connectRouter, routerMiddleware } from "connected-react-router";
 import rootReducer from "@Redux/Reducers/index";
 
 export const history = createBrowserHistory({
-  basename: "/"
+  basename: window.Config.BASE_URL
 });
 
 const store = createStore(

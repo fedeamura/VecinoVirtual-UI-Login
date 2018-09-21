@@ -11,22 +11,12 @@ import { connect } from "react-redux";
 
 //Componentes
 import { Typography, Grid, Icon, Button, IconButton } from "@material-ui/core";
-import Lottie from "react-lottie";
 import Paper from "@material-ui/core/Paper";
 
 //Mis recursos
-import * as animExito from "@Resources/animaciones/anim_chat.json";
+
 import ImagenHelper from "@Resources/imagenes/avatar_help.png";
 import ImagenHeader from "@Resources/imagenes/chat_soporte_header.png";
-
-const opcionesAnimExito = {
-  loop: false,
-  autoplay: true,
-  animationData: animExito,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice"
-  }
-};
 
 const mapDispatchToProps = dispatch => ({});
 const mapStateToProps = state => {

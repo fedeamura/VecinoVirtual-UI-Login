@@ -13,13 +13,8 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
-//Componentes
-import { Typography, Icon } from "@material-ui/core";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import red from "@material-ui/core/colors/red";
-
 //Mis componentes
-import MiCard from "@Componentes/MiCard";
+import MiCardLogin from "@Componentes/MiCardLogin";
 import PaginaUsername from "./PaginaUsername";
 import PaginaPassword from "./PaginaPassword";
 import PaginaUsuariosRecientes from "./PaginaUsuariosRecientes";
@@ -28,10 +23,19 @@ import PaginaRecuperarPassword from "./PaginaRecuperarPassword";
 import PaginaUsuarioNoActivado from "./PaginaUsuarioNoActivado";
 import ContentSwapper from "@Componentes/ContentSwapper";
 import Ayuda from "./Ayuda";
+import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
+
+const PAGINA_ERROR_VALIDANDO_CODIGO = "PAGINA_ERROR_VALIDANDO_CODIGO";
+const PAGINA_USERNAME = "PAGINA_USERNAME";
+const PAGINA_PASSWORD = "PAGINA_PASSWORD";
+const PAGINA_USUARIOS_RECIENTES = "PAGINA_USUARIOS_RECIENTES";
+const PAGINA_GENERAR_CUIL = "PAGINA_GENERAR_CUIL";
+const PAGINA_RECUPERAR_PASSWORD = "PAGINA_RECUPERAR_PASSWORD";
+const PAGINA_USUARIO_NO_ACTIVADO = "PAGINA_USUARIO_NO_ACTIVADO";
 
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
@@ -58,60 +62,47 @@ class Login extends React.Component {
       //UI
       visible: false,
       cargando: false,
+      paginaActual: undefined,
       //Info util
       dataUsuario: undefined,
       cuilGenerado: undefined,
       activarUsername: undefined,
-      activarPassword: undefined,
-      //Ayuda
-      ayudaExpandido: false,
-      //Paginas
-      paginaUsernameVisible: true,
-      paginaPasswordVisible: false,
-      paginaUsuariosRecientesVisible: false,
-      paginaGenerarCuilVisible: false,
-      paginaRecuperarPasswordVisible: false,
-      paginaUsuarioNoActivadoVisible: false
+      activarPassword: undefined
     };
   }
 
   componentDidMount() {
-    this.setState({ validandoCodigo: true }, () => {
-      Rules_Aplicacion.getInfoLogin(this.state.codigo)
-        .then(info => {
-          this.setState({ infoLogin: info });
-        })
-        .catch(error => {
-          this.setState({ errorValidandoCodigo: error });
-        })
-        .finally(() => {
-          this.setState({ validandoCodigo: false });
-        });
-    });
+    this.setState(
+      {
+        validandoCodigo: true,
+        paginaActual: undefined
+      },
+      () => {
+        Rules_Aplicacion.getInfoLogin(this.state.codigo)
+          .then(info => {
+            this.setState({
+              infoLogin: info,
+              paginaActual: PAGINA_USERNAME
+            });
+          })
+          .catch(error => {
+            this.setState({
+              errorValidandoCodigo: error,
+              paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO
+            });
+          })
+          .finally(() => {
+            this.setState({
+              validandoCodigo: false
+            });
+          });
+      }
+    );
 
     setTimeout(() => {
       this.setState({ visible: true });
     }, 500);
   }
-
-  cambiarPagina = (pagina, callback) => {
-    this.setState(
-      {
-        paginaUsernameVisible: false,
-        paginaPasswordVisible: false,
-        paginaUsuariosRecientesVisible: false,
-        paginaGenerarCuilVisible: false,
-        paginaRecuperarPasswordVisible: false,
-        paginaUsuarioNoActivadoVisible: false,
-        [pagina]: true
-      },
-      () => {
-        if (callback) {
-          callback();
-        }
-      }
-    );
-  };
 
   onCargando = cargando => {
     this.setState({ cargando: cargando || false });
@@ -119,7 +110,6 @@ class Login extends React.Component {
 
   onLogin = user => {
     this.setState({ visible: false });
-
     console.log(user);
     setTimeout(() => {
       window.location.replace(
@@ -129,52 +119,50 @@ class Login extends React.Component {
   };
 
   onCuilGenerado = cuilGenerado => {
-    this.setState({ cuilGenerado: cuilGenerado });
-    this.cambiarPagina("paginaUsernameVisible");
-  };
-
-  onPaginaUsernameBotonSiguienteClick = data => {
-    this.setState({ dataUsuario: data }, () => {
-      this.cambiarPagina("paginaPasswordVisible");
+    this.setState({
+      cuilGenerado: cuilGenerado,
+      paginaActual: PAGINA_USERNAME
     });
   };
 
+  onPaginaUsernameBotonSiguienteClick = data => {
+    this.setState({ dataUsuario: data, paginaActual: PAGINA_PASSWORD });
+  };
+
   onPaginaUsernameBotonGenerarCuilClick = () => {
-    this.cambiarPagina("paginaGenerarCuilVisible");
+    this.setState({ paginaActual: PAGINA_GENERAR_CUIL });
   };
 
   onPaginaPasswordBotonVerUsuariosRecientesClick = () => {
-    this.cambiarPagina("paginaUsuariosRecientesVisible");
+    this.setState({ paginaActual: PAGINA_USUARIOS_RECIENTES });
   };
 
   onPaginaPasswordBotonVolverClick = () => {
-    this.cambiarPagina("paginaUsernameVisible");
+    this.setState({ paginaActual: PAGINA_USERNAME });
   };
 
   onPaginaPasswordBotonRecuperarPasswordClick = () => {
-    this.cambiarPagina("paginaRecuperarPasswordVisible");
+    this.setState({ paginaActual: PAGINA_RECUPERAR_PASSWORD });
   };
 
   onPaginaPasswordUsuarioNoValidado = (username, password) => {
-    this.setState(
-      { activarUsername: username, activarPassword: password },
-      () => {
-        this.cambiarPagina("paginaUsuarioNoActivadoVisible");
-      }
-    );
+    this.setState({
+      activarUsername: username,
+      activarPassword: password,
+      paginaActual: PAGINA_USUARIO_NO_ACTIVADO
+    });
   };
 
   onPaginaRecuperarPasswordBotonVolverClick = () => {
-    this.cambiarPagina("paginaPasswordVisible");
+    this.setState({ paginaActual: PAGINA_PASSWORD });
   };
 
   onPaginaGenerarCuilBotonVolverClick = () => {
-    this.setState({ cuilGenerado: undefined });
-    this.cambiarPagina("paginaUsernameVisible");
+    this.setState({ cuilGenerado: undefined, paginaActual: PAGINA_USERNAME });
   };
 
   onPaginaUsuariosRecientesBotonVolverClick = () => {
-    this.cambiarPagina("paginaPasswordVisible");
+    this.setState({ paginaActual: PAGINA_PASSWORD });
   };
 
   onPaginaUsuarioRecientesUsuarioSeleccionado = data => {
@@ -183,11 +171,11 @@ class Login extends React.Component {
   };
 
   onPaginaUsuariosRecientesOtraCuentaClick = () => {
-    this.cambiarPagina("paginaUsernameVisible");
+    this.setState({ paginaActual: PAGINA_USERNAME });
   };
 
   onPaginaUsuarioNoActivadoBotonVolverClick = () => {
-    this.cambiarPagina("paginaPasswordVisible");
+    this.setState({ paginaActual: PAGINA_PASSWORD });
   };
 
   render() {
@@ -198,42 +186,19 @@ class Login extends React.Component {
         ? this.state.infoLogin.aplicacionNombre
         : "";
 
+    const cargando = this.state.cargando || this.state.validandoCodigo;
+
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCard
-            padding={false}
-            rootClassName={classNames(
-              classes.cardRoot,
-              this.state.visible && "visible"
-            )}
-            className={classNames(classes.cardContent)}
+          <MiCardLogin
+            titulo="Vecino Virtual"
+            subtitulo={nombreSistema}
+            cargando={cargando}
+            visible={this.state.visible}
           >
-            <LinearProgress
-              className={classNames(
-                classes.progress,
-                this.state.cargando && "visible"
-              )}
-            />
-
-            <div className={classes.header} style={{ padding: padding }}>
-              <div className={classes.imagenLogoMuni} />
-              <div className={classes.contenedorTextosSistema}>
-                <Typography variant="headline">Vecino Virtual</Typography>
-                <Typography variant="title">{nombreSistema}</Typography>
-              </div>
-            </div>
-
-            {this.renderValidandoCodigo()}
             {this.renderContent()}
-
-            <div
-              className={classNames(
-                classes.overlayCargando,
-                this.state.cargando && "visible"
-              )}
-            />
-          </MiCard>
+          </MiCardLogin>
         </div>
 
         <Ayuda expandido={this.state.expandido} />
@@ -241,67 +206,71 @@ class Login extends React.Component {
     );
   }
 
-  renderValidandoCodigo() {
-    if (this.state.validandoCodigo === false) return null;
-    return null;
-  }
-
   renderContent() {
-    if (this.state.validandoCodigo === true) return null;
-
-    if (this.state.errorValidandoCodigo !== undefined) {
-      return this.renderErrorValidandoCodigo();
-    }
-
     const { classes } = this.props;
+
+    let anim =
+      this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO
+        ? "cross-fade"
+        : "roll-up";
 
     return (
       <ContentSwapper
-        transitionName="roll-up"
+        transitionName={anim}
         transitionEnterTimeout={500}
         transitionLeaveTimeout={500}
         className={classes.contentSwapper}
       >
         <div
+          key="paginaErrorValidandoCodigo"
+          className={classes.contentSwapperContent}
+          visible={
+            "" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)
+          }
+        >
+          {this.renderPaginaErrorValidandoCodigo()}
+        </div>
+
+        <div
           key="paginaUsername"
-          style={{ height: "100%", width: "100%" }}
-          visible={"" + this.state.paginaUsernameVisible}
+          className={classes.contentSwapperContent}
+          visible={"" + (this.state.paginaActual == PAGINA_USERNAME)}
         >
           {this.renderPaginaUsername()}
         </div>
         <div
           key="paginaPassword"
-          style={{ height: "100%", width: "100%" }}
-          visible={"" + this.state.paginaPasswordVisible}
+          className={classes.contentSwapperContent}
+          visible={"" + (this.state.paginaActual == PAGINA_PASSWORD)}
         >
           {this.renderPaginaPassword()}
         </div>
         <div
           key="paginaUsuariosRecientes"
-          style={{ height: "100%", width: "100%" }}
-          visible={"" + this.state.paginaUsuariosRecientesVisible}
+          className={classes.contentSwapperContent}
+          visible={"" + (this.state.paginaActual == PAGINA_USUARIOS_RECIENTES)}
         >
           {this.renderPaginaUsuariosRecientes()}
         </div>
         <div
           key="paginaGenerarCuil"
-          style={{ height: "100%", width: "100%" }}
-          visible={"" + this.state.paginaGenerarCuilVisible}
+          className={classes.contentSwapperContent}
+          visible={"" + (this.state.paginaActual == PAGINA_GENERAR_CUIL)}
         >
           {this.renderPaginaGenerarCuil()}
         </div>
         <div
           key="paginaRecuperarPassword"
-          style={{ height: "100%", width: "100%" }}
-          visible={"" + this.state.paginaRecuperarPasswordVisible}
+          className={classes.contentSwapperContent}
+          visible={"" + (this.state.paginaActual == PAGINA_RECUPERAR_PASSWORD)}
         >
           {this.renderPaginaRecuperarPassword()}
         </div>
 
         <div
           key="paginaUsuarioNoActivado"
-          style={{ height: "100%", width: "100%" }}
-          visible={"" + this.state.paginaUsuarioNoActivadoVisible}
+          className={classes.contentSwapperContent}
+          visible={"" + (this.state.paginaActual == PAGINA_USUARIO_NO_ACTIVADO)}
         >
           {this.renderPaginaUsuarioNoActivado()}
         </div>
@@ -309,19 +278,8 @@ class Login extends React.Component {
     );
   }
 
-  renderErrorValidandoCodigo() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.contenedorError} style={{ padding: padding }}>
-        <Icon className={classes.iconoError} style={{ color: red["500"] }}>
-          error
-        </Icon>
-        <Typography variant="headline" className={classes.textoError}>
-          {this.state.errorValidandoCodigo}
-        </Typography>
-      </div>
-    );
+  renderPaginaErrorValidandoCodigo() {
+    return <MiPanelMensaje error mensaje={this.state.errorValidandoCodigo} />;
   }
 
   renderPaginaUsername() {

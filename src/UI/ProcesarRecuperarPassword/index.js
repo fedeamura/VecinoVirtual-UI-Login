@@ -1,8 +1,8 @@
 import React from "react";
-import { withStyles } from "@material-ui/core/styles";
-import classNames from "classnames";
 
 //Styles
+import { withStyles } from "@material-ui/core/styles";
+import classNames from "classnames";
 import "@UI/transitions.css";
 import styles from "./styles";
 
@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
 //Componentes
-import { Typography, Icon, Button } from "@material-ui/core";
+import { Button } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -24,26 +24,14 @@ import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import IconButton from "@material-ui/core/IconButton";
-import LinearProgress from "@material-ui/core/LinearProgress";
-import red from "@material-ui/core/colors/red";
-import Lottie from "react-lottie";
-import * as animExito from "@Resources/animaciones/anim_success.json";
 
 //Mis componentes
-import MiCard from "@Componentes/MiCard";
+import MiCardLogin from "@Componentes/MiCardLogin";
 import ContentSwapper from "@Componentes/ContentSwapper";
+import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
-
-const opcionesAnimExito = {
-  loop: false,
-  autoplay: true,
-  animationData: animExito,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice"
-  }
-};
 
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
@@ -56,6 +44,11 @@ const mapStateToProps = state => {
 };
 
 const padding = "2rem";
+
+const PAGINA_ERROR_VALIDANDO_CODIGO = "PAGINA_ERROR_VALIDANDO_CODIGO";
+const PAGINA_FORM = "PAGINA_FORM";
+const PAGINA_OK = "PAGINA_OK";
+const PAGINA_ERROR = "PAGINA_ERROR";
 
 class ProcesarRecuperarPassword extends React.Component {
   constructor(props) {
@@ -72,9 +65,7 @@ class ProcesarRecuperarPassword extends React.Component {
       showPassword: false,
       showPasswordRepeat: false,
       visible: false,
-      paginaPasswordVisible: true,
-      paginaOkVisible: false,
-      paginaErrorVisible: false,
+      paginaActual: undefined,
       urlRetorno: ""
     };
   }
@@ -84,18 +75,34 @@ class ProcesarRecuperarPassword extends React.Component {
       this.setState({ visible: true });
     }, 500);
 
-    this.setState({ validandoCodigo: true }, () => {
-      Rules_Usuario.getRecuperacionCuenta(this.state.codigo)
-        .then(data => {
-          console.log(data);
-        })
-        .catch(error => {
-          this.setState({ errorValidandoCodigo: error });
-        })
-        .finally(() => {
-          this.setState({ validandoCodigo: false });
-        });
-    });
+    this.setState(
+      {
+        validandoCodigo: true,
+        paginaActual: undefined
+      },
+      () => {
+        Rules_Usuario.getRecuperacionCuenta(this.state.codigo)
+          .then(data => {
+            if (data == undefined) {
+              this.setState({
+                paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO,
+                errorValidandoCodigo: "Solicitud inválida"
+              });
+            }
+          })
+          .catch(error => {
+            this.setState({
+              paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO,
+              errorValidandoCodigo: error
+            });
+          })
+          .finally(() => {
+            this.setState({
+              validandoCodigo: false
+            });
+          });
+      }
+    );
   }
 
   onBotonShowPasswordClick = () => {
@@ -150,18 +157,14 @@ class ProcesarRecuperarPassword extends React.Component {
           this.setState({
             urlRetorno: data,
             cargando: false,
-            paginaPasswordVisible: false,
-            paginaOkVisible: true,
-            paginaErrorVisible: false
+            paginaActual: PAGINA_OK
           });
         })
         .catch(error => {
           this.setState({
             error: error,
             cargando: false,
-            paginaPasswordVisible: false,
-            paginaOkVisible: false,
-            paginaErrorVisible: true
+            paginaActual: PAGINA_ERROR
           });
         });
     });
@@ -169,14 +172,16 @@ class ProcesarRecuperarPassword extends React.Component {
 
   onBotonReintentarClick = () => {
     this.setState({
-      paginaErrorVisible: false,
-      paginaPasswordVisible: true,
-      paginaOkVisible: false
+      paginaActual: PAGINA_FORM
     });
   };
 
   onBotonInicioClick = () => {
-    window.location = this.state.urlRetorno;
+    this.setState({ visible: false }, () => {
+      setTimeout(() => {
+        window.location = this.state.urlRetorno;
+      }, 500);
+    });
   };
 
   render() {
@@ -185,38 +190,14 @@ class ProcesarRecuperarPassword extends React.Component {
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCard
-            padding={false}
-            rootClassName={classNames(
-              classes.cardRoot,
-              this.state.visible && "visible"
-            )}
-            className={classNames(classes.cardContent)}
+          <MiCardLogin
+            visible={this.state.visible}
+            cargando={this.state.cargando || this.state.validandoCodigo}
+            titulo="Vecino Virtual"
+            subtitulo="Cambiar contraseña"
           >
-            <LinearProgress
-              className={classNames(
-                classes.progress,
-                this.state.cargando && "visible"
-              )}
-            />
-
-            <div className={classes.header} style={{ padding: padding }}>
-              <div className={classes.imagenLogoMuni} />
-              <div className={classes.contenedorTextosSistema}>
-                <Typography variant="headline">Vecino Virtual</Typography>
-                <Typography variant="title">Cambiar contraseña</Typography>
-              </div>
-            </div>
-
             {this.renderContent()}
-
-            <div
-              className={classNames(
-                classes.overlayCargando,
-                this.state.cargando && "visible"
-              )}
-            />
-          </MiCard>
+          </MiCardLogin>
         </div>
       </React.Fragment>
     );
@@ -225,6 +206,7 @@ class ProcesarRecuperarPassword extends React.Component {
   renderContent() {
     const { classes } = this.props;
 
+    console.log(this.state);
     return (
       <div className={classes.content}>
         <ContentSwapper
@@ -234,23 +216,32 @@ class ProcesarRecuperarPassword extends React.Component {
           className={classes.contentSwapper}
         >
           <div
+            key="paginaErrorValidando"
+            className={classes.contentSwapperContent}
+            visible={
+              "" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)
+            }
+          >
+            {this.renderPaginaErrorValidandoCodigo()}
+          </div>
+          <div
             key="paginaPassword"
-            style={{ height: "100%", width: "100%", display: "flex" }}
-            visible={"" + this.state.paginaPasswordVisible}
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_FORM)}
           >
             {this.renderPaginaPassword()}
           </div>
           <div
             key="paginaOk"
-            style={{ height: "100%", width: "100%", display: "flex" }}
-            visible={"" + this.state.paginaOkVisible}
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_OK)}
           >
             {this.renderPaginaOk()}
           </div>
           <div
             key="paginaError"
-            style={{ height: "100%", width: "100%", display: "flex" }}
-            visible={"" + this.state.paginaErrorVisible}
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_ERROR)}
           >
             {this.renderPaginaError()}
           </div>
@@ -262,10 +253,6 @@ class ProcesarRecuperarPassword extends React.Component {
   renderPaginaPassword() {
     const { classes } = this.props;
 
-    if (this.state.errorValidandoCodigo !== undefined) {
-      return this.renderErrorValidandoCodigo();
-    }
-
     return (
       <div className={classes.content}>
         {this.renderPaginaPasswordMain()}
@@ -275,8 +262,6 @@ class ProcesarRecuperarPassword extends React.Component {
   }
 
   renderPaginaPasswordMain() {
-    if (this.state.validandoCodigo === true) return null;
-
     const { classes } = this.props;
 
     return (
@@ -362,22 +347,6 @@ class ProcesarRecuperarPassword extends React.Component {
     );
   }
 
-  renderErrorValidandoCodigo() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.contenedorError} style={{ padding: padding }}>
-        <Icon className={classes.iconoError} style={{ color: red["500"] }}>
-          error
-        </Icon>
-        <Typography variant="headline" className={classes.textoError}>
-          {this.state.errorValidandoCodigo || "Error procesando la solicitud"}
-        </Typography>
-      
-      </div>
-    );
-  }
-  
   renderPaginaPasswordFooter() {
     const { classes } = this.props;
 
@@ -405,80 +374,29 @@ class ProcesarRecuperarPassword extends React.Component {
   }
 
   renderPaginaOk() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes.contenedorOk}>
-        {this.renderPaginaOkContent()}
-        {this.renderPaginaOkFooter()}
-      </div>
-    );
-  }
-
-  renderPaginaOkContent() {
-    const { classes } = this.props;
-
-    return (
-      <div className={classes.contenedorOkContent} style={{ padding: padding }}>
-        <Lottie
-          options={opcionesAnimExito}
-          height={150}
-          width={150}
-          style={{ minHeight: "150px" }}
-        />
-
-        <Typography variant="headline" className={classes.textoOk}>
-          Su contraseña ha sido modificada correctamente
-        </Typography>
-      </div>
-    );
-  }
-  renderPaginaOkFooter() {
-    const { classes } = this.props;
-
-    return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
-        <div style={{ flex: 1 }} />
-
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonInicioClick}
-        >
-          Ir a inicio
-        </Button>
-      </div>
+      <MiPanelMensaje
+        lottieExito
+        boton="Ir a inicio"
+        onBotonClick={this.onBotonInicioClick}
+        mensaje="Su contraseña ha sido modificada correctamente"
+      />
     );
   }
 
   renderPaginaError() {
-    const { classes } = this.props;
-
     return (
-      <div className={classes.contenedorError} style={{ padding: padding }}>
-        <Icon className={classes.iconoError} style={{ color: red["500"] }}>
-          error
-        </Icon>
-        <Typography variant="headline" className={classes.textoError}>
-          {this.state.error || "Error procesando la solicitud"}
-        </Typography>
-        <Button
-          variant="outlined"
-          style={{ marginTop: "16px" }}
-          onClick={this.onBotonReintentarClick}
-        >
-          Reintentar
-        </Button>
-      </div>
+      <MiPanelMensaje
+        mensaje={this.state.error}
+        error
+        boton="Reintentar"
+        onBotonClick={this.onBotonReintentarClick}
+      />
     );
+  }
+
+  renderPaginaErrorValidandoCodigo() {
+    return <MiPanelMensaje mensaje={this.state.errorValidandoCodigo} error />;
   }
 }
 
