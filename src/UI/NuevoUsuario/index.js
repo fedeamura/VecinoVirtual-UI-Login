@@ -20,6 +20,7 @@ import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import PaginaDatosBasicos from "./PaginaDatosBasicos";
 import PaginaDatosAcceso from "./PaginaDatosAcceso";
 import PaginaDatosContacto from "./PaginaDatosContacto";
+import PaginaDatosDomicilio from "./PaginaDatosDomicilio";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -38,9 +39,11 @@ const mapStateToProps = state => {
 const padding = "2rem";
 
 const PAGINA_ERROR_VALIDANDO_CODIGO = "PAGINA_ERROR_VALIDANDO_CODIGO";
-const PAGINA_DATOS_BASICOS = "DATOS_BASICOS";
-const PAGINA_DATOS_ACCESO = "DATOS_ACCESO";
-const PAGINA_DATOS_CONTACTO = "DATOS_CONTACTO";
+const PAGINA_DATOS_BASICOS = "PAGINA_DATOS_BASICOS";
+const PAGINA_DATOS_ACCESO = "PAGINA_DATOS_ACCESO";
+const PAGINA_DATOS_CONTACTO = "PAGINA_DATOS_CONTACTO";
+const PAGINA_DATOS_DOMICILIO = "PAGINA_DATOS_DOMICILIO";
+const PAGINA_FOTO = "PAGINA_FOTO";
 
 class NuevoUsuario extends React.Component {
   constructor(props) {
@@ -119,7 +122,16 @@ class NuevoUsuario extends React.Component {
 
     this.setState({
       datosContacto: datos,
-      paginaActual: undefined
+      paginaActual: PAGINA_DATOS_DOMICILIO
+    });
+  };
+
+  onDatosDomicilioReady = datos => {
+    console.log(datos);
+
+    this.setState({
+      datosDomicilio: datos,
+      paginaActual: PAGINA_FOTO
     });
   };
 
@@ -129,6 +141,14 @@ class NuevoUsuario extends React.Component {
 
   onPaginaDatosContactoBotonVolverClick = () => {
     this.setState({ paginaActual: PAGINA_DATOS_ACCESO });
+  };
+
+  onPaginaDatosDomicilioBotonVolverClick = () => {
+    this.setState({ paginaActual: PAGINA_DATOS_CONTACTO });
+  };
+
+  onPaginaFotoBotonVolverClick = () => {
+    this.setState({ paginaActual: PAGINA_DATOS_DOMICILIO });
   };
 
   render() {
@@ -164,7 +184,7 @@ class NuevoUsuario extends React.Component {
     return (
       <div className={classes.content}>
         <ContentSwapper
-          transitionName={anim}
+          transitionName="cross-fade"
           transitionEnterTimeout={500}
           transitionLeaveTimeout={500}
           className={classes.contentSwapper}
@@ -180,25 +200,51 @@ class NuevoUsuario extends React.Component {
           </div>
 
           <div
-            key="paginaDatosBasicos"
+            key="paginaForm"
             className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_DATOS_BASICOS)}
+            visible={
+              "" + (this.state.paginaActual != PAGINA_ERROR_VALIDANDO_CODIGO)
+            }
           >
-            {this.renderPaginaDatosBasicos()}
-          </div>
-          <div
-            key="paginaDatosAcceso"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_DATOS_ACCESO)}
-          >
-            {this.renderPaginaDatosAcceso()}
-          </div>
-          <div
-            key="paginaDatosContacto"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_DATOS_CONTACTO)}
-          >
-            {this.renderPaginaDatosContacto()}
+            <ContentSwapper
+              transitionName="roll-up"
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={500}
+              className={classes.contentSwapper}
+            >
+              <div
+                key="paginaDatosBasicos"
+                className={classes.contentSwapperContent}
+                visible={"" + (this.state.paginaActual == PAGINA_DATOS_BASICOS)}
+              >
+                {this.renderPaginaDatosBasicos()}
+              </div>
+              <div
+                key="paginaDatosAcceso"
+                className={classes.contentSwapperContent}
+                visible={"" + (this.state.paginaActual == PAGINA_DATOS_ACCESO)}
+              >
+                {this.renderPaginaDatosAcceso()}
+              </div>
+              <div
+                key="paginaDatosContacto"
+                className={classes.contentSwapperContent}
+                visible={
+                  "" + (this.state.paginaActual == PAGINA_DATOS_CONTACTO)
+                }
+              >
+                {this.renderPaginaDatosContacto()}
+              </div>
+              <div
+                key="paginaDatosDomicilio"
+                className={classes.contentSwapperContent}
+                visible={
+                  "" + (this.state.paginaActual == PAGINA_DATOS_DOMICILIO)
+                }
+              >
+                {this.renderPaginaDatosDomicilio()}
+              </div>
+            </ContentSwapper>
           </div>
         </ContentSwapper>
       </div>
@@ -240,6 +286,18 @@ class NuevoUsuario extends React.Component {
         onCargando={this.onCargando}
         onReady={this.onDatosContactoReady}
         onBotonVolverClick={this.onPaginaDatosContactoBotonVolverClick}
+      />
+    );
+  }
+
+  renderPaginaDatosDomicilio() {
+    return (
+      <PaginaDatosDomicilio
+        padding={padding}
+        datosIniciales={this.state.datosDomicilio}
+        onCargando={this.onCargando}
+        onReady={this.onDatosDomicilioReady}
+        onBotonVolverClick={this.onPaginaDatosDomicilioBotonVolverClick}
       />
     );
   }

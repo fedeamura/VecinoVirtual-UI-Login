@@ -1,4 +1,5 @@
 import React from "react";
+import { loadCSS } from "fg-loadcss/src/loadCSS";
 
 //Styles
 import { withStyles } from "@material-ui/core/styles";
@@ -17,17 +18,15 @@ import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
-import TextField from "@material-ui/core/TextField";
-
-import Visibility from "@material-ui/icons/Visibility";
-import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import _ from "lodash";
+
 import red from "@material-ui/core/colors/red";
 import orange from "@material-ui/core/colors/orange";
 
 //Mis componentes
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
+import Validador from "@Componentes/_Validador";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -65,7 +64,12 @@ class PaginaDatosContacto extends React.Component {
     };
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    loadCSS(
+      "https://use.fontawesome.com/releases/v5.3.1/css/all.css",
+      document.querySelector("#insertion-point-jss")
+    );
+  }
 
   onInputChange = e => {
     let errores = this.state.errores || [];
@@ -80,10 +84,151 @@ class PaginaDatosContacto extends React.Component {
   };
 
   onBotonSiguienteClick = () => {
-    const { username, password, passwordRepeat } = this.state;
+    const {
+      email,
+      emailRepeat,
+      telefonoCelularArea,
+      telefonoCelularNumero,
+      telefonoFijoArea,
+      telefonoFijoNumero,
+      facebook,
+      twitter,
+      instagram,
+      linkedin
+    } = this.state;
 
     this.setState({ errores: [] });
+
+    //Email
+    let errores = this.state.errores;
+    errores["email"] = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.min(email, 5),
+        Validador.max(email, 40),
+        Validador.email
+      ],
+      email
+    );
+
+    //Repetir email
+    errores["emailRepeat"] = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.min(emailRepeat, 5),
+        Validador.max(emailRepeat, 40),
+        Validador.email,
+        Validador.iguales(emailRepeat, email)
+      ],
+      emailRepeat
+    );
+
+    // Telefono Celular
+
+    //Celular area
+    errores["telefonoCelularArea"] = Validador.validar(
+      [
+        Validador.min(telefonoCelularArea, 2),
+        Validador.max(telefonoCelularArea, 4),
+        Validador.numericoEntero
+      ],
+      telefonoCelularArea
+    );
+
+    //Celular numero
+    errores["telefonoCelularNumero"] = Validador.validar(
+      [
+        Validador.min(telefonoCelularNumero, 4),
+        Validador.max(telefonoCelularNumero, 8),
+        Validador.numericoEntero
+      ],
+      telefonoCelularNumero
+    );
+
+    //Si no tiene errores en el telefono valido que si ingreso uno de los 2, este el otro
+    if (
+      errores["telefonoCelularArea"] == undefined &&
+      errores["telefonoCelularNumero"] == undefined
+    ) {
+      if ((telefonoCelularArea != "") != (telefonoCelularNumero != "")) {
+        errores[
+          telefonoCelularArea != ""
+            ? "telefonoCelularNumero"
+            : "telefonoCelularArea"
+        ] = "Dato requerido";
+      }
+    }
+
+    // Telefono Fijo
+
+    //Fijo Area
+    errores["telefonoFijoArea"] = Validador.validar(
+      [
+        Validador.min(telefonoFijoArea, 2),
+        Validador.max(telefonoFijoArea, 4),
+        Validador.numericoEntero
+      ],
+      telefonoFijoArea
+    );
+
+    //Fijo numero
+    errores["telefonoFijoNumero"] = Validador.validar(
+      [
+        Validador.min(telefonoFijoNumero, 4),
+        Validador.max(telefonoFijoNumero, 8),
+        Validador.numericoEntero
+      ],
+      telefonoFijoNumero
+    );
+
+    //Si no tiene errores en el telefono valido que si ingreso uno de los 2, este el otro
+    if (
+      errores["telefonoFijoArea"] == undefined &&
+      errores["telefonoFijoNumero"] == undefined
+    ) {
+      if ((telefonoFijoArea != "") != (telefonoFijoNumero != "")) {
+        errores[
+          telefonoFijoArea != "" ? "telefonoFijoNumero" : "telefonoFijoArea"
+        ] = "Dato requerido";
+      }
+    }
+
+    //Si hay errores, corto aca
+    this.setState({ errores: errores });
+
     let conError = false;
+    for (var prop in errores) {
+      if (errores.hasOwnProperty(prop) && errores[prop] != undefined) {
+        conError = true;
+      }
+    }
+
+    if (conError) return;
+
+    //Valido que tenga algun telefono de contacto
+    if (
+      (telefonoFijoArea == undefined || telefonoFijoNumero == "") &&
+      (telefonoCelularArea == undefined || telefonoCelularNumero == "")
+    ) {
+      this.setState({
+        error: "Ingrese algún teléfono de contacto",
+        mostrarError: true
+      });
+      return;
+    }
+
+    this.props.onReady({
+      email: email,
+      telefonoCelularArea: telefonoCelularArea,
+      telefonoCelularNumero: telefonoCelularNumero,
+      telefonoFijoArea: telefonoFijoArea,
+      telefonoFijoNumero: telefonoFijoNumero,
+      facebook: facebook,
+      twitter: twitter,
+      instagram: instagram,
+      instagram: instagram,
+      linkedin: linkedin
+    });
   };
 
   render() {
@@ -148,9 +293,6 @@ class PaginaDatosContacto extends React.Component {
                 <Input
                   id="inputEmail"
                   autoFocus
-                  inputProps={{
-                    maxLength: 20
-                  }}
                   value={this.state.email}
                   name="email"
                   type="text"
@@ -162,7 +304,6 @@ class PaginaDatosContacto extends React.Component {
                 </FormHelperText>
               </FormControl>
             </Grid>
-
             {/* Repetir email */}
             <Grid item xs={12} sm={6}>
               <FormControl
@@ -177,10 +318,6 @@ class PaginaDatosContacto extends React.Component {
                 </InputLabel>
                 <Input
                   id="inputEmailRepeat"
-                  autoFocus
-                  inputProps={{
-                    maxLength: 20
-                  }}
                   value={this.state.emailRepeat}
                   name="emailRepeat"
                   type="text"
@@ -193,67 +330,269 @@ class PaginaDatosContacto extends React.Component {
               </FormControl>
             </Grid>
 
-            <Grid item xs={12}>
-              <Typography variant="body2">Teléfono Celular</Typography>
+            <Grid item xs={12} md={6}>
+              <Grid container spacing={16}>
+                <Grid item xs={12}>
+                  <Typography variant="body2">Teléfono Celular</Typography>
+                </Grid>
+
+                {/* Telefono Celular */}
+                <Grid item xs={3}>
+                  <FormControl
+                    className={classes.formControl}
+                    fullWidth
+                    margin="dense"
+                    error={
+                      this.state.errores["telefonoCelularArea"] !== undefined
+                    }
+                    aria-describedby="textoTelefonoCelularAreaError"
+                  >
+                    <InputLabel htmlFor="inputTelefonoCelularArea">
+                      Area
+                    </InputLabel>
+                    <Input
+                      id="inputTelefonoCelularArea"
+                      value={this.state.telefonoCelularArea}
+                      name="telefonoCelularArea"
+                      type="number"
+                      onKeyPress={this.onInputKeyPress}
+                      onChange={this.onInputChange}
+                      startAdornment={
+                        <div style={{ display: "flex" }}>
+                          <InputAdornment position="start">0</InputAdornment>
+                        </div>
+                      }
+                    />
+                    <FormHelperText id="textoTelefonoCelularAreaError">
+                      {this.state.errores["telefonoCelularArea"]}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    className={classes.formControl}
+                    fullWidth
+                    margin="dense"
+                    error={
+                      this.state.errores["telefonoCelularNumero"] !== undefined
+                    }
+                    aria-describedby="textoTelefonoCelularNumeroError"
+                  >
+                    <InputLabel htmlFor="inputTelefonoCelularNumero">
+                      Número
+                    </InputLabel>
+                    <Input
+                      id="inputTelefonoCelularNumero"
+                      value={this.state.telefonoCelularNumero}
+                      name="telefonoCelularNumero"
+                      type="number"
+                      onKeyPress={this.onInputKeyPress}
+                      onChange={this.onInputChange}
+                      startAdornment={
+                        <InputAdornment position="start">15</InputAdornment>
+                      }
+                    />
+                    <FormHelperText id="textoTelefonoCelularNumeroError">
+                      {this.state.errores["telefonoCelularNumero"]}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
+              </Grid>
             </Grid>
 
-            {/* Telefono Celular */}
-            <Grid item xs={3} sm={2}>
+            <Grid item xs={12} md={6}>
+              <Grid container spacing={16}>
+                <Grid item xs={12}>
+                  <Typography variant="body2">Teléfono Fijo</Typography>
+                </Grid>
+
+                <Grid item xs={3}>
+                  <FormControl
+                    className={classes.formControl}
+                    fullWidth
+                    margin="dense"
+                    error={this.state.errores["telefonoFijoArea"] !== undefined}
+                    aria-describedby="textoTelefonoFijoAreaError"
+                  >
+                    <InputLabel htmlFor="inputTelefonoFijoArea">
+                      Area
+                    </InputLabel>
+                    <Input
+                      id="telefonoFijoArea"
+                      value={this.state.telefonoFijoArea}
+                      name="telefonoFijoArea"
+                      type="number"
+                      onKeyPress={this.onInputKeyPress}
+                      onChange={this.onInputChange}
+                      startAdornment={
+                        <div style={{ display: "flex" }}>
+                          <InputAdornment position="start">0</InputAdornment>
+                        </div>
+                      }
+                    />
+                    <FormHelperText id="textoTelefonoFijoAreaError">
+                      {this.state.errores["telefonoFijoArea"]}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
+                <Grid item xs={9}>
+                  <FormControl
+                    className={classes.formControl}
+                    fullWidth
+                    margin="dense"
+                    error={
+                      this.state.errores["telefonoFijoNumero"] !== undefined
+                    }
+                    aria-describedby="textoTelefonoFijoNumeroError"
+                  >
+                    <InputLabel htmlFor="inputTelefonoFijoNumero">
+                      Número
+                    </InputLabel>
+                    <Input
+                      id="inputTelefonoFijoNumero"
+                      value={this.state.telefonoFijoNumero}
+                      name="telefonoFijoNumero"
+                      type="number"
+                      onKeyPress={this.onInputKeyPress}
+                      onChange={this.onInputChange}
+                    />
+                    <FormHelperText id="textoTelefonoFijoNumeroError">
+                      {this.state.errores["telefonoFijoNumero"]}
+                    </FormHelperText>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+
+            {/* Telefono Fijo */}
+            <Grid item xs={12}>
+              <Typography variant="body2">Redes sociales</Typography>
+            </Grid>
+            <Grid item sm={6} md={3}>
               <FormControl
                 className={classes.formControl}
                 fullWidth
                 margin="dense"
-                error={this.state.errores["telefonoCelularArea"] !== undefined}
-                aria-describedby="textoTelefonoCelularAreaError"
+                error={this.state.errores["facebook"] !== undefined}
+                aria-describedby="textoFacebookError"
               >
-                <InputLabel htmlFor="inputTelefonoCelularArea">Area</InputLabel>
+                <InputLabel htmlFor="inputFacebook">Facebook</InputLabel>
                 <Input
-                  id="inputTelefonoCelularArea"
-                  autoFocus
-                  inputProps={{ max: 10 }}
-                  value={this.state.telefonoCelularArea}
-                  name="telefonoCelularArea"
+                  id="inputFacebook"
+                  value={this.state.facebook}
+                  name="facebook"
                   type="number"
                   onKeyPress={this.onInputKeyPress}
                   onChange={this.onInputChange}
                   startAdornment={
                     <div style={{ display: "flex" }}>
-                      <InputAdornment position="start">0</InputAdornment>
+                      <InputAdornment position="start">
+                        <i
+                          style={{ fontSize: 20, color: "#3b5998" }}
+                          className={classNames("fab", "fa-facebook-square")}
+                        />
+                      </InputAdornment>
                     </div>
                   }
                 />
-                <FormHelperText id="textoTelefonoCelularAreaError">
-                  {this.state.errores["telefonoCelularArea"]}
+                <FormHelperText id="textoFacebookError">
+                  {this.state.errores["facebook"]}
                 </FormHelperText>
               </FormControl>
             </Grid>
-            <Grid item xs={9} sm={4}>
+            <Grid item sm={6} md={3}>
               <FormControl
                 className={classes.formControl}
                 fullWidth
                 margin="dense"
-                error={
-                  this.state.errores["telefonoCelularNumero"] !== undefined
-                }
-                aria-describedby="textoTelefonoCelularNumeroError"
+                error={this.state.errores["twitter"] !== undefined}
+                aria-describedby="textoTwitterError"
               >
-                <InputLabel htmlFor="inputTelefonoCelularNumero">
-                  Número
-                </InputLabel>
+                <InputLabel htmlFor="inputTwitter">Twitter</InputLabel>
                 <Input
-                  id="inputTelefonoCelularNumero"
-                  autoFocus
-                  value={this.state.telefonoCelularNumero}
-                  name="telefonoCelularNumero"
+                  id="inputTwitter"
+                  value={this.state.twitter}
+                  name="twitter"
                   type="number"
                   onKeyPress={this.onInputKeyPress}
                   onChange={this.onInputChange}
                   startAdornment={
-                    <InputAdornment position="start">15</InputAdornment>
+                    <div style={{ display: "flex" }}>
+                      <InputAdornment position="start">
+                        <i
+                          style={{ fontSize: 20, color: "#1da1f2" }}
+                          className={classNames("fab", "fa-twitter-square")}
+                        />
+                      </InputAdornment>
+                    </div>
                   }
                 />
-                <FormHelperText id="textoTelefonoCelularNumeroError">
-                  {this.state.errores["telefonoCelularNumero"]}
+                <FormHelperText id="textoTwitterError">
+                  {this.state.errores["twitter"]}
+                </FormHelperText>
+              </FormControl>
+            </Grid>
+            <Grid item sm={6} md={3}>
+              <FormControl
+                className={classes.formControl}
+                fullWidth
+                margin="dense"
+                error={this.state.errores["instagram"] !== undefined}
+                aria-describedby="textoInstagramError"
+              >
+                <InputLabel htmlFor="inputInstagram">Instagram</InputLabel>
+                <Input
+                  id="inputInstagram"
+                  value={this.state.instagram}
+                  name="instagram"
+                  type="number"
+                  onKeyPress={this.onInputKeyPress}
+                  onChange={this.onInputChange}
+                  startAdornment={
+                    <div style={{ display: "flex" }}>
+                      <InputAdornment position="start">
+                        <i
+                          style={{ fontSize: 20, color: "#e56969" }}
+                          className={classNames("fab", "fa-instagram")}
+                        />
+                      </InputAdornment>
+                    </div>
+                  }
+                />
+                <FormHelperText id="textoInstagramError">
+                  {this.state.errores["instagram"]}
+                </FormHelperText>
+              </FormControl>
+            </Grid>
+            <Grid item sm={6} md={3}>
+              <FormControl
+                className={classes.formControl}
+                fullWidth
+                margin="dense"
+                error={this.state.errores["linkedin"] !== undefined}
+                aria-describedby="textoLinkedinError"
+              >
+                <InputLabel htmlFor="inputLinkedin">LinkedIn</InputLabel>
+                <Input
+                  id="inputLinkedin"
+                  value={this.state.linkedin}
+                  name="linkedin"
+                  type="number"
+                  onKeyPress={this.onInputKeyPress}
+                  onChange={this.onInputChange}
+                  startAdornment={
+                    <div style={{ display: "flex" }}>
+                      <InputAdornment position="start">
+                        <i
+                          style={{ fontSize: 20, color: "#0077B5" }}
+                          className={classNames("fab", "fa-linkedin")}
+                        />
+                      </InputAdornment>
+                    </div>
+                  }
+                />
+                <FormHelperText id="textoLinkedinError">
+                  {this.state.errores["linkedin"]}
                 </FormHelperText>
               </FormControl>
             </Grid>

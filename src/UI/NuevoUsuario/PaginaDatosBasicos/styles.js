@@ -27,6 +27,7 @@ const styles = theme => {
       alignItems: "center",
       backgroundColor: "rgba(0,0,0,0.05)",
       minHeight: 0,
+      maxHeight: 0,
       height: "100%",
       padding: 0,
       paddingLeft: "2rem",
@@ -45,10 +46,11 @@ const styles = theme => {
         flex: 1
       },
       opacity: 0,
-      transition: "min-height 0.3s 0.3s, opacity 0.3s",
+      transition: "min-height 0.3s 0.3s, max-height 0.3s 0.3s, opacity 0.3s",
       "&.visible": {
-        transition: "min-height 0.3s, opacity 0.3s 0.3s",
+        transition: "min-height 0.3s, max-height 0.3s, opacity 0.3s 0.3s",
         minHeight: "3rem",
+        maxHeight: "3rem",
         opacity: 1
       }
     }

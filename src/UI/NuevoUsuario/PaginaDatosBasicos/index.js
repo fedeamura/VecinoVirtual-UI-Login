@@ -49,26 +49,26 @@ class PaginaDatosBasicos extends React.Component {
     super(props);
 
     let datosIniciales = props.datosIniciales || {};
-    let fechaNacimiento = new Date(1987, 1, 28);
-    if (props.datosIniciales != undefined) {
-      let partes = props.datosIniciales.fechaNacimiento
-        .split("T")[0]
-        .split("-");
-      fechaNacimiento = new Date(partes[0], parseInt(partes[1]) - 1, partes[2]);
-    }
-    console.log(datosIniciales);
+    // let fechaNacimiento = new Date(1987, 1, 28);
+    // if (props.datosIniciales != undefined) {
+    //   let partes = props.datosIniciales.fechaNacimiento
+    //     .split("T")[0]
+    //     .split("-");
+    //   fechaNacimiento = new Date(partes[0], parseInt(partes[1]) - 1, partes[2]);
+    // }
 
     this.state = {
       estadosCiviles: undefined,
+      errorEstadosCiviles: undefined,
       validandoUsuario: false,
       errorValidandoUsuario: undefined,
       nombre: datosIniciales.nombre || "yohana",
       apellido: datosIniciales.apellido || "arroyo",
       dni: datosIniciales.dni || "32875065",
-      fechaNacimiento: fechaNacimiento,
+      fechaNacimiento: datosIniciales.fechaNacimiento || new Date(1987, 1, 28),
       fechaNacimientoKeyPress: false,
-      estadoCivil: undefined,
-      sexo: datosIniciales.sexoMasculino || false ? "m" : "f",
+      estadoCivil: datosIniciales.estadoCivil || undefined,
+      sexo: datosIniciales.sexo || false ? "m" : "f",
       errores: [],
       error: undefined,
       mostrarError: false
@@ -76,19 +76,25 @@ class PaginaDatosBasicos extends React.Component {
   }
 
   componentDidMount() {
-    Rules_EstadoCivil.get()
-      .then(data => {
-        let estadosCiviles = data.map(item => {
-          return { value: item.id, label: item.nombre };
+    this.props.onCargando(true);
+    this.setState({ errorEstadosCiviles: undefined }, () => {
+      Rules_EstadoCivil.get()
+        .then(data => {
+          let estadosCiviles = data.map(item => {
+            return { value: item.id, label: item.nombre };
+          });
+          estadosCiviles.unshift({ value: -1, label: "Seleccione..." });
+          this.setState({
+            estadosCiviles: estadosCiviles
+          });
+        })
+        .catch(error => {
+          this.setState({ errorEstadosCiviles: error });
+        })
+        .finally(() => {
+          this.props.onCargando(false);
         });
-        estadosCiviles.unshift({ value: -1, label: "Seleccione..." });
-        this.setState({
-          estadosCiviles: estadosCiviles
-        });
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    });
   }
 
   onInputFechaNacimientoChange = fecha => {
@@ -122,9 +128,15 @@ class PaginaDatosBasicos extends React.Component {
   };
 
   onBotonSiguienteClick = () => {
-    const { nombre, apellido, dni, fechaNacimiento, sexo } = this.state;
+    const {
+      nombre,
+      apellido,
+      dni,
+      fechaNacimiento,
+      sexo,
+      estadoCivil
+    } = this.state;
 
-    console.log(this.state);
     let conError = false;
     if (nombre == undefined || nombre.trim() == "") {
       let errores = this.state.errores;
@@ -169,7 +181,14 @@ class PaginaDatosBasicos extends React.Component {
         sexoMasculino: sexo == "m"
       })
         .then(data => {
-          this.props.onReady(data);
+          this.props.onReady({
+            nombre: nombre,
+            apellido: apellido,
+            dni: dni,
+            fechaNacimiento: fechaNacimiento,
+            sexoMasculino: sexo,
+            estadoCivil: estadoCivil
+          });
         })
         .catch(error => {
           this.setState({ error: error, mostrarError: true });
@@ -192,7 +211,7 @@ class PaginaDatosBasicos extends React.Component {
   render() {
     const { classes } = this.props;
 
-    if (this.state.estadosCiviles === undefined) {
+    if (this.state.errorEstadosCiviles != undefined) {
       return (
         <div className={classes.root}>
           <MiPanelMensaje
@@ -376,6 +395,7 @@ class PaginaDatosBasicos extends React.Component {
                 <RadioGroup
                   aria-label="Sexo"
                   name="sexo"
+                  style={{ flexDirection: "row" }}
                   value={this.state.sexo}
                   onChange={this.onInputSexoChange}
                 >

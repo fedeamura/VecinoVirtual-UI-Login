@@ -39,6 +39,20 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
+Promise.prototype.finally = function(callback) {
+  return this.then(
+    value => this.constructor.resolve(callback()).then(() => value),
+    reason =>
+      this.constructor.resolve(callback()).then(() => {
+        throw reason;
+      })
+  );
+};
+
+String.prototype.toTitleCase = function () {
+  return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+};
+
 class App extends React.Component {
   constructor(props) {
     super(props);

@@ -70,9 +70,11 @@ const styles = theme => ({
   tituloMargin: {
     marginTop: theme.spacing.unit * 2
   },
-  content: {},
+  content: {
+    maxHeight: "100%"
+  },
   cardSinPadding: {
-    padding: '0 !important'
+    padding: "0 !important"
   }
 });
 

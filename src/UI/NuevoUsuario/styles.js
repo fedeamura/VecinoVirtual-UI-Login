@@ -31,10 +31,12 @@ const styles = theme => {
       justifyContent: "center"
     },
     cardRoot: {
-      maxHeight: "670px",
+      maxHeight: "100%",
+      [theme.breakpoints.up("sm")]: {
+        maxHeight: "670px"
+      },
       maxWidth: "900px",
       alignSelf: "center",
-      width: "100%",
       height: "100%",
       opacity: 0,
       transform: "translateY(100px)",
@@ -46,6 +48,7 @@ const styles = theme => {
     },
     cardContent: {
       height: "100%",
+      maxHeight: "100%",
       display: "flex",
       flexDirection: "column",
       flex: 1,
@@ -96,7 +99,7 @@ const styles = theme => {
       borderTop: "1px solid rgba(0,0,0,0.1)",
       padding: "16px",
       display: "flex"
-    },
+    }
   };
 };
 export default styles;
