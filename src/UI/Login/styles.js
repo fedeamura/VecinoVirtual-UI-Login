@@ -18,6 +18,12 @@ const styles = theme => {
       width: "100%",
       flex: 1
     },
+    content: {
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      position: "relative"
+    },
     pagina: {
       position: "absolute",
       overflow: "hidden",
@@ -37,6 +43,20 @@ const styles = theme => {
       borderTop: "1px solid rgba(0,0,0,0.1)",
       padding: "16px",
       display: "flex"
+    },
+    paginaExtra: {
+      position: "absolute",
+      backgroundColor: "white",
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      opacity: 0,
+      pointerEvents: "none",
+      transition: "all 0.3s",
+      "&.visible": {
+        opacity: 1,
+        pointerEvents: "all"
+      }
     }
   };
 };

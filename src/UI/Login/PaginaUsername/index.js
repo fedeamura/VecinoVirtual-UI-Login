@@ -12,6 +12,9 @@ import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import { Typography, Grid } from "@material-ui/core";
 
+//Mis componentes
+import Validador from "@Componentes/_Validador";
+
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 
@@ -26,31 +29,35 @@ class PaginaUsername extends React.Component {
     super(props);
 
     this.state = {
-      username: props.cuilGenerado || "",
+      username: props.username,
       error: undefined
     };
   }
 
   componentWillReceiveProps(nextProps) {
-    if (nextProps.cuilGenerado != this.props.cuilGenerado) {
-      this.setState({ username: nextProps.cuilGenerado });
+    if (nextProps.username != this.props.username) {
+      this.setState({ username: nextProps.username });
     }
   }
 
   onBotonSiguienteClick = () => {
-    let errorUsername = undefined;
-    if (this.state.username.trim() == "") {
-      errorUsername = "Dato requerido";
-    }
+    let { username } = this.state;
 
-    if (errorUsername != undefined) {
-      this.setState({ error: errorUsername });
-      return;
-    }
+    let errorUsername = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.min(username, 5),
+        Validador.max(username, 20)
+      ],
+      username
+    );
+    this.setState({ error: errorUsername });
+
+    if (errorUsername != undefined) return;
 
     this.props.onCargando(true);
     this.setState({ error: undefined }, () => {
-      Rules_Usuario.getInfoPublica(this.state.username)
+      Rules_Usuario.getInfoPublica(username)
         .then(data => {
           Rules_Usuario.guardarUsuarioReciente(data);
           this.props.onBotonSiguienteClick(data);
@@ -73,9 +80,6 @@ class PaginaUsername extends React.Component {
       error: undefined,
       [event.target.name]: event.target.value
     });
-    
-    
-    
   };
 
   onInputKeyPress = event => {
@@ -100,7 +104,7 @@ class PaginaUsername extends React.Component {
 
     return (
       <div className={classes.content} style={{ padding: padding }}>
-        <Grid container>
+        <Grid container spacing={16}>
           <Grid item xs={12} className={classes.fixPadding}>
             <Typography variant="title">Iniciar Sesión</Typography>
           </Grid>
@@ -108,7 +112,7 @@ class PaginaUsername extends React.Component {
             <FormControl
               className={classes.formControl}
               fullWidth
-              margin="normal"
+              margin="dense"
               error={this.state.error !== undefined}
               aria-describedby="textoUsernameError"
             >
@@ -118,6 +122,9 @@ class PaginaUsername extends React.Component {
               <Input
                 id="inputUsername"
                 autoFocus
+                inputProps={{
+                  maxLength: 20
+                }}
                 value={this.state.username}
                 name="username"
                 onKeyPress={this.onInputKeyPress}
@@ -159,7 +166,7 @@ class PaginaUsername extends React.Component {
             variant="flat"
             color="primary"
             className={classes.button}
-            onClick={this.onBotonNuevoUsuarioClick}
+            onClick={this.props.onBotonNuevoUsuarioClick}
           >
             Nuevo usuario
           </Button>
@@ -185,7 +192,7 @@ const styles = theme => {
       display: "flex",
       flexDirection: "column",
       flex: 1,
-      height:'100%'
+      height: "100%"
     },
     content: {
       flex: 1,

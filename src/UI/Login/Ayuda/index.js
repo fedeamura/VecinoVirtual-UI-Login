@@ -10,19 +10,24 @@ import "@UI/transitions.css";
 import { connect } from "react-redux";
 
 //Componentes
-import { Typography, Grid, Icon, Button, IconButton } from "@material-ui/core";
+import {
+  Typography,
+  Grid,
+  Icon,
+  Button,
+  IconButton,
+  Input
+} from "@material-ui/core";
 import Paper from "@material-ui/core/Paper";
+import Card from "@material-ui/core/Card";
 
 //Mis recursos
-
 import ImagenHelper from "@Resources/imagenes/avatar_help.png";
 import ImagenHeader from "@Resources/imagenes/chat_soporte_header.png";
 
 const mapDispatchToProps = dispatch => ({});
 const mapStateToProps = state => {
-  return {
-    expandido: false
-  };
+  return {};
 };
 
 class LoginAyuda extends React.Component {
@@ -31,11 +36,56 @@ class LoginAyuda extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { abierto: false };
+    this.state = {
+      input: "",
+      abierto: false,
+      mensajes: [
+        {
+          mio: false,
+          mensaje:
+            "Hola! Soy el asistente virtual de Vecino Virtual. Podes preguntarme cualquier cosa y yo intentare ayudarte"
+        }
+      ]
+    };
   }
 
   toggle = () => {
     this.setState({ abierto: !this.state.abierto });
+  };
+
+  onInputChange = e => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
+  onInputKeyPress = event => {
+    if (event.key === "Enter") {
+      this.onBotonEnviarClick();
+    }
+  };
+
+  onScrollRef = ref => {
+    this.scroll = ref;
+  };
+
+  onBotonEnviarClick = () => {
+    let { input, mensajes } = this.state;
+    if (input.trim() == "") return;
+
+    mensajes.push({
+      mio: true,
+      mensaje: input || "Sin texto"
+    });
+
+    if (mensajes.length % 3 == 0) {
+      mensajes.push({
+        mio: false,
+        mensaje: "Respuesta automatica"
+      });
+    }
+
+    this.setState({ mensajes: mensajes, input: "" }, () => {
+      this.scroll.scrollTop = this.scroll.scrollHeight;
+    });
   };
 
   render() {
@@ -66,9 +116,6 @@ class LoginAyuda extends React.Component {
             <div>
               <Typography variant="title">Asistente virtual</Typography>
             </div>
-            <IconButton>
-              <Icon>keyboard_arrow_down</Icon>
-            </IconButton>
             <IconButton onClick={this.toggle}>
               <Icon>close</Icon>
             </IconButton>
@@ -78,69 +125,52 @@ class LoginAyuda extends React.Component {
             style={{ backgroundImage: "url(" + ImagenHeader + ")" }}
           />
           <div className={classes.panelContent}>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
-            <Typography>Test</Typography>
+            <div className={classes.contenedorMensajes} ref={this.onScrollRef}>
+              {this.state.mensajes.map(item => {
+                return <Mensaje classes={classes} data={item} />;
+              })}
+            </div>
+
+            <div className={classes.contenedorInput}>
+              <Input
+                value={this.state.input}
+                onChange={this.onInputChange}
+                name="input"
+                className={classes.input}
+                disableUnderline={true}
+                onKeyPress={this.onInputKeyPress}
+                margin="none"
+                placeholder="¿Con qué necesitas ayuda?"
+              />
+
+              <IconButton onClick={this.onBotonEnviarClick}>
+                <Icon color="primary">send</Icon>
+              </IconButton>
+            </div>
           </div>
         </Paper>
       </div>
+    );
+  }
+}
+
+class Mensaje extends React.PureComponent {
+  render() {
+    const { classes } = this.props;
+
+    console.log(this.props);
+
+    return (
+      <Card
+        className={classNames(
+          classes.mensaje,
+          this.props.data.mio == true && classes.mensajeMio
+        )}
+      >
+        <Typography align={this.props.data.mio == true ? "right" : "left"}>
+          {this.props.data.mensaje}
+        </Typography>
+      </Card>
     );
   }
 }

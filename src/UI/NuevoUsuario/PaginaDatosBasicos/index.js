@@ -12,7 +12,7 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 //Componentes
-import { Typography, Icon, Button, Grid, IconButton } from "@material-ui/core";
+import { Typography, Icon, Button, Grid } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
 import InputLabel from "@material-ui/core/InputLabel";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -24,10 +24,11 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
 import _ from "lodash";
-import red from "@material-ui/core/colors/red";
 
 //Mis componentes
+import Validador from "@Componentes/_Validador";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
+import MiBanerError from "@Componentes/MiBanerError";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -62,13 +63,13 @@ class PaginaDatosBasicos extends React.Component {
       errorEstadosCiviles: undefined,
       validandoUsuario: false,
       errorValidandoUsuario: undefined,
-      nombre: datosIniciales.nombre || "yohana",
-      apellido: datosIniciales.apellido || "arroyo",
-      dni: datosIniciales.dni || "32875065",
-      fechaNacimiento: datosIniciales.fechaNacimiento || new Date(1987, 1, 28),
+      nombre: datosIniciales.nombre || "",
+      apellido: datosIniciales.apellido || "",
+      dni: datosIniciales.dni || "",
+      fechaNacimiento: datosIniciales.fechaNacimiento || new Date(1900, 0, 1),
       fechaNacimientoKeyPress: false,
       estadoCivil: datosIniciales.estadoCivil || undefined,
-      sexo: datosIniciales.sexo || false ? "m" : "f",
+      sexo: datosIniciales.sexoMasculino || true ? "m" : "f",
       errores: [],
       error: undefined,
       mostrarError: false
@@ -134,41 +135,50 @@ class PaginaDatosBasicos extends React.Component {
       dni,
       fechaNacimiento,
       sexo,
-      estadoCivil
+      idEstadoCivil
     } = this.state;
 
+    let errores = [];
+    errores["nombre"] = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.min(nombre, 3),
+        Validador.max(nombre, 50)
+      ],
+      nombre
+    );
+    errores["apellido"] = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.min(apellido, 3),
+        Validador.max(apellido, 50)
+      ],
+      apellido
+    );
+
+    errores["dni"] = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.numericoEntero,
+        Validador.min(dni, 7),
+        Validador.max(dni, 8)
+      ],
+      dni
+    );
+
+    errores["fechaNacimiento"] =
+      fechaNacimiento == undefined ? "Dato requerido" : undefined;
+
+    //Si hay errores, corto aca
+    this.setState({ errores: errores });
+
     let conError = false;
-    if (nombre == undefined || nombre.trim() == "") {
-      let errores = this.state.errores;
-      errores["nombre"] = "Dato requerido";
-      this.setState({ errores: errores });
-
-      conError = true;
-    }
-
-    if (apellido == undefined || apellido.trim() == "") {
-      let errores = this.state.errores || [];
-      errores["apellido"] = "Dato requerido";
-      this.setState({ errores: errores });
-
-      conError = true;
-    }
-
-    if (dni == undefined || dni + "" == "") {
-      let errores = this.state.errores || [];
-      errores["dni"] = "Dato requerido";
-      this.setState({ errores: errores });
-
-      conError = true;
-    } else {
-      if (dni.length < 7 || (dni + "").length > 8) {
-        let errores = this.state.errores || [];
-        errores["dni"] = "Valor inválido";
-        this.setState({ errores: errores });
-
+    for (var prop in errores) {
+      if (errores.hasOwnProperty(prop) && errores[prop] != undefined) {
         conError = true;
       }
     }
+
     if (conError) return;
 
     this.props.onCargando(true);
@@ -187,7 +197,7 @@ class PaginaDatosBasicos extends React.Component {
             dni: dni,
             fechaNacimiento: fechaNacimiento,
             sexoMasculino: sexo,
-            estadoCivil: estadoCivil
+            idEstadoCivil: idEstadoCivil
           });
         })
         .catch(error => {
@@ -238,181 +248,188 @@ class PaginaDatosBasicos extends React.Component {
     let opcionEstadoCivil = undefined;
     if (this.state.estadoCivil != undefined) {
       opcionEstadoCivil = _.find(this.state.estadosCiviles, item => {
-        return item.value == this.state.estadoCivil;
+        return item.value == this.state.idEstadoCivil;
       });
     }
 
     return (
-      <div className={classes.content}>
-        <div
-          className={classNames(
-            classes.contenedorError,
-            this.state.mostrarError && "visible"
-          )}
-        >
-          <div>
-            <Icon style={{ color: red["500"] }}>error</Icon>
-            <Typography
-              variant="body2"
-              className="texto"
-              style={{ color: red["500"] }}
-            >
-              {this.state.error}
-            </Typography>
-            <IconButton
-              onClick={() => {
-                this.setState({ mostrarError: false });
-              }}
-            >
-              <Icon>clear</Icon>
-            </IconButton>
-          </div>
-        </div>
+      <div className={classes.root}>
+        {/* Error  */}
+        <MiBanerError
+          visible={this.state.mostrarError}
+          mensaje={this.state.error}
+          onClose={() => {
+            this.setState({ mostrarError: false });
+          }}
+        />
 
-        <div style={{ padding: padding, paddingTop: "16px" }}>
-          <div className={classes.encabezado}>
-            <Typography variant="headline">Nuevo Usuario</Typography>
-            <Icon>keyboard_arrow_right</Icon>
-            <Typography variant="subheading">Datos personales</Typography>
-          </div>
+        {/* Contenido */}
+        <div className={classes.content}>
+          <div style={{ padding: padding, paddingTop: "16px" }}>
+            <div className={classes.encabezado}>
+              <Typography variant="headline">Nuevo Usuario</Typography>
+              <Icon>keyboard_arrow_right</Icon>
+              <Typography variant="subheading">Datos personales</Typography>
+            </div>
 
-          <Grid container spacing={16}>
-            <Grid item xs={12} sm={6}>
-              <FormControl
-                className={classes.formControl}
-                fullWidth
-                margin="dense"
-                error={this.state.errores["nombre"] !== undefined}
-                aria-describedby="textoNombreError"
-              >
-                <InputLabel htmlFor="inputNombre">Nombre</InputLabel>
-                <Input
-                  id="inputNombre"
-                  autoFocus
-                  value={this.state.nombre}
-                  name="nombre"
-                  type="text"
-                  onKeyPress={this.onInputKeyPress}
-                  onChange={this.onInputChange}
-                />
-                <FormHelperText id="textoNombreError">
-                  {this.state.errores["nombre"]}
-                </FormHelperText>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl
-                className={classes.formControl}
-                fullWidth
-                margin="dense"
-                error={this.state.errores["apellido"] !== undefined}
-                aria-describedby="textoApellidoError"
-              >
-                <InputLabel htmlFor="inputApellido">Apellido</InputLabel>
-                <Input
-                  id="inputApellido"
-                  value={this.state.apellido}
-                  name="apellido"
-                  type="text"
-                  onKeyPress={this.onInputKeyPress}
-                  onChange={this.onInputChange}
-                />
-                <FormHelperText id="textoApellidoError">
-                  {this.state.errores["apellido"]}
-                </FormHelperText>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl
-                className={classes.formControl}
-                fullWidth
-                margin="dense"
-                error={this.state.errores["dni"] !== undefined}
-                aria-describedby="textoDniError"
-              >
-                <InputLabel htmlFor="inputDni">N° de Documento</InputLabel>
-                <Input
-                  id="inputDni"
-                  value={this.state.dni}
-                  name="dni"
-                  type="number"
-                  onKeyPress={this.onInputKeyPress}
-                  onChange={this.onInputChange}
-                />
-                <FormHelperText id="textoDniError">
-                  {this.state.errores["dni"]}
-                </FormHelperText>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <DatePicker
-                keyboard
-                style={{ marginTop: "4px", width: "100%" }}
-                label="Fecha de nacimiento"
-                format="dd/MM/yyyy"
-                openToYearSelection={true}
-                disableFuture={true}
-                labelFunc={this.renderLabelFecha}
-                invalidDateMessage="Fecha inválida"
-                maxDateMessage="Fecha inválida"
-                minDateMessage="Fecha inválida"
-                mask={value =>
-                  value
-                    ? [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/]
-                    : []
-                }
-                value={this.state.fechaNacimiento}
-                onChange={this.onInputFechaNacimientoChange}
-                disableOpenOnEnter
-                animateYearScrolling={false}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl
-                className={classes.formControl}
-                fullWidth
-                margin="dense"
-                error={this.state.errores["estadoCivil"] !== undefined}
-                aria-describedby="textoEstadoCivilError"
-              >
-                <MiSelect
-                  value={opcionEstadoCivil}
-                  style={{ width: "100%" }}
-                  label="Estado civil"
-                  placeholder="Seleccione..."
-                  onChange={this.onInputEstadoCivilChange}
-                  options={this.state.estadosCiviles}
-                />
-                <FormHelperText id="textoEstadoCivilError">
-                  {this.state.errores["estadoCivil"]}
-                </FormHelperText>
-              </FormControl>
-            </Grid>
-
-            <Grid item xs={12} style={{ marginTop: "16px" }}>
-              <FormControl component="fieldset" className={classes.formControl}>
-                <FormLabel component="legend">Sexo</FormLabel>
-                <RadioGroup
-                  aria-label="Sexo"
-                  name="sexo"
-                  style={{ flexDirection: "row" }}
-                  value={this.state.sexo}
-                  onChange={this.onInputSexoChange}
+            <Grid container spacing={16}>
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  className={classes.formControl}
+                  fullWidth
+                  margin="dense"
+                  error={this.state.errores["nombre"] !== undefined}
+                  aria-describedby="textoNombreError"
                 >
-                  <FormControlLabel
-                    value="m"
-                    control={<Radio />}
-                    label="Masculino"
+                  <InputLabel htmlFor="inputNombre">Nombre</InputLabel>
+                  <Input
+                    id="inputNombre"
+                    autoFocus
+                    value={this.state.nombre}
+                    name="nombre"
+                    inputProps={{
+                      maxLength: 30
+                    }}
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
                   />
-                  <FormControlLabel
-                    value="f"
-                    control={<Radio />}
-                    label="Femenino"
+                  <FormHelperText id="textoNombreError">
+                    {this.state.errores["nombre"]}
+                  </FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  className={classes.formControl}
+                  fullWidth
+                  margin="dense"
+                  error={this.state.errores["apellido"] !== undefined}
+                  aria-describedby="textoApellidoError"
+                >
+                  <InputLabel htmlFor="inputApellido">Apellido</InputLabel>
+                  <Input
+                    id="inputApellido"
+                    value={this.state.apellido}
+                    name="apellido"
+                    inputProps={{
+                      maxLength: 30
+                    }}
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
                   />
-                </RadioGroup>
-              </FormControl>
+                  <FormHelperText id="textoApellidoError">
+                    {this.state.errores["apellido"]}
+                  </FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  className={classes.formControl}
+                  fullWidth
+                  margin="dense"
+                  error={this.state.errores["dni"] !== undefined}
+                  aria-describedby="textoDniError"
+                >
+                  <InputLabel htmlFor="inputDni">N° de Documento</InputLabel>
+                  <Input
+                    id="inputDni"
+                    value={this.state.dni}
+                    name="dni"
+                    type="number"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                  <FormHelperText id="textoDniError">
+                    {this.state.errores["dni"]}
+                  </FormHelperText>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <DatePicker
+                  keyboard
+                  style={{ marginTop: "4px", width: "100%" }}
+                  label="Fecha de nacimiento"
+                  format="dd/MM/yyyy"
+                  openToYearSelection={true}
+                  disableFuture={true}
+                  labelFunc={this.renderLabelFecha}
+                  invalidDateMessage="Fecha inválida"
+                  maxDateMessage="Fecha inválida"
+                  minDateMessage="Fecha inválida"
+                  mask={value =>
+                    value
+                      ? [
+                          /\d/,
+                          /\d/,
+                          "/",
+                          /\d/,
+                          /\d/,
+                          "/",
+                          /\d/,
+                          /\d/,
+                          /\d/,
+                          /\d/
+                        ]
+                      : []
+                  }
+                  value={this.state.fechaNacimiento}
+                  onChange={this.onInputFechaNacimientoChange}
+                  disableOpenOnEnter
+                  animateYearScrolling={false}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <FormControl
+                  className={classes.formControl}
+                  fullWidth
+                  margin="dense"
+                  error={this.state.errores["estadoCivil"] !== undefined}
+                  aria-describedby="textoEstadoCivilError"
+                >
+                  <MiSelect
+                    value={opcionEstadoCivil}
+                    style={{ width: "100%" }}
+                    label="Estado civil"
+                    placeholder="Seleccione..."
+                    onChange={this.onInputEstadoCivilChange}
+                    options={this.state.estadosCiviles}
+                  />
+                  <FormHelperText id="textoEstadoCivilError">
+                    {this.state.errores["estadoCivil"]}
+                  </FormHelperText>
+                </FormControl>
+              </Grid>
+
+              <Grid item xs={12} style={{ marginTop: "16px" }}>
+                <FormControl
+                  component="fieldset"
+                  className={classes.formControl}
+                >
+                  <FormLabel component="legend">Sexo</FormLabel>
+                  <RadioGroup
+                    aria-label="Sexo"
+                    name="sexo"
+                    style={{ flexDirection: "row" }}
+                    value={this.state.sexo}
+                    onChange={this.onInputSexoChange}
+                  >
+                    <FormControlLabel
+                      value="m"
+                      control={<Radio />}
+                      label="Masculino"
+                    />
+                    <FormControlLabel
+                      value="f"
+                      control={<Radio />}
+                      label="Femenino"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Grid>
             </Grid>
-          </Grid>
+          </div>
         </div>
       </div>
     );
@@ -430,7 +447,16 @@ class PaginaDatosBasicos extends React.Component {
           paddingTop: "16px"
         }}
       >
-        <div style={{ flex: 1 }} />
+        <div style={{ flex: 1 }}>
+          <Button
+            variant="flat"
+            color="primary"
+            className={classes.button}
+            onClick={this.props.onBotonYaEstoyRegistradoClick}
+          >
+            Ya estoy registrado
+          </Button>
+        </div>
 
         <Button
           variant="raised"

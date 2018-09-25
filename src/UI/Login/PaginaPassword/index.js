@@ -198,7 +198,7 @@ class PaginaPassword extends React.Component {
         </div>
 
         <Button
-          variant="outlined"
+          variant="raised"
           color="primary"
           className={classes.button}
           onClick={this.onBotonAccederClick}

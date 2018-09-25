@@ -21,6 +21,8 @@ import PaginaDatosBasicos from "./PaginaDatosBasicos";
 import PaginaDatosAcceso from "./PaginaDatosAcceso";
 import PaginaDatosContacto from "./PaginaDatosContacto";
 import PaginaDatosDomicilio from "./PaginaDatosDomicilio";
+import PaginaFoto from "./PaginaFoto";
+import PaginaConfirmacion from "./PaginaConfirmacion";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -38,12 +40,17 @@ const mapStateToProps = state => {
 
 const padding = "2rem";
 
-const PAGINA_ERROR_VALIDANDO_CODIGO = "PAGINA_ERROR_VALIDANDO_CODIGO";
-const PAGINA_DATOS_BASICOS = "PAGINA_DATOS_BASICOS";
-const PAGINA_DATOS_ACCESO = "PAGINA_DATOS_ACCESO";
-const PAGINA_DATOS_CONTACTO = "PAGINA_DATOS_CONTACTO";
-const PAGINA_DATOS_DOMICILIO = "PAGINA_DATOS_DOMICILIO";
-const PAGINA_FOTO = "PAGINA_FOTO";
+const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO =
+  "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
+const PAGINA_EXTRA_EXITO = "PAGINA_EXTRA_EXITO";
+const PAGINA_EXTRA_ERROR_REGISTRANDO = "PAGINA_EXTRA_ERROR_REGISTRANDO";
+
+const PAGINA_DATOS_BASICOS = 1;
+const PAGINA_DATOS_ACCESO = 2;
+const PAGINA_DATOS_CONTACTO = 3;
+const PAGINA_DATOS_DOMICILIO = 4;
+const PAGINA_FOTO = 5;
+const PAGINA_CONFIRMACION = 6;
 
 class NuevoUsuario extends React.Component {
   constructor(props) {
@@ -54,9 +61,18 @@ class NuevoUsuario extends React.Component {
       validandoCodigo: true,
       errorValidandoCodigo: undefined,
       infoLogin: undefined,
+      errorRegistrando: undefined,
+      //Datos
+      datosBasicos: undefined,
+      datosAcceso: undefined,
+      datosContacto: undefined,
+      datosDomicilio: undefined,
+      foto: undefined,
       //UI
       visible: false,
-      paginaActual: undefined
+      paginaAnterior: undefined,
+      paginaActual: undefined,
+      paginaExtraActual: undefined
     };
   }
 
@@ -78,14 +94,15 @@ class NuevoUsuario extends React.Component {
         Rules_Aplicacion.getInfoLogin(this.state.codigo)
           .then(data => {
             this.setState({
-              infoLogin: data,
-              paginaActual: PAGINA_DATOS_BASICOS
+              infoLogin: data
             });
+
+            this.cambiarPagina(PAGINA_DATOS_BASICOS);
           })
           .catch(error => {
             this.setState({
               errorValidandoCodigo: error,
-              paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO
+              paginaExtraActual: PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO
             });
           })
           .finally(() => {
@@ -99,56 +116,199 @@ class NuevoUsuario extends React.Component {
     this.setState({ cargando: cargando || false });
   };
 
+  cambiarPagina = pagina => {
+    this.setState({
+      paginaAnterior: this.state.paginaActual,
+      paginaActual: pagina
+    });
+  };
+
   onDatosBasicosReady = datos => {
     console.log(datos);
 
     this.setState({
-      datosBasicos: datos,
-      paginaActual: PAGINA_DATOS_ACCESO
+      datosBasicos: datos
     });
+
+    this.cambiarPagina(PAGINA_DATOS_ACCESO);
   };
 
   onDatosAccesoReady = datos => {
     console.log(datos);
 
     this.setState({
-      datosAcceso: datos,
-      paginaActual: PAGINA_DATOS_CONTACTO
+      datosAcceso: datos
     });
+
+    this.cambiarPagina(PAGINA_DATOS_CONTACTO);
   };
 
   onDatosContactoReady = datos => {
     console.log(datos);
 
     this.setState({
-      datosContacto: datos,
-      paginaActual: PAGINA_DATOS_DOMICILIO
+      datosContacto: datos
     });
+
+    this.cambiarPagina(PAGINA_DATOS_DOMICILIO);
   };
 
   onDatosDomicilioReady = datos => {
     console.log(datos);
 
     this.setState({
-      datosDomicilio: datos,
-      paginaActual: PAGINA_FOTO
+      datosDomicilio: datos
+    });
+
+    this.cambiarPagina(PAGINA_FOTO);
+  };
+
+  onFotoReady = datos => {
+    console.log(datos);
+
+    this.setState({
+      foto: datos
+    });
+
+    this.cambiarPagina(PAGINA_CONFIRMACION);
+  };
+
+  onConfirmacionReady = recaptcha => {
+    console.log(this.state);
+
+    try {
+      let telefonoFijo = undefined;
+      if (this.state.datosContacto.telefonoFijoArea != undefined) {
+        telefonoFijo = (
+          this.state.datosContacto.telefonoFijoArea +
+          "-" +
+          this.state.datosContacto.telefonoFijoNumero
+        ).trim();
+      }
+
+      let telefonoCelular = undefined;
+      if (this.state.datosContacto.telefonoCelularArea != undefined) {
+        telefonoCelular = (
+          this.state.datosContacto.telefonoCelularArea +
+          "-" +
+          this.state.datosContacto.telefonoCelularNumero
+        ).trim();
+      }
+
+      let comando = {
+        comando: {
+          nombre: this.state.datosBasicos.nombre,
+          apellido: this.state.datosBasicos.apellido,
+          dni: this.state.datosBasicos.dni,
+          fechaNacimiento: this.convertirFechaNacimientoString(
+            this.state.datosBasicos.fechaNacimiento
+          ),
+          sexoMasculino: this.state.datosBasicos.sexoMasculino,
+          idEstadoCivil: this.state.datosBasicos.idEstadoCivil,
+          domicilio:
+            this.state.datosDomicilio == undefined
+              ? undefined
+              : {
+                  direccion: this.state.datosDomicilio.direccion,
+                  altura: this.state.datosDomicilio.altura,
+                  torre: this.state.datosDomicilio.torre,
+                  piso: this.state.datosDomicilio.piso,
+                  depto: this.state.datosDomicilio.depto,
+                  ciudad: this.state.datosDomicilio.ciudad,
+                  idCiudad: this.state.datosDomicilio.idCiudad,
+                  barrio: this.state.datosDomicilio.barrio,
+                  idBarrio: this.state.datosDomicilio.idBarrio,
+                  provincia: this.state.datosDomicilio.provincia,
+                  idProvincia: this.state.datosDomicilio.idProvincia
+                },
+          email: this.state.datosContacto.email,
+          telefonoFijo: telefonoFijo,
+          telefonoCelular: telefonoCelular,
+          facebook: this.state.datosContacto.facebook,
+          twitter: this.state.datosContacto.twitter,
+          instragram: this.state.datosContacto.instragram,
+          linkedin: this.state.datosContacto.linkedin,
+          username: this.state.datosAcceso.username,
+          password: this.state.datosAcceso.password,
+          base64FotoPersonal: this.state.foto
+        },
+        passwordDefault: false,
+        urlRetorno:
+          window.location.origin +
+          window.Config.BASE_URL +
+          "/Login/" +
+          this.state.codigo
+      };
+
+      this.setState({ cargando: true }, () => {
+        Rules_Usuario.registrar(comando)
+          .then(() => {
+            this.setState({ paginaExtraActual: PAGINA_EXTRA_EXITO });
+          })
+          .catch(error => {
+            console.log(error);
+            this.setState({
+              errorRegistrando: error
+            });
+
+            this.setState({
+              paginaExtraActual: PAGINA_EXTRA_ERROR_REGISTRANDO
+            });
+          })
+          .finally(() => {
+            this.setState({ cargando: false });
+          });
+      });
+    } catch (ex) {
+      this.setState({
+        cargando: false,
+        errorRegistrando: "Error procesando la solicitud"
+      });
+      this.setState({ paginaExtraActual: PAGINA_EXTRA_ERROR_REGISTRANDO });
+    }
+  };
+
+  convertirFechaNacimientoString = fecha => {
+    let dia = fecha.getDate();
+    if (dia < 10) dia = "0" + dia;
+    let mes = fecha.getMonth() + 1;
+    if (mes < 10) mes = "0" + mes;
+    let año = fecha.getFullYear();
+    return dia + "/" + mes + "/" + año;
+  };
+
+  onPaginaDatosBasicosBotonYaEstoyRegistradoClick = () => {
+    this.setState({ visible: false }, () => {
+      this.props.redireccionar("/Login/" + this.state.codigo);
     });
   };
 
   onPaginaDatosAccesoBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_DATOS_BASICOS });
+    this.cambiarPagina(PAGINA_DATOS_BASICOS);
   };
 
   onPaginaDatosContactoBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_DATOS_ACCESO });
+    this.cambiarPagina(PAGINA_DATOS_ACCESO);
   };
 
   onPaginaDatosDomicilioBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_DATOS_CONTACTO });
+    this.cambiarPagina(PAGINA_DATOS_CONTACTO);
   };
 
   onPaginaFotoBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_DATOS_DOMICILIO });
+    this.cambiarPagina(PAGINA_DATOS_DOMICILIO);
+  };
+
+  onPaginaConfirmacionBotonVolverClick = () => {
+    this.cambiarPagina(PAGINA_FOTO);
+  };
+
+  onPaginaErrorRegistrandoBotonReintentarClick = () => {
+    this.setState({ paginaExtraActual: undefined });
+  };
+
+  onPaginaExitoBotonInicioClick = () => {
+    this.props.redireccionar("/Login/" + this.state.codigo);
   };
 
   render() {
@@ -176,77 +336,105 @@ class NuevoUsuario extends React.Component {
   renderContent() {
     const { classes } = this.props;
 
-    let anim =
-      this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO
+    const anim =
+      this.state.paginaAnterior == undefined
         ? "cross-fade"
-        : "roll-up";
+        : this.state.paginaAnterior < this.state.paginaActual
+          ? "mover-derecha"
+          : "mover-izquierda";
 
     return (
       <div className={classes.content}>
         <ContentSwapper
-          transitionName="cross-fade"
+          transitionName={anim}
           transitionEnterTimeout={500}
           transitionLeaveTimeout={500}
           className={classes.contentSwapper}
         >
           <div
-            key="paginaErrorValidandoCodigo"
+            key="paginaDatosBasicos"
             className={classes.contentSwapperContent}
-            visible={
-              "" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)
-            }
+            visible={"" + (this.state.paginaActual == PAGINA_DATOS_BASICOS)}
+          >
+            {this.renderPaginaDatosBasicos()}
+          </div>
+          <div
+            key="paginaDatosAcceso"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_DATOS_ACCESO)}
+          >
+            {this.renderPaginaDatosAcceso()}
+          </div>
+          <div
+            key="paginaDatosContacto"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_DATOS_CONTACTO)}
+          >
+            {this.renderPaginaDatosContacto()}
+          </div>
+          <div
+            key="paginaDatosDomicilio"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_DATOS_DOMICILIO)}
+          >
+            {this.renderPaginaDatosDomicilio()}
+          </div>
+          <div
+            key="paginaFoto"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_FOTO)}
+          >
+            {this.renderPaginaFoto()}
+          </div>
+          <div
+            key="paginaConfirmacion"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_CONFIRMACION)}
+          >
+            {this.renderPaginaConfirmacion()}
+          </div>
+        </ContentSwapper>
+
+        {/* Paginas flotantes */}
+        <div
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: "none"
+          }}
+        >
+          <div
+            className={classNames(
+              classes.paginaExtra,
+              this.state.paginaExtraActual ==
+                PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO && "visible"
+            )}
           >
             {this.renderPaginaErrorValidandoCodigo()}
           </div>
 
           <div
-            key="paginaForm"
-            className={classes.contentSwapperContent}
-            visible={
-              "" + (this.state.paginaActual != PAGINA_ERROR_VALIDANDO_CODIGO)
-            }
+            className={classNames(
+              classes.paginaExtra,
+              this.state.paginaExtraActual == PAGINA_EXTRA_ERROR_REGISTRANDO &&
+                "visible"
+            )}
           >
-            <ContentSwapper
-              transitionName="roll-up"
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={500}
-              className={classes.contentSwapper}
-            >
-              <div
-                key="paginaDatosBasicos"
-                className={classes.contentSwapperContent}
-                visible={"" + (this.state.paginaActual == PAGINA_DATOS_BASICOS)}
-              >
-                {this.renderPaginaDatosBasicos()}
-              </div>
-              <div
-                key="paginaDatosAcceso"
-                className={classes.contentSwapperContent}
-                visible={"" + (this.state.paginaActual == PAGINA_DATOS_ACCESO)}
-              >
-                {this.renderPaginaDatosAcceso()}
-              </div>
-              <div
-                key="paginaDatosContacto"
-                className={classes.contentSwapperContent}
-                visible={
-                  "" + (this.state.paginaActual == PAGINA_DATOS_CONTACTO)
-                }
-              >
-                {this.renderPaginaDatosContacto()}
-              </div>
-              <div
-                key="paginaDatosDomicilio"
-                className={classes.contentSwapperContent}
-                visible={
-                  "" + (this.state.paginaActual == PAGINA_DATOS_DOMICILIO)
-                }
-              >
-                {this.renderPaginaDatosDomicilio()}
-              </div>
-            </ContentSwapper>
+            {this.renderPaginaErrorRegistrando()}
           </div>
-        </ContentSwapper>
+
+          <div
+            className={classNames(
+              classes.paginaExtra,
+              this.state.paginaExtraActual == PAGINA_EXTRA_EXITO && "visible"
+            )}
+          >
+            {this.renderPaginaExito()}
+          </div>
+        </div>
       </div>
     );
   }
@@ -262,6 +450,9 @@ class NuevoUsuario extends React.Component {
         datosIniciales={this.state.datosBasicos}
         onCargando={this.onCargando}
         onReady={this.onDatosBasicosReady}
+        onBotonYaEstoyRegistradoClick={
+          this.onPaginaDatosBasicosBotonYaEstoyRegistradoClick
+        }
       />
     );
   }
@@ -298,6 +489,65 @@ class NuevoUsuario extends React.Component {
         onCargando={this.onCargando}
         onReady={this.onDatosDomicilioReady}
         onBotonVolverClick={this.onPaginaDatosDomicilioBotonVolverClick}
+      />
+    );
+  }
+
+  renderPaginaFoto() {
+    let sexoMasculino =
+      this.state.datosBasicos != undefined
+        ? this.state.datosBasicos.sexoMasculino || false
+        : false;
+    return (
+      <PaginaFoto
+        padding={padding}
+        datosIniciales={this.state.foto}
+        onCargando={this.onCargando}
+        onReady={this.onFotoReady}
+        sexoMasculino={sexoMasculino}
+        onBotonVolverClick={this.onPaginaFotoBotonVolverClick}
+      />
+    );
+  }
+
+  renderPaginaConfirmacion() {
+    return (
+      <PaginaConfirmacion
+        padding={padding}
+        onCargando={this.onCargando}
+        onReady={this.onConfirmacionReady}
+        onBotonVolverClick={this.onPaginaConfirmacionBotonVolverClick}
+      />
+    );
+  }
+
+  renderPaginaErrorRegistrando() {
+    return (
+      <MiPanelMensaje
+        error
+        mensaje={this.state.errorRegistrando}
+        boton="Reintentar"
+        onBotonClick={this.onPaginaErrorRegistrandoBotonReintentarClick}
+      />
+    );
+  }
+
+  renderPaginaExito() {
+    let email =
+      this.state.datosContacto != undefined
+        ? this.state.datosContacto.email
+        : "Sin e-mail";
+    return (
+      <MiPanelMensaje
+        lottieExito
+        mensaje="Su usuario ha sido creado correctamente."
+        detalle={
+          "Le enviamos un e-mail a " +
+          email +
+          " con las instrucciones para activarlo"
+        }
+        boton="Volver al inicio"
+        onBotonClick={this.onPaginaExitoBotonInicioClick}
       />
     );
   }

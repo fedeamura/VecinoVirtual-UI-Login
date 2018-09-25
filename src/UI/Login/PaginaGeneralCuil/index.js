@@ -18,7 +18,8 @@ import FormLabel from "@material-ui/core/FormLabel";
 import red from "@material-ui/core/colors/red";
 
 //Mis componentes
-import ContentSwapper from "@Componentes/ContentSwapper";
+import MiBanerError from "@Componentes/MiBanerError";
+import Validador from "@Componentes/_Validador";
 
 //REDUX
 import { connect } from "react-redux";
@@ -47,16 +48,25 @@ class PaginaGenerarCUIL extends React.Component {
       errorDni: undefined,
       sexo: "m",
       errorSexo: undefined,
-      paginaFormVisible: true,
-      paginaErrorVisible: false
+      mostrarError: false,
+      error: undefined
     };
   }
 
   onBotonGenerarClick = () => {
-    let errorDni = undefined;
-    if (this.state.dni.trim() === "") {
-      errorDni = "Dato requerido";
-    }
+    let { dni } = this.state;
+
+    this.setState({ errorDni: undefined, mostrarError: false });
+
+    let errorDni = Validador.validar(
+      [
+        Validador.requerido,
+        Validador.numericoEntero,
+        Validador.min(dni, 7),
+        Validador.max(dni, 8)
+      ],
+      dni
+    );
 
     if (errorDni != undefined) {
       this.setState({ errorDni: errorDni });
@@ -71,13 +81,22 @@ class PaginaGenerarCUIL extends React.Component {
     this.props.onCargando(true);
     Rules_Usuario.generarCuil(comando)
       .then(cuil => {
+        console.log(cuil);
+
+        if (cuil == undefined || cuil == "") {
+          this.setState({
+            mostrarError: true,
+            error: "Error procesando la solicitud"
+          });
+          return;
+        }
+
         this.props.onCuilGenerado(cuil);
       })
       .catch(error => {
         this.setState({
-          error: error,
-          paginaFormVisible: false,
-          paginaErrorVisible: true
+          mostrarError: true,
+          error: error
         });
       })
       .finally(() => {
@@ -106,35 +125,6 @@ class PaginaGenerarCUIL extends React.Component {
     const { classes } = this.props;
 
     return (
-      <ContentSwapper
-        transitionName="cross-fade"
-        transitionEnterTimeout={500}
-        transitionLeaveTimeout={500}
-        className={classes.contentSwapper}
-      >
-        <div
-          key="paginaForm"
-          className={classes.contentSwapperContent}
-          visible={"" + this.state.paginaFormVisible}
-        >
-          {this.renderPaginaForm()}
-        </div>
-
-        <div
-          key="paginaError"
-          className={classes.contentSwapperContent}
-          visible={"" + this.state.paginaErrorVisible}
-        >
-          {this.renderPaginaError()}
-        </div>
-      </ContentSwapper>
-    );
-  }
-
-  renderPaginaForm() {
-    const { classes } = this.props;
-
-    return (
       <div className={classes.root}>
         {this.renderPaginaFormContent()}
         {this.renderPaginaFormFooter()}
@@ -146,65 +136,79 @@ class PaginaGenerarCUIL extends React.Component {
     const { classes, padding } = this.props;
 
     return (
-      <div className={classes.content} style={{ padding: padding }}>
-        <Grid container>
-          <Grid item xs={12}>
-            <FormControl
-              className={classes.formControl}
-              fullWidth
-              margin="normal"
-              error={this.state.errorDni !== undefined}
-              aria-describedby="textoDniError"
-            >
-              <InputLabel htmlFor="inputPassword">N° de Documento</InputLabel>
-              <Input
-                id="inputDni"
-                autoFocus
-                value={this.state.password}
-                name="dni"
-                type="number"
-                onKeyPress={this.onInputKeyPress}
-                onChange={this.onInputChange}
-              />
-              <FormHelperText id="textoDniError">
-                {this.state.errorDni}
-              </FormHelperText>
-            </FormControl>
-          </Grid>
-          <Grid item xs={12}>
-            <FormControl
-              className={classes.formControl}
-              fullWidth
-              margin="normal"
-              error={this.state.errorSexo !== undefined}
-              aria-describedby="textoSexoError"
-            >
-              <FormLabel component="legend">Sexo</FormLabel>
-              <RadioGroup
-                aria-label="Gender"
-                name="gender1"
-                className={classes.group}
-                value={this.state.sexo}
-                onChange={this.onSexoChange}
-              >
-                <FormControlLabel
-                  value="m"
-                  control={<Radio />}
-                  label="Masculino"
-                />
+      <div className={classes.root}>
+        <MiBanerError
+          visible={this.state.mostrarError}
+          onClose={() => {
+            this.setState({ mostrarError: false });
+          }}
+          mensaje={this.state.error}
+        />
 
-                <FormControlLabel
-                  value="f"
-                  control={<Radio />}
-                  label="Femenino"
+        <div className={classes.content} style={{ padding: padding }}>
+          <Grid container spacing={16}>
+            <Grid item xs={12}>
+              <Typography variant="title">Generar CUIL</Typography>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl
+                className={classes.formControl}
+                fullWidth
+                margin="dense"
+                error={this.state.errorDni !== undefined}
+                aria-describedby="textoDniError"
+              >
+                <InputLabel htmlFor="inputPassword">N° de Documento</InputLabel>
+                <Input
+                  id="inputDni"
+                  autoFocus
+                  value={this.state.password}
+                  name="dni"
+                  type="number"
+                  onKeyPress={this.onInputKeyPress}
+                  onChange={this.onInputChange}
                 />
-              </RadioGroup>
-              {this.state.errorSexo != undefined && (
-                <FormHelperText>{this.state.errorSexo}</FormHelperText>
-              )}
-            </FormControl>
+                <FormHelperText id="textoDniError">
+                  {this.state.errorDni}
+                </FormHelperText>
+              </FormControl>
+            </Grid>
+            <Grid item xs={12}>
+              <FormControl
+                className={classes.formControl}
+                fullWidth
+                margin="normal"
+                error={this.state.errorSexo !== undefined}
+                aria-describedby="textoSexoError"
+              >
+                <FormLabel component="legend">Sexo</FormLabel>
+                <RadioGroup
+                  aria-label="Gender"
+                  name="gender1"
+                  style={{ display: "flex", flexDirection: "row" }}
+                  className={classes.group}
+                  value={this.state.sexo}
+                  onChange={this.onSexoChange}
+                >
+                  <FormControlLabel
+                    value="m"
+                    control={<Radio />}
+                    label="Masculino"
+                  />
+
+                  <FormControlLabel
+                    value="f"
+                    control={<Radio />}
+                    label="Femenino"
+                  />
+                </RadioGroup>
+                {this.state.errorSexo != undefined && (
+                  <FormHelperText>{this.state.errorSexo}</FormHelperText>
+                )}
+              </FormControl>
+            </Grid>
           </Grid>
-        </Grid>
+        </div>
       </div>
     );
   }

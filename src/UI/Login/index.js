@@ -29,13 +29,15 @@ import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import Rules_Usuario from "@Rules/Rules_Usuario";
 import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
 
-const PAGINA_ERROR_VALIDANDO_CODIGO = "PAGINA_ERROR_VALIDANDO_CODIGO";
-const PAGINA_USERNAME = "PAGINA_USERNAME";
-const PAGINA_PASSWORD = "PAGINA_PASSWORD";
-const PAGINA_USUARIOS_RECIENTES = "PAGINA_USUARIOS_RECIENTES";
-const PAGINA_GENERAR_CUIL = "PAGINA_GENERAR_CUIL";
-const PAGINA_RECUPERAR_PASSWORD = "PAGINA_RECUPERAR_PASSWORD";
-const PAGINA_USUARIO_NO_ACTIVADO = "PAGINA_USUARIO_NO_ACTIVADO";
+const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO =
+  "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
+
+const PAGINA_USERNAME = 1;
+const PAGINA_PASSWORD = 2;
+const PAGINA_USUARIOS_RECIENTES = 3;
+const PAGINA_GENERAR_CUIL = 4;
+const PAGINA_RECUPERAR_PASSWORD = 5;
+const PAGINA_USUARIO_NO_ACTIVADO = 6;
 
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
@@ -62,6 +64,7 @@ class Login extends React.Component {
       //UI
       visible: false,
       cargando: false,
+      paginaAnterior: undefined,
       paginaActual: undefined,
       //Info util
       dataUsuario: undefined,
@@ -81,14 +84,14 @@ class Login extends React.Component {
         Rules_Aplicacion.getInfoLogin(this.state.codigo)
           .then(info => {
             this.setState({
-              infoLogin: info,
-              paginaActual: PAGINA_USERNAME
+              infoLogin: info
             });
+            this.cambiarPagina(PAGINA_USERNAME);
           })
           .catch(error => {
             this.setState({
               errorValidandoCodigo: error,
-              paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO
+              paginaExtraActual: PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO
             });
           })
           .finally(() => {
@@ -108,6 +111,13 @@ class Login extends React.Component {
     this.setState({ cargando: cargando || false });
   };
 
+  cambiarPagina = pagina => {
+    this.setState({
+      paginaAnterior: this.state.paginaActual,
+      paginaActual: pagina
+    });
+  };
+
   onLogin = user => {
     this.setState({ visible: false });
     console.log(user);
@@ -120,49 +130,61 @@ class Login extends React.Component {
 
   onCuilGenerado = cuilGenerado => {
     this.setState({
-      cuilGenerado: cuilGenerado,
-      paginaActual: PAGINA_USERNAME
+      username: cuilGenerado
+    });
+
+    this.cambiarPagina(PAGINA_USERNAME);
+  };
+
+  onPaginaUsernameBotonNuevoUsuarioClick = () => {
+    this.setState({ visible: false }, () => {
+      setTimeout(() => {
+        this.props.redireccionar("/NuevoUsuario/" + this.state.codigo);
+      }, 500);
     });
   };
 
-  onPaginaUsernameBotonSiguienteClick = data => {
-    this.setState({ dataUsuario: data, paginaActual: PAGINA_PASSWORD });
-  };
-
   onPaginaUsernameBotonGenerarCuilClick = () => {
-    this.setState({ paginaActual: PAGINA_GENERAR_CUIL });
+    this.cambiarPagina(PAGINA_GENERAR_CUIL);
   };
 
   onPaginaPasswordBotonVerUsuariosRecientesClick = () => {
-    this.setState({ paginaActual: PAGINA_USUARIOS_RECIENTES });
+    this.cambiarPagina(PAGINA_USUARIOS_RECIENTES);
   };
 
   onPaginaPasswordBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_USERNAME });
+    this.cambiarPagina(PAGINA_USERNAME);
   };
 
   onPaginaPasswordBotonRecuperarPasswordClick = () => {
-    this.setState({ paginaActual: PAGINA_RECUPERAR_PASSWORD });
+    this.cambiarPagina(PAGINA_RECUPERAR_PASSWORD);
   };
 
   onPaginaPasswordUsuarioNoValidado = (username, password) => {
     this.setState({
       activarUsername: username,
-      activarPassword: password,
-      paginaActual: PAGINA_USUARIO_NO_ACTIVADO
+      activarPassword: password
     });
+    this.cambiarPagina(PAGINA_USUARIO_NO_ACTIVADO);
   };
 
   onPaginaRecuperarPasswordBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_PASSWORD });
+    this.cambiarPagina(PAGINA_PASSWORD);
   };
 
   onPaginaGenerarCuilBotonVolverClick = () => {
-    this.setState({ cuilGenerado: undefined, paginaActual: PAGINA_USERNAME });
+    this.setState({ cuilGenerado: undefined });
+    this.cambiarPagina(PAGINA_USERNAME);
   };
 
   onPaginaUsuariosRecientesBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_PASSWORD });
+    this.cambiarPagina(PAGINA_PASSWORD);
+  };
+
+  onPaginaUsernameBotonSiguienteClick = data => {
+    console.log(data);
+    this.setState({ dataUsuario: data, username: data.username });
+    this.cambiarPagina(PAGINA_PASSWORD);
   };
 
   onPaginaUsuarioRecientesUsuarioSeleccionado = data => {
@@ -171,11 +193,11 @@ class Login extends React.Component {
   };
 
   onPaginaUsuariosRecientesOtraCuentaClick = () => {
-    this.setState({ paginaActual: PAGINA_USERNAME });
+    this.cambiarPagina(PAGINA_USERNAME);
   };
 
   onPaginaUsuarioNoActivadoBotonVolverClick = () => {
-    this.setState({ paginaActual: PAGINA_PASSWORD });
+    this.cambiarPagina(PAGINA_PASSWORD);
   };
 
   render() {
@@ -209,19 +231,22 @@ class Login extends React.Component {
   renderContent() {
     const { classes } = this.props;
 
-    let anim =
-      this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO
+    const anim =
+      this.state.paginaAnterior == undefined
         ? "cross-fade"
-        : "roll-up";
+        : this.state.paginaAnterior < this.state.paginaActual
+          ? "mover-derecha"
+          : "mover-izquierda";
 
     return (
-      <ContentSwapper
-        transitionName={anim}
-        transitionEnterTimeout={500}
-        transitionLeaveTimeout={500}
-        className={classes.contentSwapper}
-      >
-        <div
+      <div className={classes.content}>
+        <ContentSwapper
+          transitionName={anim}
+          transitionEnterTimeout={500}
+          transitionLeaveTimeout={500}
+          className={classes.contentSwapper}
+        >
+          {/* <div
           key="paginaErrorValidandoCodigo"
           className={classes.contentSwapperContent}
           visible={
@@ -229,52 +254,81 @@ class Login extends React.Component {
           }
         >
           {this.renderPaginaErrorValidandoCodigo()}
-        </div>
+        </div> */}
 
-        <div
-          key="paginaUsername"
-          className={classes.contentSwapperContent}
-          visible={"" + (this.state.paginaActual == PAGINA_USERNAME)}
-        >
-          {this.renderPaginaUsername()}
-        </div>
-        <div
-          key="paginaPassword"
-          className={classes.contentSwapperContent}
-          visible={"" + (this.state.paginaActual == PAGINA_PASSWORD)}
-        >
-          {this.renderPaginaPassword()}
-        </div>
-        <div
-          key="paginaUsuariosRecientes"
-          className={classes.contentSwapperContent}
-          visible={"" + (this.state.paginaActual == PAGINA_USUARIOS_RECIENTES)}
-        >
-          {this.renderPaginaUsuariosRecientes()}
-        </div>
-        <div
-          key="paginaGenerarCuil"
-          className={classes.contentSwapperContent}
-          visible={"" + (this.state.paginaActual == PAGINA_GENERAR_CUIL)}
-        >
-          {this.renderPaginaGenerarCuil()}
-        </div>
-        <div
-          key="paginaRecuperarPassword"
-          className={classes.contentSwapperContent}
-          visible={"" + (this.state.paginaActual == PAGINA_RECUPERAR_PASSWORD)}
-        >
-          {this.renderPaginaRecuperarPassword()}
-        </div>
+          <div
+            key="paginaUsername"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_USERNAME)}
+          >
+            {this.renderPaginaUsername()}
+          </div>
+          <div
+            key="paginaPassword"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_PASSWORD)}
+          >
+            {this.renderPaginaPassword()}
+          </div>
+          <div
+            key="paginaUsuariosRecientes"
+            className={classes.contentSwapperContent}
+            visible={
+              "" + (this.state.paginaActual == PAGINA_USUARIOS_RECIENTES)
+            }
+          >
+            {this.renderPaginaUsuariosRecientes()}
+          </div>
+          <div
+            key="paginaGenerarCuil"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_GENERAR_CUIL)}
+          >
+            {this.renderPaginaGenerarCuil()}
+          </div>
+          <div
+            key="paginaRecuperarPassword"
+            className={classes.contentSwapperContent}
+            visible={
+              "" + (this.state.paginaActual == PAGINA_RECUPERAR_PASSWORD)
+            }
+          >
+            {this.renderPaginaRecuperarPassword()}
+          </div>
 
+          <div
+            key="paginaUsuarioNoActivado"
+            className={classes.contentSwapperContent}
+            visible={
+              "" + (this.state.paginaActual == PAGINA_USUARIO_NO_ACTIVADO)
+            }
+          >
+            {this.renderPaginaUsuarioNoActivado()}
+          </div>
+        </ContentSwapper>
+
+        {/* Paginas flotantes */}
         <div
-          key="paginaUsuarioNoActivado"
-          className={classes.contentSwapperContent}
-          visible={"" + (this.state.paginaActual == PAGINA_USUARIO_NO_ACTIVADO)}
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            right: 0,
+            bottom: 0,
+            pointerEvents: "none"
+          }}
         >
-          {this.renderPaginaUsuarioNoActivado()}
+          <div
+            className={classNames(
+              classes.paginaExtra,
+              this.state.paginaExtraActual ==
+                PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO && "visible"
+            )}
+          >
+            {this.renderPaginaErrorValidandoCodigo()}
+          </div>
         </div>
-      </ContentSwapper>
+      </div>
     );
   }
 
@@ -286,9 +340,9 @@ class Login extends React.Component {
     return (
       <PaginaUsername
         padding={padding}
-        cuilGenerado={this.state.cuilGenerado}
         onCargando={this.onCargando}
-        username={this.state.username}
+        username={this.state.username != undefined ? this.state.username : ""}
+        onBotonNuevoUsuarioClick={this.onPaginaUsernameBotonNuevoUsuarioClick}
         onBotonSiguienteClick={this.onPaginaUsernameBotonSiguienteClick}
         onBotonGenerarCuil={this.onPaginaUsernameBotonGenerarCuilClick}
       />

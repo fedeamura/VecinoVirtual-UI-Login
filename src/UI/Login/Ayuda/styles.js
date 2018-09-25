@@ -1,4 +1,6 @@
 const styles = theme => {
+  console.log(theme);
+
   return {
     root: {
       position: "absolute",
@@ -88,8 +90,47 @@ const styles = theme => {
     },
     panelContent: {
       maxHeight: "300px",
+      minHeight: "300px",
+      display: "flex",
+      flexDirection: "column"
+    },
+    contenedorMensajes: {
+      padding: "1rem",
       overflow: "auto",
-      padding: "16px"
+      flex: 1,
+      display: "flex",
+      flexDirection: "column"
+    },
+    mensaje: {
+      minHeight: "fit-content",
+      marginBottom: "16px",
+      display: "flex",
+      padding: "8px",
+      backgroundColor: theme.palette.primary.main,
+      alignSelf: "flex-start",
+      "& p": {
+        color: "white"
+      }
+    },
+    mensajeMio: {
+      backgroundColor: "rgba(240,240,240,1)",
+      alignSelf: "flex-end",
+      "& p": {
+        color: "black"
+      }
+    },
+    contenedorInput: {
+      minHeight: "fit-content",
+      display: "flex",
+      borderTop: "1px solid rgba(0,0,0,0.1)",
+      width: "100%",
+      paddingTop: "0px",
+      paddingBottom: "0px",
+      backgroundColor: "rgba(0,0,0,0.05)"
+    },
+    input: {
+      paddingLeft: "16px",
+      flex: 1
     }
   };
 };

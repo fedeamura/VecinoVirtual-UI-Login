@@ -2,6 +2,38 @@ import _ from "lodash";
 const KEY_INFO_PUBLICA = "UIYAUISYNQNNWSDSS";
 
 const metodos = {
+  registrar: comando => {
+    comando.urlServidor =
+      window.location.origin +
+      window.Config.BASE_URL +
+      "/ProcesarActivacionUsuario";
+
+    console.log(comando);
+
+    const url = window.Config.BASE_URL_WS + "/v1/Usuario";
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(comando)
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
+  },
   getInfoPublica: username => {
     let url = window.Config.BASE_URL_WS + "/v1/Usuario/InfoPublica";
 
@@ -92,8 +124,6 @@ const metodos = {
   },
   validarRenaper: comando => {
     const url = window.Config.BASE_URL_WS + "/v1/Usuario/ValidarRenaper";
-
-    console.log(comando);
 
     return new Promise((resolve, reject) => {
       fetch(url, {

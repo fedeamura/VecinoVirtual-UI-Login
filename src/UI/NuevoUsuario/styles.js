@@ -89,7 +89,8 @@ const styles = theme => {
     content: {
       flex: 1,
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
+      position: "relative"
     },
     mainContent: {
       flex: 1,
@@ -99,6 +100,20 @@ const styles = theme => {
       borderTop: "1px solid rgba(0,0,0,0.1)",
       padding: "16px",
       display: "flex"
+    },
+    paginaExtra: {
+      position: "absolute",
+      backgroundColor: "white",
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      opacity: 0,
+      pointerEvents: "none",
+      transition: "all 0.3s",
+      "&.visible": {
+        opacity: 1,
+        pointerEvents: "all"
+      }
     }
   };
 };

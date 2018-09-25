@@ -22,39 +22,9 @@ const styles = theme => {
       padding: "16px",
       display: "flex"
     },
-    contenedorError: {
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.05)",
-      maxHeight: 0,
-      height: "100%",
-      padding: 0,
-      paddingLeft: "2rem",
-      paddingRigth: "2rem",
-      overflow: "hidden",
-      "& > div": {
-        width: "100%",
-        minHeight: "3rem",
-        display: "flex",
-        alignItems: "center"
-      },
-      "& > div > .material-icons": {
-        marginRight: "0.5rem"
-      },
-      "& > div > .texto": {
-        flex: 1
-      },
-      opacity: 0,
-      transition: "max-height 0.3s 0.3s, opacity 0.3s",
-      "&.visible": {
-        transition: "max-height 0.3s, opacity 0.3s 0.3s",
-        maxHeight: "3rem",
-        opacity: 1
-      }
-    },
     contenedorInfoUsername: {
       display: "flex",
-      "& > .material-icons": {
+      "& .material-icons": {
         marginRight: "0.5rem"
       }
     }

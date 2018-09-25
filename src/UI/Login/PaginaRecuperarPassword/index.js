@@ -120,6 +120,8 @@ class PaginaRecuperarPassword extends React.Component {
         lottieExito
         mensaje=" Se ha enviado un e-mail a su casilla de correo con las instrucciones
       para recuperar su contraseña"
+        boton="Volver"
+        onBotonClick={this.props.onBotonVolverClick}
       />
     );
   }
