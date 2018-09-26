@@ -1,5 +1,4 @@
 const styles = theme => {
-  console.log(theme);
 
   return {
     root: {

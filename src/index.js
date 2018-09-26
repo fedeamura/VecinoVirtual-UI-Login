@@ -1,12 +1,13 @@
+import "./public-path";
 import React from "react";
 import ReactDOM from "react-dom";
 import App from "@UI/App";
-import registerServiceWorker from "./registerServiceWorker";
+// import registerServiceWorker from "./registerServiceWorker";
 import { hot } from "react-hot-loader";
 
 import MuiPickersUtilsProvider from "material-ui-pickers/utils/MuiPickersUtilsProvider";
 import DateFnsUtils from "material-ui-pickers/utils/date-fns-utils";
-import arLocale from 'date-fns/locale/es';
+import arLocale from "date-fns/locale/es";
 
 //REDUX
 import { Provider } from "react-redux";
@@ -37,7 +38,6 @@ ReactDOM.render(
   <Provider store={Store}>
     <ConnectedRouter history={history}>
       <MuiThemeProvider theme={theme}>
-        {/* <HotApp /> */}
         <MuiPickersUtilsProvider utils={DateFnsUtils} locale={arLocale}>
           <App />
         </MuiPickersUtilsProvider>
@@ -47,4 +47,4 @@ ReactDOM.render(
   document.getElementById("root")
 );
 
-registerServiceWorker();
+// registerServiceWorker();

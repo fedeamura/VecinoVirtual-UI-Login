@@ -49,8 +49,10 @@ const mapDispatchToProps = dispatch => ({
 //   );
 // };
 
-String.prototype.toTitleCase = function () {
-  return this.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+String.prototype.toTitleCase = function() {
+  return this.replace(/\w\S*/g, function(txt) {
+    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+  });
 };
 
 class App extends React.Component {
@@ -75,8 +77,12 @@ class App extends React.Component {
   }
 
   renderContent() {
-    const { classes } = this.props;
+    const { classes, match } = this.props;
 
+    let base = "";
+    // base = "";
+
+    console.log(match);
     return (
       <main className={classes.content}>
         <AnimatedSwitch
@@ -85,14 +91,17 @@ class App extends React.Component {
           atActive={{ opacity: 1 }}
           className={"switch-wrapper"}
         >
-          <Route path="/Login/:codigo" component={Login} />
-          <Route path="/NuevoUsuario/:codigo" component={NuevoUsuario} />
+          <Route path={`${base}/Login/:codigo`} component={Login} />
           <Route
-            path="/ProcesarRecuperarPassword"
+            path={`${base}/NuevoUsuario/:codigo`}
+            component={NuevoUsuario}
+          />
+          <Route
+            path={`${base}/ProcesarRecuperarPassword`}
             component={ProcesarRecuperarPassword}
           />
           <Route
-            path="/ProcesarActivacionUsuario"
+            path={`${base}/ProcesarActivacionUsuario`}
             component={ProcesarActivacionUsuario}
           />
           <Route component={Pagina404} />

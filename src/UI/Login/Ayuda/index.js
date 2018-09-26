@@ -126,8 +126,8 @@ class LoginAyuda extends React.Component {
           />
           <div className={classes.panelContent}>
             <div className={classes.contenedorMensajes} ref={this.onScrollRef}>
-              {this.state.mensajes.map(item => {
-                return <Mensaje classes={classes} data={item} />;
+              {this.state.mensajes.map((item, index) => {
+                return <Mensaje key={index} classes={classes} data={item} />;
               })}
             </div>
 
@@ -157,8 +157,6 @@ class LoginAyuda extends React.Component {
 class Mensaje extends React.PureComponent {
   render() {
     const { classes } = this.props;
-
-    console.log(this.props);
 
     return (
       <Card
