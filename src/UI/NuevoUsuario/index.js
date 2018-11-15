@@ -124,8 +124,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onDatosBasicosReady = datos => {
-    console.log(datos);
-
     this.setState({
       datosBasicos: datos
     });
@@ -134,8 +132,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onDatosAccesoReady = datos => {
-    console.log(datos);
-
     this.setState({
       datosAcceso: datos
     });
@@ -144,8 +140,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onDatosContactoReady = datos => {
-    console.log(datos);
-
     this.setState({
       datosContacto: datos
     });
@@ -154,8 +148,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onDatosDomicilioReady = datos => {
-    console.log(datos);
-
     this.setState({
       datosDomicilio: datos
     });
@@ -164,8 +156,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onFotoReady = datos => {
-    console.log(datos);
-
     this.setState({
       foto: datos
     });
@@ -174,8 +164,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onConfirmacionReady = recaptcha => {
-    console.log(this.state);
-
     try {
       let telefonoFijo = undefined;
       if (this.state.datosContacto.telefonoFijoArea != undefined) {
@@ -236,7 +224,7 @@ class NuevoUsuario extends React.Component {
         urlRetorno:
           window.location.origin +
           window.Config.BASE_URL +
-          "/Login/" +
+          "/#/Login/" +
           this.state.codigo
       };
 
@@ -246,7 +234,6 @@ class NuevoUsuario extends React.Component {
             this.setState({ paginaExtraActual: PAGINA_EXTRA_EXITO });
           })
           .catch(error => {
-            console.log(error);
             this.setState({
               errorRegistrando: error
             });

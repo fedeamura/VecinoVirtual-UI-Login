@@ -37,7 +37,6 @@ const PAGINA_ERROR = "PAGINA_ERROR";
 class ProcesarActivacionUsuario extends React.Component {
   constructor(props) {
     super(props);
-    console.log(props.location.search.split("codigo=")[1]);
     this.state = {
       codigo: props.location.search.split("codigo=")[1],
       validandoCodigo: true,

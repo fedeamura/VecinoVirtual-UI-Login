@@ -206,7 +206,6 @@ class ProcesarRecuperarPassword extends React.Component {
   renderContent() {
     const { classes } = this.props;
 
-    console.log(this.state);
     return (
       <div className={classes.content}>
         <ContentSwapper

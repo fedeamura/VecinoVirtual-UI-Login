@@ -294,7 +294,7 @@ class PaginaDatosBasicos extends React.Component {
                     onKeyPress={this.onInputKeyPress}
                     onChange={this.onInputChange}
                   />
-                  <FormHelperText id="textoNombreError">
+                  <FormHelperText id="textoNombreError" >
                     {this.state.errores["nombre"]}
                   </FormHelperText>
                 </FormControl>

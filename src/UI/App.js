@@ -4,6 +4,7 @@ import React from "react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
 import "./style.css";
+import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
 
 //Router
 import { withRouter } from "react-router-dom";
@@ -39,6 +40,20 @@ const mapDispatchToProps = dispatch => ({
   }
 });
 
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#149257"
+    },
+    secondary: {
+      main: "#149257"
+    },
+    background: {
+      default: "#eee"
+    }
+  }
+});
+
 // Promise.prototype.finally = function(callback) {
 //   return this.then(
 //     value => this.constructor.resolve(callback()).then(() => value),
@@ -68,42 +83,26 @@ class App extends React.Component {
     const { classes } = this.props;
 
     return (
-      <div className={classes.root}>
-        <CssBaseline />
-        {this.renderContent()}
-        {this.renderAlertas()}
-      </div>
+      <MuiThemeProvider theme={theme}>
+        <div className={classes.root}>
+          <CssBaseline />
+          {this.renderContent()}
+          {this.renderAlertas()}
+        </div>
+      </MuiThemeProvider>
     );
   }
 
   renderContent() {
-    const { classes, match } = this.props;
-
+    const { classes } = this.props;
     let base = "";
-    // base = "";
-
-    console.log(match);
     return (
       <main className={classes.content}>
-        <AnimatedSwitch
-          atEnter={{ opacity: 0 }}
-          atLeave={{ opacity: 0 }}
-          atActive={{ opacity: 1 }}
-          className={"switch-wrapper"}
-        >
+        <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
           <Route path={`${base}/Login/:codigo`} component={Login} />
-          <Route
-            path={`${base}/NuevoUsuario/:codigo`}
-            component={NuevoUsuario}
-          />
-          <Route
-            path={`${base}/ProcesarRecuperarPassword`}
-            component={ProcesarRecuperarPassword}
-          />
-          <Route
-            path={`${base}/ProcesarActivacionUsuario`}
-            component={ProcesarActivacionUsuario}
-          />
+          <Route path={`${base}/NuevoUsuario/:codigo`} component={NuevoUsuario} />
+          <Route path={`${base}/ProcesarRecuperarPassword`} component={ProcesarRecuperarPassword} />
+          <Route path={`${base}/ProcesarActivacionUsuario`} component={ProcesarActivacionUsuario} />
           <Route component={Pagina404} />
         </AnimatedSwitch>
       </main>
@@ -135,15 +134,8 @@ class App extends React.Component {
             style={{ backgroundColor: alerta.color }}
             aria-describedby="client-snackbar"
             message={
-              <span
-                id={"message-id" + alerta.id}
-                className={classes.snackMessage}
-              >
-                {alerta.icono != undefined && (
-                  <Icon className={classes.snackCustomIcon}>
-                    {alerta.icono}
-                  </Icon>
-                )}
+              <span id={"message-id" + alerta.id} className={classes.snackMessage}>
+                {alerta.icono != undefined && <Icon className={classes.snackCustomIcon}>{alerta.icono}</Icon>}
                 {alerta.texto}
               </span>
             }
@@ -172,7 +164,8 @@ const styles = theme => {
   return {
     root: {
       display: "flex",
-      height: "100vh",
+      width:'100%',
+      height: "100%",
       overflow: "hidden"
     },
     content: {

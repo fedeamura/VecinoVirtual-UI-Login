@@ -81,8 +81,6 @@ class PaginaGenerarCUIL extends React.Component {
     this.props.onCargando(true);
     Rules_Usuario.generarCuil(comando)
       .then(cuil => {
-        console.log(cuil);
-
         if (cuil == undefined || cuil == "") {
           this.setState({
             mostrarError: true,

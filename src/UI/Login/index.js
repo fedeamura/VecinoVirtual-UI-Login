@@ -22,15 +22,15 @@ import PaginaGenerarCUIL from "./PaginaGeneralCuil";
 import PaginaRecuperarPassword from "./PaginaRecuperarPassword";
 import PaginaUsuarioNoActivado from "./PaginaUsuarioNoActivado";
 import ContentSwapper from "@Componentes/ContentSwapper";
-import Ayuda from "./Ayuda";
+// import Ayuda from "./Ayuda";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
+import { QueryString } from "@Componentes/urlUtils";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
 
-const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO =
-  "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
+const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO = "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
 
 const PAGINA_USERNAME = 1;
 const PAGINA_PASSWORD = 2;
@@ -120,11 +120,39 @@ class Login extends React.Component {
 
   onLogin = user => {
     this.setState({ visible: false });
-    console.log(user);
     setTimeout(() => {
-      window.location.replace(
-        this.state.infoLogin.url + "?token=" + user.token
-      );
+      let url = this.state.infoLogin.url;
+
+      //Si no esta validado lo mando a validar
+      if (user.validacionDNI === false) {
+        let q = QueryString(window.location.href);
+
+        if (q.url) {
+          if (url.indexOf("?") != -1) {
+            url += "&url=" + q.url;
+          } else {
+            url += "?url=" + q.url;
+          }
+        }
+
+        window.location.replace(`${window.Config.URL_VALIDAR_RENAPER}/#/?token=${user.token}&url=${encodeURIComponent(url)}`);
+      }
+      //Sino logeo
+      else {
+        if (url.indexOf("?") != -1) {
+          url += "&token=" + user.token;
+        } else {
+          url += "?token=" + user.token;
+        }
+
+        let q = QueryString(window.location.href);
+
+        if (q.url) {
+          url += "&url=" + q.url;
+        }
+
+        window.location.replace(url);
+      }
     }, 500);
   };
 
@@ -182,7 +210,6 @@ class Login extends React.Component {
   };
 
   onPaginaUsernameBotonSiguienteClick = data => {
-    console.log(data);
     this.setState({ dataUsuario: data, username: data.username });
     this.cambiarPagina(PAGINA_PASSWORD);
   };
@@ -203,27 +230,19 @@ class Login extends React.Component {
   render() {
     const { classes } = this.props;
 
-    const nombreSistema =
-      this.state.infoLogin != undefined
-        ? this.state.infoLogin.aplicacionNombre
-        : "";
+    const nombreSistema = this.state.infoLogin != undefined ? this.state.infoLogin.aplicacionNombre : "";
 
     const cargando = this.state.cargando || this.state.validandoCodigo;
 
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCardLogin
-            titulo="Vecino Virtual"
-            subtitulo={nombreSistema}
-            cargando={cargando}
-            visible={this.state.visible}
-          >
+          <MiCardLogin titulo="Vecino Virtual" subtitulo={nombreSistema} cargando={cargando} visible={this.state.visible}>
             {this.renderContent()}
           </MiCardLogin>
         </div>
 
-        <Ayuda expandido={this.state.expandido} />
+        {/* <Ayuda expandido={this.state.expandido} /> */}
       </React.Fragment>
     );
   }
@@ -235,17 +254,12 @@ class Login extends React.Component {
       this.state.paginaAnterior == undefined
         ? "cross-fade"
         : this.state.paginaAnterior < this.state.paginaActual
-          ? "mover-derecha"
-          : "mover-izquierda";
+        ? "mover-derecha"
+        : "mover-izquierda";
 
     return (
       <div className={classes.content}>
-        <ContentSwapper
-          transitionName={anim}
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={500}
-          className={classes.contentSwapper}
-        >
+        <ContentSwapper transitionName={anim} transitionEnterTimeout={500} transitionLeaveTimeout={500} className={classes.contentSwapper}>
           {/* <div
           key="paginaErrorValidandoCodigo"
           className={classes.contentSwapperContent}
@@ -256,26 +270,16 @@ class Login extends React.Component {
           {this.renderPaginaErrorValidandoCodigo()}
         </div> */}
 
-          <div
-            key="paginaUsername"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_USERNAME)}
-          >
+          <div key="paginaUsername" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_USERNAME)}>
             {this.renderPaginaUsername()}
           </div>
-          <div
-            key="paginaPassword"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_PASSWORD)}
-          >
+          <div key="paginaPassword" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_PASSWORD)}>
             {this.renderPaginaPassword()}
           </div>
           <div
             key="paginaUsuariosRecientes"
             className={classes.contentSwapperContent}
-            visible={
-              "" + (this.state.paginaActual == PAGINA_USUARIOS_RECIENTES)
-            }
+            visible={"" + (this.state.paginaActual == PAGINA_USUARIOS_RECIENTES)}
           >
             {this.renderPaginaUsuariosRecientes()}
           </div>
@@ -289,9 +293,7 @@ class Login extends React.Component {
           <div
             key="paginaRecuperarPassword"
             className={classes.contentSwapperContent}
-            visible={
-              "" + (this.state.paginaActual == PAGINA_RECUPERAR_PASSWORD)
-            }
+            visible={"" + (this.state.paginaActual == PAGINA_RECUPERAR_PASSWORD)}
           >
             {this.renderPaginaRecuperarPassword()}
           </div>
@@ -299,9 +301,7 @@ class Login extends React.Component {
           <div
             key="paginaUsuarioNoActivado"
             className={classes.contentSwapperContent}
-            visible={
-              "" + (this.state.paginaActual == PAGINA_USUARIO_NO_ACTIVADO)
-            }
+            visible={"" + (this.state.paginaActual == PAGINA_USUARIO_NO_ACTIVADO)}
           >
             {this.renderPaginaUsuarioNoActivado()}
           </div>
@@ -319,11 +319,7 @@ class Login extends React.Component {
           }}
         >
           <div
-            className={classNames(
-              classes.paginaExtra,
-              this.state.paginaExtraActual ==
-                PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO && "visible"
-            )}
+            className={classNames(classes.paginaExtra, this.state.paginaExtraActual == PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO && "visible")}
           >
             {this.renderPaginaErrorValidandoCodigo()}
           </div>
@@ -357,12 +353,8 @@ class Login extends React.Component {
         onLogin={this.onLogin}
         padding={padding}
         onBotonVolverClick={this.onPaginaPasswordBotonVolverClick}
-        onBotonVerUsuariosRecientesClick={
-          this.onPaginaPasswordBotonVerUsuariosRecientesClick
-        }
-        onBotonRecuperarPassword={
-          this.onPaginaPasswordBotonRecuperarPasswordClick
-        }
+        onBotonVerUsuariosRecientesClick={this.onPaginaPasswordBotonVerUsuariosRecientesClick}
+        onBotonRecuperarPassword={this.onPaginaPasswordBotonRecuperarPasswordClick}
         onUsuarioNoValidado={this.onPaginaPasswordUsuarioNoValidado}
       />
     );

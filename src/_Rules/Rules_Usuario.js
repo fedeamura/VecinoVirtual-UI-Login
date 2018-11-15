@@ -6,9 +6,7 @@ const metodos = {
     comando.urlServidor =
       window.location.origin +
       window.Config.BASE_URL +
-      "/ProcesarActivacionUsuario";
-
-    console.log(comando);
+      "/#/ProcesarActivacionUsuario";
 
     const url = window.Config.BASE_URL_WS + "/v1/Usuario";
     return new Promise((resolve, reject) => {
@@ -213,7 +211,7 @@ const metodos = {
     comando.urlServidor =
       window.location.origin +
       window.Config.BASE_URL +
-      "/ProcesarActivacionUsuario";
+      "/#/ProcesarActivacionUsuario";
 
     return new Promise((resolve, reject) => {
       fetch(url, {

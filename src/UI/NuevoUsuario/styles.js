@@ -27,7 +27,7 @@ const styles = theme => {
       display: "flex",
       width: "100%",
       flexDirection: "column",
-      height: "100vh",
+      height: "100%",
       justifyContent: "center"
     },
     cardRoot: {

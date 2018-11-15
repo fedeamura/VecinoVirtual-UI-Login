@@ -64,7 +64,6 @@ class PaginaFoto extends React.Component {
     var file = files[0];
     var fr = new FileReader();
 
-    console.log(file.size);
     if (file.size > 10 * 1024 * 1024) {
       this.setState({
         mostrarError: true,
@@ -158,7 +157,7 @@ class PaginaFoto extends React.Component {
 
     let foto =
       this.state.foto == undefined
-        ? this.state.sexoMasculino
+        ? this.state.sexoMasculino === true
           ? FOTO_PLACEHOLDER_MALE
           : FOTO_PLACEHOLDER_FEMALE
         : this.state.foto;
@@ -175,10 +174,7 @@ class PaginaFoto extends React.Component {
         />
 
         {/* Contenido */}
-        <div
-          className={classes.content}
-          style={{ padding: padding, paddingTop: 0 }}
-        >
+        <div className={classes.content} style={{ padding: padding, paddingTop: 0 }}>
           <Grid container spacing={16}>
             <Grid item xs={12}>
               <div className={classes.encabezado}>
@@ -190,39 +186,19 @@ class PaginaFoto extends React.Component {
 
             <Grid item xs={12}>
               <div className={classes.contenedorForm}>
-                <Avatar
-                  className={classNames(
-                    classes.foto,
-                    this.state.procesandoFoto && "procesando"
-                  )}
-                  src={foto}
-                />
+                <Avatar className={classNames(classes.foto, this.state.procesandoFoto && "procesando")} src={foto} />
 
-                <Button
-                  onClick={this.onBotonSeleccionarFotoClick}
-                  variant="outlined"
-                  color="primary"
-                >
+                <Button onClick={this.onBotonSeleccionarFotoClick} variant="outlined" color="primary">
                   Seleccionar foto
                 </Button>
 
                 {this.state.foto != undefined && (
-                  <Button
-                    onClick={this.onBotonQuitarFotoClick}
-                    variant="flat"
-                    style={{ marginTop: "0.5rem", color: red["500"] }}
-                  >
+                  <Button onClick={this.onBotonQuitarFotoClick} variant="flat" style={{ marginTop: "0.5rem", color: red["500"] }}>
                     Quitar foto
                   </Button>
                 )}
 
-                <input
-                  style={{ display: "none" }}
-                  ref={this.onFilePickerRef}
-                  type="file"
-                  id="pickerFile"
-                  accept="image/*"
-                />
+                <input style={{ display: "none" }} ref={this.onFilePickerRef} type="file" id="pickerFile" accept="image/*" />
               </div>
             </Grid>
           </Grid>
@@ -244,22 +220,12 @@ class PaginaFoto extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="flat"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
 
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonSiguienteClick}
-        >
+        <Button variant="raised" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>
