@@ -3,10 +3,7 @@ const KEY_INFO_PUBLICA = "UIYAUISYNQNNWSDSS";
 
 const metodos = {
   registrar: comando => {
-    comando.urlServidor =
-      window.location.origin +
-      window.Config.BASE_URL +
-      "/#/ProcesarActivacionUsuario";
+    comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
     const url = window.Config.BASE_URL_WS + "/v1/Usuario";
     return new Promise((resolve, reject) => {
@@ -91,12 +88,7 @@ const metodos = {
     });
   },
   generarCuil: comando => {
-    const url =
-      window.Config.BASE_URL_WS +
-      "/v1/Usuario/GenerarCuil?dni=" +
-      comando.dni +
-      "&sexoMasculino=" +
-      comando.sexoMasculino;
+    const url = window.Config.BASE_URL_WS + "/v1/Usuario/GenerarCuil?dni=" + comando.dni + "&sexoMasculino=" + comando.sexoMasculino;
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -147,10 +139,7 @@ const metodos = {
     });
   },
   validarUsername: username => {
-    const url =
-      window.Config.BASE_URL_WS +
-      "/v1/Usuario/ExisteUsername?username=" +
-      username;
+    const url = window.Config.BASE_URL_WS + "/v1/Usuario/ExisteUsername?username=" + username;
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -176,8 +165,7 @@ const metodos = {
   },
   //Usuario activado
   validarUsuarioActivado: (username, password) => {
-    let url =
-      window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Validar";
+    let url = window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Validar";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -206,12 +194,8 @@ const metodos = {
     });
   },
   iniciarActivacion: comando => {
-    const url =
-      window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Iniciar";
-    comando.urlServidor =
-      window.location.origin +
-      window.Config.BASE_URL +
-      "/#/ProcesarActivacionUsuario";
+    const url = window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Iniciar";
+    comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -237,10 +221,7 @@ const metodos = {
     });
   },
   procesarActivacionUsuario: codigo => {
-    const url =
-      window.Config.BASE_URL_WS +
-      "/v2/Usuario/ActivacionCuenta/Procesar?codigo=" +
-      codigo;
+    const url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta/Procesar?codigo=" + codigo;
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "PUT",
@@ -266,12 +247,8 @@ const metodos = {
   //Recuperacion cuenta
   iniciarRecuperarPassword: comando => {
     return new Promise((resolve, reject) => {
-      const url =
-        window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Iniciar";
-      comando.urlServidor =
-        window.location.origin +
-        window.Config.BASE_URL +
-        "/ProcesarRecuperarPassword";
+      const url = window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Iniciar";
+      comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarRecuperarPassword";
 
       fetch(url, {
         method: "PUT",
@@ -297,8 +274,7 @@ const metodos = {
   },
   procesarRecuperarPassword: comando => {
     return new Promise((resolve, reject) => {
-      const url =
-        window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Procesar";
+      const url = window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Procesar";
 
       fetch(url, {
         method: "PUT",
@@ -323,10 +299,7 @@ const metodos = {
     });
   },
   getRecuperacionCuenta: codigo => {
-    const url =
-      window.Config.BASE_URL_WS +
-      "/v1/Usuario/RecuperacionCuenta/Datos?codigo=" +
-      codigo;
+    const url = window.Config.BASE_URL_WS + "/v1/Usuario/RecuperacionCuenta/Datos?codigo=" + codigo;
 
     return new Promise((resolve, reject) => {
       fetch(url, {

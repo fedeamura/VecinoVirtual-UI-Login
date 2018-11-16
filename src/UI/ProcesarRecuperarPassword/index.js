@@ -54,6 +54,8 @@ class ProcesarRecuperarPassword extends React.Component {
   constructor(props) {
     super(props);
 
+    console.log(props.location.search.split("codigo=")[1]);
+
     this.state = {
       codigo: props.location.search.split("codigo=")[1],
       validandoCodigo: true,
@@ -88,7 +90,12 @@ class ProcesarRecuperarPassword extends React.Component {
                 paginaActual: PAGINA_ERROR_VALIDANDO_CODIGO,
                 errorValidandoCodigo: "Solicitud inválida"
               });
+              return;
             }
+
+            this.setState({
+              paginaActual: PAGINA_FORM
+            });
           })
           .catch(error => {
             this.setState({
@@ -206,6 +213,8 @@ class ProcesarRecuperarPassword extends React.Component {
   renderContent() {
     const { classes } = this.props;
 
+    console.log(this.state.paginaActual);
+
     return (
       <div className={classes.content}>
         <ContentSwapper
@@ -217,31 +226,17 @@ class ProcesarRecuperarPassword extends React.Component {
           <div
             key="paginaErrorValidando"
             className={classes.contentSwapperContent}
-            visible={
-              "" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)
-            }
+            visible={"" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)}
           >
             {this.renderPaginaErrorValidandoCodigo()}
           </div>
-          <div
-            key="paginaPassword"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_FORM)}
-          >
+          <div key="paginaPassword" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_FORM)}>
             {this.renderPaginaPassword()}
           </div>
-          <div
-            key="paginaOk"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_OK)}
-          >
+          <div key="paginaOk" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_OK)}>
             {this.renderPaginaOk()}
           </div>
-          <div
-            key="paginaError"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_ERROR)}
-          >
+          <div key="paginaError" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_ERROR)}>
             {this.renderPaginaError()}
           </div>
         </ContentSwapper>
@@ -285,22 +280,13 @@ class ProcesarRecuperarPassword extends React.Component {
                 onChange={this.onInputChange}
                 endAdornment={
                   <InputAdornment position="end">
-                    <IconButton
-                      aria-label="Toggle password visibility"
-                      onClick={this.onBotonShowPasswordClick}
-                    >
-                      {this.state.showPassword ? (
-                        <VisibilityOff />
-                      ) : (
-                        <Visibility />
-                      )}
+                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick}>
+                      {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 }
               />
-              <FormHelperText id="textoPasswordError">
-                {this.state.errorPassword}
-              </FormHelperText>
+              <FormHelperText id="textoPasswordError">{this.state.errorPassword}</FormHelperText>
             </FormControl>
           </Grid>
           <Grid item xs={12} className={classes.fixPadding}>
@@ -311,9 +297,7 @@ class ProcesarRecuperarPassword extends React.Component {
               error={this.state.errorPasswordRepeat !== undefined}
               aria-describedby="textoPasswordRepeatError"
             >
-              <InputLabel htmlFor="inputPasswordRepeat">
-                Repetita la contraseña
-              </InputLabel>
+              <InputLabel htmlFor="inputPasswordRepeat">Repetita la contraseña</InputLabel>
               <Input
                 id="inputPasswordRepeat"
                 value={this.state.passwordRepeat}
@@ -323,22 +307,13 @@ class ProcesarRecuperarPassword extends React.Component {
                 onChange={this.onInputChange}
                 endAdornment={
                   <InputAdornment position="end">
-                    <IconButton
-                      aria-label="Toggle password visibility"
-                      onClick={this.onBotonShowPasswordRepeatClick}
-                    >
-                      {this.state.showPasswordRepeat ? (
-                        <VisibilityOff />
-                      ) : (
-                        <Visibility />
-                      )}
+                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick}>
+                      {this.state.showPasswordRepeat ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
                 }
               />
-              <FormHelperText id="textoPasswordRepeatError">
-                {this.state.errorPasswordRepeat}
-              </FormHelperText>
+              <FormHelperText id="textoPasswordRepeatError">{this.state.errorPasswordRepeat}</FormHelperText>
             </FormControl>
           </Grid>
         </Grid>
@@ -360,12 +335,7 @@ class ProcesarRecuperarPassword extends React.Component {
       >
         <div style={{ flex: 1 }} />
 
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.recuperarPassword}
-        >
+        <Button variant="raised" color="primary" className={classes.button} onClick={this.recuperarPassword}>
           Recuperar contraseña
         </Button>
       </div>
@@ -384,14 +354,7 @@ class ProcesarRecuperarPassword extends React.Component {
   }
 
   renderPaginaError() {
-    return (
-      <MiPanelMensaje
-        mensaje={this.state.error}
-        error
-        boton="Reintentar"
-        onBotonClick={this.onBotonReintentarClick}
-      />
-    );
+    return <MiPanelMensaje mensaje={this.state.error} error boton="Reintentar" onBotonClick={this.onBotonReintentarClick} />;
   }
 
   renderPaginaErrorValidandoCodigo() {
