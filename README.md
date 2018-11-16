@@ -10,6 +10,5 @@ Sistema encargado de resolver la funcionalidad de:
 
 
 Tecnologias aplicadas
---------------------------------------------------------
-React
-Redux
+ - React
+ - Redux
