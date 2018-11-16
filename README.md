@@ -7,3 +7,9 @@ Sistema encargado de resolver la funcionalidad de:
  - Activar Usuario
  - Validar usuario con Renaper
  - Recuperar contraseña
+
+
+Tecnologias aplicadas
+--------------------------------------------------------
+React
+Redux
