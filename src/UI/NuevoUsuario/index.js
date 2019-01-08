@@ -13,16 +13,22 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
+//Componentes
+import { isMobile } from "react-device-detect";
+
 //Mis componentes
 import MiCardLogin from "@Componentes/MiCardLogin";
 import ContentSwapper from "@Componentes/ContentSwapper";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
+import PaginaModo from "./PaginaModo";
 import PaginaDatosBasicos from "./PaginaDatosBasicos";
 import PaginaDatosAcceso from "./PaginaDatosAcceso";
 import PaginaDatosContacto from "./PaginaDatosContacto";
 import PaginaDatosDomicilio from "./PaginaDatosDomicilio";
 import PaginaFoto from "./PaginaFoto";
 import PaginaConfirmacion from "./PaginaConfirmacion";
+import PanelCamara from "./_PanelCamara";
+import PanelPicker from "./_PanelPicker";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -40,11 +46,11 @@ const mapStateToProps = state => {
 
 const padding = "2rem";
 
-const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO =
-  "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
+const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO = "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
 const PAGINA_EXTRA_EXITO = "PAGINA_EXTRA_EXITO";
 const PAGINA_EXTRA_ERROR_REGISTRANDO = "PAGINA_EXTRA_ERROR_REGISTRANDO";
 
+const PAGINA_MODO = 0;
 const PAGINA_DATOS_BASICOS = 1;
 const PAGINA_DATOS_ACCESO = 2;
 const PAGINA_DATOS_CONTACTO = 3;
@@ -97,7 +103,7 @@ class NuevoUsuario extends React.Component {
               infoLogin: data
             });
 
-            this.cambiarPagina(PAGINA_DATOS_BASICOS);
+            this.cambiarPagina(PAGINA_MODO);
           })
           .catch(error => {
             this.setState({
@@ -155,32 +161,46 @@ class NuevoUsuario extends React.Component {
     this.cambiarPagina(PAGINA_FOTO);
   };
 
-  onFotoReady = datos => {
+  onFoto = datos => {
     this.setState({
       foto: datos
     });
+  };
 
+  onFotoReady = () => {
     this.cambiarPagina(PAGINA_CONFIRMACION);
+  };
+
+  onModo = modo => {
+    switch (modo) {
+      case "manual":
+        {
+          this.cambiarPagina(PAGINA_DATOS_BASICOS);
+        }
+        break;
+
+      case "dni":
+        {
+          if (isMobile) {
+            this.mostrarDniCamara();
+          } else {
+            this.mostrarDniFilePicker();
+          }
+        }
+        break;
+    }
   };
 
   onConfirmacionReady = recaptcha => {
     try {
       let telefonoFijo = undefined;
       if (this.state.datosContacto.telefonoFijoArea != undefined) {
-        telefonoFijo = (
-          this.state.datosContacto.telefonoFijoArea +
-          "-" +
-          this.state.datosContacto.telefonoFijoNumero
-        ).trim();
+        telefonoFijo = (this.state.datosContacto.telefonoFijoArea + "-" + this.state.datosContacto.telefonoFijoNumero).trim();
       }
 
       let telefonoCelular = undefined;
       if (this.state.datosContacto.telefonoCelularArea != undefined) {
-        telefonoCelular = (
-          this.state.datosContacto.telefonoCelularArea +
-          "-" +
-          this.state.datosContacto.telefonoCelularNumero
-        ).trim();
+        telefonoCelular = (this.state.datosContacto.telefonoCelularArea + "-" + this.state.datosContacto.telefonoCelularNumero).trim();
       }
 
       let comando = {
@@ -188,10 +208,8 @@ class NuevoUsuario extends React.Component {
           nombre: this.state.datosBasicos.nombre,
           apellido: this.state.datosBasicos.apellido,
           dni: this.state.datosBasicos.dni,
-          fechaNacimiento: this.convertirFechaNacimientoString(
-            this.state.datosBasicos.fechaNacimiento
-          ),
-          sexoMasculino: this.state.datosBasicos.sexoMasculino,
+          fechaNacimiento: this.convertirFechaNacimientoString(this.state.datosBasicos.fechaNacimiento),
+          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m",
           idEstadoCivil: this.state.datosBasicos.idEstadoCivil,
           domicilio:
             this.state.datosDomicilio == undefined
@@ -221,11 +239,7 @@ class NuevoUsuario extends React.Component {
           base64FotoPersonal: this.state.foto
         },
         passwordDefault: false,
-        urlRetorno:
-          window.location.origin +
-          window.Config.BASE_URL +
-          "/#/Login/" +
-          this.state.codigo
+        urlRetorno: window.location.origin + window.Config.BASE_URL + "/#/Login/" + this.state.codigo
       };
 
       this.setState({ cargando: true }, () => {
@@ -262,6 +276,10 @@ class NuevoUsuario extends React.Component {
     if (mes < 10) mes = "0" + mes;
     let año = fecha.getFullYear();
     return dia + "/" + mes + "/" + año;
+  };
+
+  onPaginaDatosBasicosBotonVolverClick = () => {
+    this.cambiarPagina(PAGINA_MODO);
   };
 
   onPaginaDatosBasicosBotonYaEstoyRegistradoClick = () => {
@@ -315,6 +333,9 @@ class NuevoUsuario extends React.Component {
           >
             {this.renderContent()}
           </MiCardLogin>
+
+          {this.renderDniCamara()}
+          {this.renderDniFilePicker()}
         </div>
       </React.Fragment>
     );
@@ -327,17 +348,16 @@ class NuevoUsuario extends React.Component {
       this.state.paginaAnterior == undefined
         ? "cross-fade"
         : this.state.paginaAnterior < this.state.paginaActual
-          ? "mover-derecha"
-          : "mover-izquierda";
+        ? "mover-derecha"
+        : "mover-izquierda";
 
     return (
       <div className={classes.content}>
-        <ContentSwapper
-          transitionName={anim}
-          transitionEnterTimeout={500}
-          transitionLeaveTimeout={500}
-          className={classes.contentSwapper}
-        >
+        <ContentSwapper transitionName={anim} transitionEnterTimeout={500} transitionLeaveTimeout={500} className={classes.contentSwapper}>
+          <div key="paginaModo" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_MODO)}>
+            {this.renderPaginaModo()}
+          </div>
+
           <div
             key="paginaDatosBasicos"
             className={classes.contentSwapperContent}
@@ -366,11 +386,7 @@ class NuevoUsuario extends React.Component {
           >
             {this.renderPaginaDatosDomicilio()}
           </div>
-          <div
-            key="paginaFoto"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_FOTO)}
-          >
+          <div key="paginaFoto" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_FOTO)}>
             {this.renderPaginaFoto()}
           </div>
           <div
@@ -394,31 +410,16 @@ class NuevoUsuario extends React.Component {
           }}
         >
           <div
-            className={classNames(
-              classes.paginaExtra,
-              this.state.paginaExtraActual ==
-                PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO && "visible"
-            )}
+            className={classNames(classes.paginaExtra, this.state.paginaExtraActual == PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO && "visible")}
           >
             {this.renderPaginaErrorValidandoCodigo()}
           </div>
 
-          <div
-            className={classNames(
-              classes.paginaExtra,
-              this.state.paginaExtraActual == PAGINA_EXTRA_ERROR_REGISTRANDO &&
-                "visible"
-            )}
-          >
+          <div className={classNames(classes.paginaExtra, this.state.paginaExtraActual == PAGINA_EXTRA_ERROR_REGISTRANDO && "visible")}>
             {this.renderPaginaErrorRegistrando()}
           </div>
 
-          <div
-            className={classNames(
-              classes.paginaExtra,
-              this.state.paginaExtraActual == PAGINA_EXTRA_EXITO && "visible"
-            )}
-          >
+          <div className={classNames(classes.paginaExtra, this.state.paginaExtraActual == PAGINA_EXTRA_EXITO && "visible")}>
             {this.renderPaginaExito()}
           </div>
         </div>
@@ -430,6 +431,17 @@ class NuevoUsuario extends React.Component {
     return <MiPanelMensaje error mensaje={this.state.errorValidandoCodigo} />;
   }
 
+  renderPaginaModo() {
+    return (
+      <PaginaModo
+        padding={padding}
+        onCargando={this.onCargando}
+        onModo={this.onModo}
+        onBotonYaEstoyRegistradoClick={this.onPaginaDatosBasicosBotonYaEstoyRegistradoClick}
+      />
+    );
+  }
+
   renderPaginaDatosBasicos() {
     return (
       <PaginaDatosBasicos
@@ -437,9 +449,8 @@ class NuevoUsuario extends React.Component {
         datosIniciales={this.state.datosBasicos}
         onCargando={this.onCargando}
         onReady={this.onDatosBasicosReady}
-        onBotonYaEstoyRegistradoClick={
-          this.onPaginaDatosBasicosBotonYaEstoyRegistradoClick
-        }
+        onBotonVolverClick={this.onPaginaDatosBasicosBotonVolverClick}
+        // onBotonYaEstoyRegistradoClick={this.onPaginaDatosBasicosBotonYaEstoyRegistradoClick}
       />
     );
   }
@@ -481,15 +492,14 @@ class NuevoUsuario extends React.Component {
   }
 
   renderPaginaFoto() {
-    let sexoMasculino =
-      this.state.datosBasicos != undefined
-        ? this.state.datosBasicos.sexoMasculino || false
-        : false;
+    let sexoMasculino = this.state.datosBasicos != undefined ? this.state.datosBasicos.sexoMasculino == "m" || true : false;
+
     return (
       <PaginaFoto
         padding={padding}
         datosIniciales={this.state.foto}
         onCargando={this.onCargando}
+        onFoto={this.onFoto}
         onReady={this.onFotoReady}
         sexoMasculino={sexoMasculino}
         onBotonVolverClick={this.onPaginaFotoBotonVolverClick}
@@ -520,21 +530,46 @@ class NuevoUsuario extends React.Component {
   }
 
   renderPaginaExito() {
-    let email =
-      this.state.datosContacto != undefined
-        ? this.state.datosContacto.email
-        : "Sin e-mail";
+    let email = this.state.datosContacto != undefined ? this.state.datosContacto.email : "Sin e-mail";
     return (
       <MiPanelMensaje
         lottieExito
         mensaje="Su usuario ha sido creado correctamente."
-        detalle={
-          "Le enviamos un e-mail a " +
-          email +
-          " con las instrucciones para activarlo"
-        }
+        detalle={"Le enviamos un e-mail a " + email + " con las instrucciones para activarlo"}
         boton="Volver al inicio"
         onBotonClick={this.onPaginaExitoBotonInicioClick}
+      />
+    );
+  }
+
+  mostrarDniCamara = () => {
+    this.setState({ dniCamaraVisible: true, dniFilePickerVisible: false });
+  };
+
+  cerrarDniCamara = () => {
+    this.setState({ dniCamaraVisible: false });
+  };
+
+  renderDniCamara() {
+    return (
+      <PanelCamara visible={this.state.dniCamaraVisible} onClose={this.cerrarDniCamara} onBotonArchivoClick={this.mostrarDniFilePicker} />
+    );
+  }
+
+  mostrarDniFilePicker = () => {
+    this.setState({ dniFilePickerVisible: true, dniCamaraVisible: false });
+  };
+
+  cerrarDniFilePicker = () => {
+    this.setState({ dniFilePickerVisible: false });
+  };
+
+  renderDniFilePicker() {
+    return (
+      <PanelPicker
+        visible={this.state.dniFilePickerVisible}
+        onClose={this.cerrarDniFilePicker}
+        onBotonCamaraClick={this.mostrarDniCamara}
       />
     );
   }

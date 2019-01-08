@@ -89,9 +89,14 @@ class PaginaFoto extends React.Component {
           this.setState({ procesandoFoto: true }, () => {
             setTimeout(() => {
               this.setState({ foto: imagen }, () => {
-                this.setState({
-                  procesandoFoto: false
-                });
+                this.setState(
+                  {
+                    procesandoFoto: false
+                  },
+                  () => {
+                    this.informarFoto();
+                  }
+                );
               });
             }, 500);
           });
@@ -109,6 +114,13 @@ class PaginaFoto extends React.Component {
   onBotonSeleccionarFotoClick = () => {
     this.filePicker.value = "";
     this.filePicker.click();
+  };
+
+  onBotonOmitirClick = () => {
+    this.setState({ foto: undefined }, () => {
+      this.informarFoto();
+      this.props.onReady();
+    });
   };
 
   onBotonSiguienteClick = () => {
@@ -129,14 +141,20 @@ class PaginaFoto extends React.Component {
 
     if (conError) return;
 
-    this.props.onReady(foto);
+    this.props.onReady();
+  };
+
+  informarFoto = () => {
+    this.props.onFoto(this.state.foto);
   };
 
   onBotonQuitarFotoClick = () => {
     this.filePicker.value = "";
     this.setState({ procesandoFoto: true }, () => {
       setTimeout(() => {
-        this.setState({ foto: undefined, procesandoFoto: false });
+        this.setState({ foto: undefined, procesandoFoto: false }, () => {
+          this.informarFoto();
+        });
       }, 500);
     });
   };
@@ -225,7 +243,27 @@ class PaginaFoto extends React.Component {
           </Button>
         </div>
 
-        <Button variant="raised" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
+        {/* {this.state.foto == undefined && ( */}
+        <Button
+          // variant="outlined"
+          color="primary"
+          // disabled={this.state.foto != undefined}
+          className={classes.button}
+          onClick={this.onBotonOmitirClick}
+        >
+          Omitir
+        </Button>
+        {/* )} */}
+
+        <div style={{ marginLeft: 8 }} />
+
+        <Button
+          variant="raised"
+          // disabled={this.state.foto == undefined}
+          color="primary"
+          className={classes.button}
+          onClick={this.onBotonSiguienteClick}
+        >
           Siguiente
         </Button>
       </div>

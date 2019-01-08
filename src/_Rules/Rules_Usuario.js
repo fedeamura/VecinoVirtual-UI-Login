@@ -358,6 +358,34 @@ const metodos = {
       return item.username !== username;
     });
     localStorage.setItem("usuariosRecientes", JSON.stringify(usuarios));
+  },
+  validarQR: data => {
+    const url = window.Config.BASE_URL_WS + "/v2/Usuario/QR/Validar";
+
+    let comando = { data: data };
+    console.log(comando);
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(comando)
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
   }
 };
 

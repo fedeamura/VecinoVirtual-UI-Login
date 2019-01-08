@@ -69,8 +69,7 @@ const styles = theme => {
     imagenLogoMuni: {
       width: "64px",
       height: "64px",
-      backgroundImage:
-        "url(https://servicios2.cordoba.gov.ar/VecinoVirtualUtils_Internet/Resources/Imagenes/escudo_verde.png)",
+      backgroundImage: "url(https://servicios2.cordoba.gov.ar/VecinoVirtualUtils_Internet/Resources/Imagenes/escudo_verde.png)",
       backgroundRepeat: "no-repeat",
       backgroundSize: "contain",
       backgroundPosition: "center"

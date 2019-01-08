@@ -44,6 +44,7 @@ class PaginaDatosContacto extends React.Component {
     super(props);
 
     let datosIniciales = props.datosIniciales || {};
+
     this.state = {
       email: datosIniciales.email || "",
       emailRepeat: datosIniciales.email || "",

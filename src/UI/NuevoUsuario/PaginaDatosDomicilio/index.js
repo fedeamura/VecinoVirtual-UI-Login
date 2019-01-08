@@ -61,10 +61,18 @@ class PaginaDatosDomicilio extends React.Component {
       });
     }
 
+    let provincias = Provincias.map(item => {
+      return { value: item.id, label: item.nombre.toTitleCase() };
+    });
+    provincias.unshift({
+      value: -1,
+      label: "Seleccione..."
+    });
+
+    console.log(provincias);
+
     this.state = {
-      provincias: Provincias.map(item => {
-        return { value: item.id, label: item.nombre.toTitleCase() };
-      }),
+      provincias: provincias,
       ciudades: ciudades,
       barrios: [],
       errorCargandoBarrios: undefined,
@@ -103,17 +111,33 @@ class PaginaDatosDomicilio extends React.Component {
   onProvinciaChange = e => {
     let errores = this.state.errores || [];
     errores["provincia"] = undefined;
-    this.setState({
-      idProvincia: e.value,
-      idCiudad: undefined,
-      idBarrio: undefined,
-      errores: errores,
-      ciudades: _.filter(Ciudades, item => {
-        return item.id_provincia == e.value;
-      }).map(item => {
-        return { value: item.id, label: item.nombre.toTitleCase() };
-      })
-    });
+
+    let idProvincia = e.value;
+    if (idProvincia == -1) idProvincia = undefined;
+
+    let idCiudad = undefined;
+    if (idProvincia == PROVINCIA_CORDOBA) {
+      idCiudad = CIUDAD_CORDOBA;
+    }
+
+    this.setState(
+      {
+        idProvincia: idProvincia,
+        idCiudad: idCiudad,
+        idBarrio: undefined,
+        errores: errores,
+        ciudades: _.filter(Ciudades, item => {
+          return item.id_provincia == e.value;
+        }).map(item => {
+          return { value: item.id, label: item.nombre.toTitleCase() };
+        })
+      },
+      () => {
+        if (idCiudad == CIUDAD_CORDOBA) {
+          this.buscarBarrios();
+        }
+      }
+    );
   };
 
   onCiudadChange = e => {
@@ -159,58 +183,31 @@ class PaginaDatosDomicilio extends React.Component {
       });
   };
 
+  onBotonOmitirClick = () => {
+    // this.setState({ errores: [] });
+    this.props.onReady(undefined);
+  };
+
   onBotonSiguienteClick = () => {
-    const {
-      direccion,
-      altura,
-      torre,
-      piso,
-      depto,
-      idBarrio,
-      idCiudad,
-      idProvincia
-    } = this.state;
+    const { direccion, altura, torre, piso, depto, idBarrio, idCiudad, idProvincia } = this.state;
 
     let errores = [];
     this.setState({ errores: errores });
 
-    let domicilioRequerido =
-      direccion.trim() != "" ||
-      (direccion.trim() == "" &&
-        (altura.trim() != "" ||
-          torre.trim() != "" ||
-          piso.trim() != "" ||
-          depto.trim() != "" ||
-          idCiudad != undefined ||
-          idProvincia != undefined ||
-          idBarrio != undefined));
+    errores["direccion"] = Validador.validar([Validador.requerido, Validador.min(direccion, 5), Validador.max(direccion, 100)], direccion);
 
-    if (domicilioRequerido) {
-      errores["direccion"] = Validador.validar(
-        [
-          Validador.requerido,
-          Validador.min(direccion, 5),
-          Validador.max(direccion, 100)
-        ],
-        direccion
-      );
+    errores["altura"] = Validador.validar([Validador.max(altura, 10)], altura);
 
-      errores["altura"] = Validador.validar(
-        [Validador.max(altura, 10)],
-        altura
-      );
+    if (idProvincia == undefined) {
+      errores["provincia"] = "Dato requerido";
+    }
 
-      if (idProvincia == undefined) {
-        errores["provincia"] = "Dato requerido";
-      }
+    if (idCiudad == undefined) {
+      errores["ciudad"] = "Dato requerido";
+    }
 
-      if (idCiudad == undefined) {
-        errores["ciudad"] = "Dato requerido";
-      }
-
-      if (idCiudad == CIUDAD_CORDOBA && idBarrio == undefined) {
-        errores["barrio"] = "Dato requerido";
-      }
+    if (idCiudad == CIUDAD_CORDOBA && idBarrio == undefined) {
+      errores["barrio"] = "Dato requerido";
     }
 
     //Si hay errores, corto aca
@@ -224,11 +221,6 @@ class PaginaDatosDomicilio extends React.Component {
     }
 
     if (conError) return;
-
-    if (domicilioRequerido == false) {
-      this.props.onReady(undefined);
-      return;
-    }
 
     let provinciaSeleccionada = _.find(this.state.provincias, item => {
       return item.value == this.state.idProvincia;
@@ -248,22 +240,12 @@ class PaginaDatosDomicilio extends React.Component {
       torre: torre,
       piso: piso,
       depto: depto,
-      provincia:
-        provinciaSeleccionada != undefined
-          ? provinciaSeleccionada.label
-          : undefined,
-      idProvincia:
-        provinciaSeleccionada != undefined
-          ? provinciaSeleccionada.value
-          : undefined,
-      ciudad:
-        ciudadSeleccionada != undefined ? ciudadSeleccionada.label : undefined,
-      idCiudad:
-        ciudadSeleccionada != undefined ? ciudadSeleccionada.value : undefined,
-      barrio:
-        barrioSeleccionado != undefined ? barrioSeleccionado.label : undefined,
-      idBarrio:
-        barrioSeleccionado != undefined ? barrioSeleccionado.value : undefined
+      provincia: provinciaSeleccionada != undefined ? provinciaSeleccionada.label : undefined,
+      idProvincia: provinciaSeleccionada != undefined ? provinciaSeleccionada.value : undefined,
+      ciudad: ciudadSeleccionada != undefined ? ciudadSeleccionada.label : undefined,
+      idCiudad: ciudadSeleccionada != undefined ? ciudadSeleccionada.value : undefined,
+      barrio: barrioSeleccionado != undefined ? barrioSeleccionado.label : undefined,
+      idBarrio: barrioSeleccionado != undefined ? barrioSeleccionado.value : undefined
     });
   };
 
@@ -281,17 +263,7 @@ class PaginaDatosDomicilio extends React.Component {
   renderContent() {
     const { classes, padding } = this.props;
 
-    let provinciaSeleccionada = _.find(this.state.provincias, item => {
-      return item.value == this.state.idProvincia;
-    });
-
-    let ciudadSeleccionada = _.find(this.state.ciudades, item => {
-      return item.value == this.state.idCiudad;
-    });
-
-    let barrioSeleccionado = _.find(this.state.barrios, item => {
-      return item.value == this.state.idBarrio;
-    });
+    console.log(this.state.idProvincia);
 
     return (
       <div className={classes.root}>
@@ -318,7 +290,7 @@ class PaginaDatosDomicilio extends React.Component {
               <Grid item xs={12}>
                 <Grid container spacing={16}>
                   {/* Direccion */}
-                  <Grid item xs={9} sm={7}>
+                  <Grid item xs={9} sm={10}>
                     <FormControl
                       className={classes.formControl}
                       fullWidth
@@ -326,9 +298,7 @@ class PaginaDatosDomicilio extends React.Component {
                       error={this.state.errores["direccion"] !== undefined}
                       aria-describedby="textoDireccionError"
                     >
-                      <InputLabel htmlFor="inputDireccion">
-                        Direccion
-                      </InputLabel>
+                      <InputLabel htmlFor="inputDireccion">Direccion</InputLabel>
                       <Input
                         id="inputDireccion"
                         autoFocus
@@ -341,9 +311,7 @@ class PaginaDatosDomicilio extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoDireccionError">
-                        {this.state.errores["direccion"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoDireccionError">{this.state.errores["direccion"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
@@ -368,16 +336,14 @@ class PaginaDatosDomicilio extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoAlturaError">
-                        {this.state.errores["altura"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoAlturaError">{this.state.errores["altura"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
                   <Grid item xs={12} />
 
                   {/* Torre */}
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <FormControl
                       className={classes.formControl}
                       fullWidth
@@ -397,14 +363,12 @@ class PaginaDatosDomicilio extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoTorreError">
-                        {this.state.errores["torre"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoTorreError">{this.state.errores["torre"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
                   {/* Piso */}
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <FormControl
                       className={classes.formControl}
                       fullWidth
@@ -424,14 +388,12 @@ class PaginaDatosDomicilio extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoPisoError">
-                        {this.state.errores["piso"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoPisoError">{this.state.errores["piso"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
                   {/* Depto */}
-                  <Grid item xs={4} sm={3}>
+                  <Grid item xs={4}>
                     <FormControl
                       className={classes.formControl}
                       fullWidth
@@ -451,9 +413,7 @@ class PaginaDatosDomicilio extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoDeptoError">
-                        {this.state.errores["depto"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoDeptoError">{this.state.errores["depto"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
@@ -467,16 +427,14 @@ class PaginaDatosDomicilio extends React.Component {
                       aria-describedby="textoProvinciaError"
                     >
                       <MiSelect
-                        value={provinciaSeleccionada}
+                        value={this.state.idProvincia}
                         style={{ width: "100%" }}
                         label="Provincia"
                         placeholder="Seleccione..."
                         onChange={this.onProvinciaChange}
                         options={this.state.provincias}
                       />
-                      <FormHelperText id="textoProvinciaError">
-                        {this.state.errores["provincia"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoProvinciaError">{this.state.errores["provincia"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
@@ -491,16 +449,14 @@ class PaginaDatosDomicilio extends React.Component {
                     >
                       <MiSelect
                         disabled={this.state.idProvincia == undefined}
-                        value={ciudadSeleccionada || null}
+                        value={this.state.idCiudad}
                         style={{ width: "100%" }}
                         label="Ciudad"
                         placeholder="Seleccione..."
                         onChange={this.onCiudadChange}
                         options={this.state.ciudades}
                       />
-                      <FormHelperText id="textoCiudadError">
-                        {this.state.errores["ciudad"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoCiudadError">{this.state.errores["ciudad"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
@@ -515,16 +471,14 @@ class PaginaDatosDomicilio extends React.Component {
                         aria-describedby="textoBarrioError"
                       >
                         <MiSelect
-                          value={barrioSeleccionado || null}
+                          value={this.state.idBarrio}
                           style={{ width: "100%" }}
                           label="Barrio"
                           placeholder="Seleccione..."
                           onChange={this.onBarrioChange}
                           options={this.state.barrios}
                         />
-                        <FormHelperText id="textoBarrioError">
-                          {this.state.errores["barrio"]}
-                        </FormHelperText>
+                        <FormHelperText id="textoBarrioError">{this.state.errores["barrio"]}</FormHelperText>
                       </FormControl>
                     </Grid>
                   )}
@@ -550,22 +504,18 @@ class PaginaDatosDomicilio extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="flat"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
 
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonSiguienteClick}
-        >
+        <Button color="primary" className={classes.button} onClick={this.onBotonOmitirClick}>
+          Omitir
+        </Button>
+
+        <div style={{ marginLeft: "8px" }} />
+
+        <Button variant="raised" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>

@@ -22,6 +22,7 @@ import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import _ from "lodash";
 import orange from "@material-ui/core/colors/orange";
+import green from "@material-ui/core/colors/green";
 
 //Mis componentes
 import MiBanerError from "@Componentes/MiBanerError";
@@ -192,6 +193,14 @@ class PaginaDatosAcceso extends React.Component {
 
               <Grid item xs={12}>
                 <Grid container spacing={16}>
+                  <Grid item xs={12}>
+                    <div className={classes.contenedorInfoUsername}>
+                      <Icon style={{ color: green["500"], marginBottom: 16 }}>check_circle</Icon>
+                      <Typography variant="body1">
+                        Sus datos han sido validados correctamente con el Registro Nacional de Personas
+                      </Typography>
+                    </div>
+                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <FormControl
                       className={classes.formControl}
@@ -246,7 +255,7 @@ class PaginaDatosAcceso extends React.Component {
                         onChange={this.onInputChange}
                         endAdornment={
                           <InputAdornment position="end">
-                            <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick}>
+                            <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick} tabIndex="-1">
                               {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
                           </InputAdornment>
@@ -276,7 +285,7 @@ class PaginaDatosAcceso extends React.Component {
                         onChange={this.onInputChange}
                         endAdornment={
                           <InputAdornment position="end">
-                            <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick}>
+                            <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick} tabIndex="-1">
                               {this.state.showPasswordRepeat ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
                           </InputAdornment>

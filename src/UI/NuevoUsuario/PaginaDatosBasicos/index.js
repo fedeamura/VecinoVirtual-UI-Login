@@ -50,6 +50,7 @@ class PaginaDatosBasicos extends React.Component {
     super(props);
 
     let datosIniciales = props.datosIniciales || {};
+
     // let fechaNacimiento = new Date(1987, 1, 28);
     // if (props.datosIniciales != undefined) {
     //   let partes = props.datosIniciales.fechaNacimiento
@@ -68,7 +69,7 @@ class PaginaDatosBasicos extends React.Component {
       dni: datosIniciales.dni || "",
       fechaNacimiento: datosIniciales.fechaNacimiento || new Date(1900, 0, 1),
       fechaNacimientoKeyPress: false,
-      estadoCivil: datosIniciales.estadoCivil || undefined,
+      idEstadoCivil: datosIniciales.idEstadoCivil || undefined,
       sexo: datosIniciales.sexoMasculino || true ? "m" : "f",
       errores: [],
       error: undefined,
@@ -119,9 +120,11 @@ class PaginaDatosBasicos extends React.Component {
   };
 
   onInputEstadoCivilChange = e => {
+    console.log(e);
+
     let errores = this.state.errores || [];
     errores["estadoCivil"] = undefined;
-    this.setState({ estadoCivil: e.value, errores: errores });
+    this.setState({ idEstadoCivil: e.value, errores: errores });
   };
 
   onInputSexoChange = e => {
@@ -129,45 +132,15 @@ class PaginaDatosBasicos extends React.Component {
   };
 
   onBotonSiguienteClick = () => {
-    const {
-      nombre,
-      apellido,
-      dni,
-      fechaNacimiento,
-      sexo,
-      idEstadoCivil
-    } = this.state;
+    const { nombre, apellido, dni, fechaNacimiento, sexo, idEstadoCivil } = this.state;
 
     let errores = [];
-    errores["nombre"] = Validador.validar(
-      [
-        Validador.requerido,
-        Validador.min(nombre, 3),
-        Validador.max(nombre, 50)
-      ],
-      nombre
-    );
-    errores["apellido"] = Validador.validar(
-      [
-        Validador.requerido,
-        Validador.min(apellido, 3),
-        Validador.max(apellido, 50)
-      ],
-      apellido
-    );
+    errores["nombre"] = Validador.validar([Validador.requerido, Validador.min(nombre, 3), Validador.max(nombre, 50)], nombre);
+    errores["apellido"] = Validador.validar([Validador.requerido, Validador.min(apellido, 3), Validador.max(apellido, 50)], apellido);
 
-    errores["dni"] = Validador.validar(
-      [
-        Validador.requerido,
-        Validador.numericoEntero,
-        Validador.min(dni, 7),
-        Validador.max(dni, 8)
-      ],
-      dni
-    );
+    errores["dni"] = Validador.validar([Validador.requerido, Validador.numericoEntero, Validador.min(dni, 7), Validador.max(dni, 8)], dni);
 
-    errores["fechaNacimiento"] =
-      fechaNacimiento == undefined ? "Dato requerido" : undefined;
+    errores["fechaNacimiento"] = fechaNacimiento == undefined ? "Dato requerido" : undefined;
 
     //Si hay errores, corto aca
     this.setState({ errores: errores });
@@ -224,12 +197,7 @@ class PaginaDatosBasicos extends React.Component {
     if (this.state.errorEstadosCiviles != undefined) {
       return (
         <div className={classes.root}>
-          <MiPanelMensaje
-            mensaje="Error inicializando los datos"
-            icono="error"
-            iconoColor="red"
-          />
-          ;
+          <MiPanelMensaje mensaje="Error inicializando los datos" icono="error" iconoColor="red" />;
         </div>
       );
     }
@@ -244,14 +212,6 @@ class PaginaDatosBasicos extends React.Component {
 
   renderContent() {
     const { classes, padding } = this.props;
-
-    let opcionEstadoCivil = undefined;
-    if (this.state.estadoCivil != undefined) {
-      opcionEstadoCivil = _.find(this.state.estadosCiviles, item => {
-        return item.value == this.state.idEstadoCivil;
-      });
-    }
-
     return (
       <div className={classes.root}>
         {/* Error  */}
@@ -294,9 +254,7 @@ class PaginaDatosBasicos extends React.Component {
                     onKeyPress={this.onInputKeyPress}
                     onChange={this.onInputChange}
                   />
-                  <FormHelperText id="textoNombreError" >
-                    {this.state.errores["nombre"]}
-                  </FormHelperText>
+                  <FormHelperText id="textoNombreError">{this.state.errores["nombre"]}</FormHelperText>
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -319,9 +277,7 @@ class PaginaDatosBasicos extends React.Component {
                     onKeyPress={this.onInputKeyPress}
                     onChange={this.onInputChange}
                   />
-                  <FormHelperText id="textoApellidoError">
-                    {this.state.errores["apellido"]}
-                  </FormHelperText>
+                  <FormHelperText id="textoApellidoError">{this.state.errores["apellido"]}</FormHelperText>
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -341,9 +297,7 @@ class PaginaDatosBasicos extends React.Component {
                     onKeyPress={this.onInputKeyPress}
                     onChange={this.onInputChange}
                   />
-                  <FormHelperText id="textoDniError">
-                    {this.state.errores["dni"]}
-                  </FormHelperText>
+                  <FormHelperText id="textoDniError">{this.state.errores["dni"]}</FormHelperText>
                 </FormControl>
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -358,22 +312,7 @@ class PaginaDatosBasicos extends React.Component {
                   invalidDateMessage="Fecha inválida"
                   maxDateMessage="Fecha inválida"
                   minDateMessage="Fecha inválida"
-                  mask={value =>
-                    value
-                      ? [
-                          /\d/,
-                          /\d/,
-                          "/",
-                          /\d/,
-                          /\d/,
-                          "/",
-                          /\d/,
-                          /\d/,
-                          /\d/,
-                          /\d/
-                        ]
-                      : []
-                  }
+                  mask={value => (value ? [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/] : [])}
                   value={this.state.fechaNacimiento}
                   onChange={this.onInputFechaNacimientoChange}
                   disableOpenOnEnter
@@ -389,24 +328,19 @@ class PaginaDatosBasicos extends React.Component {
                   aria-describedby="textoEstadoCivilError"
                 >
                   <MiSelect
-                    value={opcionEstadoCivil}
+                    value={this.state.idEstadoCivil}
                     style={{ width: "100%" }}
                     label="Estado civil"
                     placeholder="Seleccione..."
                     onChange={this.onInputEstadoCivilChange}
                     options={this.state.estadosCiviles}
                   />
-                  <FormHelperText id="textoEstadoCivilError">
-                    {this.state.errores["estadoCivil"]}
-                  </FormHelperText>
+                  <FormHelperText id="textoEstadoCivilError">{this.state.errores["estadoCivil"]}</FormHelperText>
                 </FormControl>
               </Grid>
 
               <Grid item xs={12} style={{ marginTop: "16px" }}>
-                <FormControl
-                  component="fieldset"
-                  className={classes.formControl}
-                >
+                <FormControl component="fieldset" className={classes.formControl}>
                   <FormLabel component="legend">Sexo</FormLabel>
                   <RadioGroup
                     aria-label="Sexo"
@@ -415,16 +349,8 @@ class PaginaDatosBasicos extends React.Component {
                     value={this.state.sexo}
                     onChange={this.onInputSexoChange}
                   >
-                    <FormControlLabel
-                      value="m"
-                      control={<Radio />}
-                      label="Masculino"
-                    />
-                    <FormControlLabel
-                      value="f"
-                      control={<Radio />}
-                      label="Femenino"
-                    />
+                    <FormControlLabel value="m" control={<Radio />} label="Masculino" />
+                    <FormControlLabel value="f" control={<Radio />} label="Femenino" />
                   </RadioGroup>
                 </FormControl>
               </Grid>
@@ -448,22 +374,12 @@ class PaginaDatosBasicos extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="flat"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonYaEstoyRegistradoClick}
-          >
-            Ya estoy registrado
+          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+            Volver
           </Button>
         </div>
 
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonSiguienteClick}
-        >
+        <Button variant="raised" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>
