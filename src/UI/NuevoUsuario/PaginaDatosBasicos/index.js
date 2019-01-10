@@ -51,14 +51,6 @@ class PaginaDatosBasicos extends React.Component {
 
     let datosIniciales = props.datosIniciales || {};
 
-    // let fechaNacimiento = new Date(1987, 1, 28);
-    // if (props.datosIniciales != undefined) {
-    //   let partes = props.datosIniciales.fechaNacimiento
-    //     .split("T")[0]
-    //     .split("-");
-    //   fechaNacimiento = new Date(partes[0], parseInt(partes[1]) - 1, partes[2]);
-    // }
-
     this.state = {
       estadosCiviles: undefined,
       errorEstadosCiviles: undefined,
@@ -120,8 +112,6 @@ class PaginaDatosBasicos extends React.Component {
   };
 
   onInputEstadoCivilChange = e => {
-    console.log(e);
-
     let errores = this.state.errores || [];
     errores["estadoCivil"] = undefined;
     this.setState({ idEstadoCivil: e.value, errores: errores });
@@ -237,6 +227,7 @@ class PaginaDatosBasicos extends React.Component {
                 <FormControl
                   className={classes.formControl}
                   fullWidth
+                  disabled={this.props.desdeQR}
                   margin="dense"
                   error={this.state.errores["nombre"] !== undefined}
                   aria-describedby="textoNombreError"
@@ -262,6 +253,7 @@ class PaginaDatosBasicos extends React.Component {
                   className={classes.formControl}
                   fullWidth
                   margin="dense"
+                  disabled={this.props.desdeQR}
                   error={this.state.errores["apellido"] !== undefined}
                   aria-describedby="textoApellidoError"
                 >
@@ -285,6 +277,7 @@ class PaginaDatosBasicos extends React.Component {
                   className={classes.formControl}
                   fullWidth
                   margin="dense"
+                  disabled={this.props.desdeQR}
                   error={this.state.errores["dni"] !== undefined}
                   aria-describedby="textoDniError"
                 >
@@ -306,6 +299,7 @@ class PaginaDatosBasicos extends React.Component {
                   style={{ marginTop: "4px", width: "100%" }}
                   label="Fecha de nacimiento"
                   format="dd/MM/yyyy"
+                  disabled={this.props.desdeQR}
                   openToYearSelection={true}
                   disableFuture={true}
                   labelFunc={this.renderLabelFecha}
@@ -343,14 +337,15 @@ class PaginaDatosBasicos extends React.Component {
                 <FormControl component="fieldset" className={classes.formControl}>
                   <FormLabel component="legend">Sexo</FormLabel>
                   <RadioGroup
+                    disabled={this.props.desdeQR}
                     aria-label="Sexo"
                     name="sexo"
                     style={{ flexDirection: "row" }}
                     value={this.state.sexo}
                     onChange={this.onInputSexoChange}
                   >
-                    <FormControlLabel value="m" control={<Radio />} label="Masculino" />
-                    <FormControlLabel value="f" control={<Radio />} label="Femenino" />
+                    <FormControlLabel value="m" control={<Radio disabled={this.props.desdeQR} />} label="Masculino" />
+                    <FormControlLabel value="f" control={<Radio disabled={this.props.desdeQR} />} label="Femenino" />
                   </RadioGroup>
                 </FormControl>
               </Grid>
@@ -374,12 +369,12 @@ class PaginaDatosBasicos extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
 
-        <Button variant="raised" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>

@@ -111,9 +111,9 @@ class MiPanelMensaje extends React.PureComponent {
     return (
       <Lottie
         options={lottie}
-        height={150}
-        width={150}
-        style={{ minHeight: "150px" }}
+        height={130}
+        width={130}
+        style={{ minHeight: "130px" }}
       />
     );
   }

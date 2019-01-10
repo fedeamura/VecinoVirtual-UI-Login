@@ -151,7 +151,7 @@ class PaginaConfirmacion extends React.Component {
       >
         <div style={{ flex: 1 }}>
           <Button
-            variant="flat"
+            variant="text"
             color="primary"
             className={classes.button}
             onClick={this.props.onBotonVolverClick}
@@ -161,7 +161,7 @@ class PaginaConfirmacion extends React.Component {
         </div>
 
         <Button
-          variant="raised"
+          variant="contained"
           disabled={this.state.recaptcha == undefined}
           color="primary"
           className={classes.button}

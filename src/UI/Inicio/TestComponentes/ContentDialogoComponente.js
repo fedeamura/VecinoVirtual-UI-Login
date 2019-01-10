@@ -11,7 +11,7 @@ class ContentDialogoComponente extends React.Component {
     return (
       <div>
         <Button
-          variant="raised"
+          variant="contained"
           onClick={() => {
             this.props.onClose();
           }}

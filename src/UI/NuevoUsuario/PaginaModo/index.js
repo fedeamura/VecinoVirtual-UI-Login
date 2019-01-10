@@ -140,7 +140,7 @@ class PaginaModo extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonYaEstoyRegistradoClick}>
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonYaEstoyRegistradoClick}>
             Ya estoy registrado
           </Button>
         </div>

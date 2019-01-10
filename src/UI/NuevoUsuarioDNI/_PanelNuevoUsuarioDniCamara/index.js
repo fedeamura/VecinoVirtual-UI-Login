@@ -9,9 +9,7 @@ import styles from "./styles";
 import Webcam from "react-webcam";
 import Lottie from "react-lottie";
 import * as animScan from "@Resources/animaciones/anim_scan.json";
-import { Typography, Button, Icon } from "@material-ui/core";
-import loadImage from "blueimp-load-image";
-import ImageJS from "image-js";
+import { Typography, Button, Icon, Fab } from "@material-ui/core";
 
 const lottieScan = {
   loop: true,
@@ -27,21 +25,25 @@ class PanelCamara extends React.Component {
     super(props);
 
     this.state = {
-      infoVisible: false
+      infoVisible: false,
+      camaraVisible: false
     };
   }
 
   componentDidMount() {
-    let w = this.encuadre.clientWidth - 64;
-    if (w > 1000) w = 1000;
-    let h = w / 1.55;
-    if (h > this.encuadre.clientHeight - 64) {
-      h = this.encuadre.clientHeight - 64;
-      w = h * 1.55;
+    if (this.encuadre) {
+      let w = this.encuadre.clientWidth - 64;
+      if (w > 1000) w = 1000;
+      let h = w / 1.55;
+      if (h > this.encuadre.clientHeight - 64) {
+        h = this.encuadre.clientHeight - 64;
+        w = h * 1.55;
+      }
+      this.setState({ width: w, height: h });
     }
-    this.setState({ width: w, height: h });
 
-    setInterval(() => {
+    this.intervalo = setInterval(() => {
+      if (this.encuadre == undefined) return;
       let w = this.encuadre.clientWidth - 64;
       if (w > 1000) w = 1000;
       let h = w / 1.55;
@@ -53,9 +55,19 @@ class PanelCamara extends React.Component {
     }, 200);
   }
 
+  componentWillUnmount() {
+    clearInterval(this.intervalo);
+  }
+
   componentWillReceiveProps(nextProps) {
-    if (nextProps.visible != this.props.visible && nextProps.visible) {
-      this.setState({ infoVisible: true });
+    if (nextProps.visible != this.props.visible) {
+      if (nextProps.visible) {
+        this.setState({ infoVisible: true, camaraVisible: true });
+      } else {
+        setTimeout(() => {
+          this.setState({ camaraVisible: false });
+        }, 500);
+      }
     }
   }
 
@@ -77,7 +89,6 @@ class PanelCamara extends React.Component {
 
   onBotonCamaraClick = () => {
     const imageSrc = this.webcam.getScreenshot();
-    console.log(imageSrc);
 
     this.setState({ tomandoFoto: true }, () => {
       setTimeout(() => {
@@ -86,10 +97,9 @@ class PanelCamara extends React.Component {
     });
   };
 
-
   render() {
     const { classes, visible } = this.props;
-    let { infoVisible, width, height, tomandoFoto } = this.state;
+    let { infoVisible, width, height, tomandoFoto, camaraVisible } = this.state;
 
     const videoConstraints = {
       width: width,
@@ -104,9 +114,9 @@ class PanelCamara extends React.Component {
     const encuadreLeft = this.encuadre ? (this.encuadre.clientWidth - width) / 2 : 0;
 
     return (
-      <div className={classNames(classes.contenedorCamara, visible && "visible")} ref={this.onEncuadreRef}>
+      <div className={classNames(classes.root, visible && "visible")} ref={this.onEncuadreRef}>
         <div className={classNames(classes.contenedorPanelFoto, visible && "visible")}>
-          {visible && (
+          {camaraVisible && (
             <Webcam
               width={encuadreWidth}
               height={encuadreHeight}
@@ -159,12 +169,12 @@ class PanelCamara extends React.Component {
             Encuadre el último ejemplar de su DNI para poder validar su identidad
           </Typography>
 
-          <Button onClick={this.onBotonCamaraInfoClick} variant="raised" color="primary" style={{ marginTop: 16 }}>
+          <Button onClick={this.onBotonCamaraInfoClick} variant="contained" color="primary" style={{ marginTop: 16 }}>
             Aceptar
           </Button>
 
           <Button
-            onClick={this.props.onBotonArchivoClick}
+            onClick={this.props.onBotonFileClick}
             variant="outlined"
             color="primary"
             style={{ color: "white", marginTop: 16, borderColor: "white" }}
@@ -174,18 +184,18 @@ class PanelCamara extends React.Component {
         </div>
 
         {/* boton camara */}
-        <Button
-          variant="extendedFab"
+        <Fab
+          variant="extended"
           onClick={this.onBotonCamaraClick}
           color="primary"
           style={{ bottom: 16 }}
           className={classNames(classes.botonCamara, visible && infoVisible == false && "visible")}
         >
           Capturar
-        </Button>
+        </Fab>
 
-        <Button className={classes.camaraBotonCerrar} variant="raised" onClick={this.onBotonCerrarClick}>
-          <Icon>close</Icon>
+        <Button className={classes.camaraBotonCerrar} variant="contained" onClick={this.onBotonCerrarClick}>
+          <Icon style={{ marginRight: 8 }}>close</Icon>
           Cancelar
         </Button>
       </div>

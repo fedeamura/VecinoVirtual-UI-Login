@@ -3,13 +3,12 @@ import { withStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import Switch from "@material-ui/core/Switch";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
-import { Typography } from "@material-ui/core";
 import Icon from "@material-ui/core/Icon";
+import Fab from "@material-ui/core/Fab";
 import Grid from "@material-ui/core/Grid";
 import Dialog from "@material-ui/core/Dialog";
 import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import withMobileDialog from "@material-ui/core/withMobileDialog";
 
@@ -21,12 +20,7 @@ import grey from "@material-ui/core/colors/grey";
 //REDUX
 import { connect } from "react-redux";
 import { login } from "@Redux/Actions/usuario";
-import {
-  mostrarAlerta,
-  mostrarAlertaNaranja,
-  mostrarAlertaRoja,
-  mostrarAlertaVerde
-} from "@Redux/Actions/alerta";
+import { mostrarAlerta, mostrarAlertaNaranja, mostrarAlertaRoja, mostrarAlertaVerde } from "@Redux/Actions/alerta";
 import { mostrarCargando } from "@Redux/Actions/mainContent";
 
 //Mis componentes
@@ -178,59 +172,31 @@ class TestComponentes extends React.Component {
       <MiCard margin titulo="Botones">
         <Grid container>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-            >
-              {this.state.botonesConIcono && (
-                <Icon className={classes.iconoIzquierda}>add</Icon>
-              )}
+            <Button variant="contained" color="secondary" className={classes.button}>
+              {this.state.botonesConIcono && <Icon className={classes.iconoIzquierda}>add</Icon>}
               contained
             </Button>
             <Button variant="fab" color="secondary" className={classes.button}>
               <Icon>add</Icon>
             </Button>
-            <Button
-              variant="extendedFab"
-              color="secondary"
-              className={classes.button}
-            >
-              {this.state.botonesConIcono && (
-                <Icon className={classes.iconoIzquierda}>add</Icon>
-              )}
+            <Fab variant="extended" color="secondary" className={classes.button}>
+              {this.state.botonesConIcono && <Icon className={classes.iconoIzquierda}>add</Icon>}
               extendedFab
-            </Button>
-            <Button variant="flat" color="secondary" className={classes.button}>
-              {this.state.botonesConIcono && (
-                <Icon className={classes.iconoIzquierda}>add</Icon>
-              )}
+            </Fab>
+            <Button variant="text" color="secondary" className={classes.button}>
+              {this.state.botonesConIcono && <Icon className={classes.iconoIzquierda}>add</Icon>}
               flat
             </Button>
-            <Button
-              variant="outlined"
-              color="secondary"
-              className={classes.button}
-            >
-              {this.state.botonesConIcono && (
-                <Icon className={classes.iconoIzquierda}>add</Icon>
-              )}
+            <Button variant="outlined" color="secondary" className={classes.button}>
+              {this.state.botonesConIcono && <Icon className={classes.iconoIzquierda}>add</Icon>}
               outlined
             </Button>
-            <Button
-              variant="raised"
-              className={classes.button}
-              color="secondary"
-            >
-              {this.state.botonesConIcono && (
-                <Icon className={classes.iconoIzquierda}>add</Icon>
-              )}
+            <Button variant="contained" className={classes.button} color="secondary">
+              {this.state.botonesConIcono && <Icon className={classes.iconoIzquierda}>add</Icon>}
               raised
             </Button>
             <Button variant="text" className={classes.button} color="secondary">
-              {this.state.botonesConIcono && (
-                <Icon className={classes.iconoIzquierda}>add</Icon>
-              )}
+              {this.state.botonesConIcono && <Icon className={classes.iconoIzquierda}>add</Icon>}
               text
             </Button>
           </Grid>
@@ -238,12 +204,7 @@ class TestComponentes extends React.Component {
           <Grid item xs={12}>
             <FormControlLabel
               control={
-                <Switch
-                  color="secondary"
-                  checked={this.state.botonesConIcono}
-                  onChange={this.onCheckBotonesConIconoChange}
-                  value="Icono"
-                />
+                <Switch color="secondary" checked={this.state.botonesConIcono} onChange={this.onCheckBotonesConIconoChange} value="Icono" />
               }
               label="Botones con icono"
             />
@@ -332,12 +293,7 @@ class TestComponentes extends React.Component {
       <MiCard margin titulo="Utils">
         <Grid container>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              onClick={this.onBotonCargandoClick}
-            >
+            <Button variant="contained" color="secondary" className={classes.button} onClick={this.onBotonCargandoClick}>
               Mostrar cargando
             </Button>
           </Grid>
@@ -381,12 +337,7 @@ class TestComponentes extends React.Component {
       <MiCard margin titulo="Dialogos">
         <Grid container>
           <Grid item xs={12}>
-            <Button
-              variant="contained"
-              color="secondary"
-              className={classes.button}
-              onClick={this.onBotonDialogoClick}
-            >
+            <Button variant="contained" color="secondary" className={classes.button} onClick={this.onBotonDialogoClick}>
               Crear dialogo
             </Button>
           </Grid>

@@ -13,8 +13,7 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
-//Componentes
-import { isMobile } from "react-device-detect";
+import { QueryString } from "@Componentes/urlUtils";
 
 //Mis componentes
 import MiCardLogin from "@Componentes/MiCardLogin";
@@ -27,8 +26,6 @@ import PaginaDatosContacto from "./PaginaDatosContacto";
 import PaginaDatosDomicilio from "./PaginaDatosDomicilio";
 import PaginaFoto from "./PaginaFoto";
 import PaginaConfirmacion from "./PaginaConfirmacion";
-import PanelCamara from "./_PanelCamara";
-import PanelPicker from "./_PanelPicker";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -103,7 +100,31 @@ class NuevoUsuario extends React.Component {
               infoLogin: data
             });
 
-            this.cambiarPagina(PAGINA_MODO);
+            let q = QueryString(window.location.href);
+            if (q.conData == "true") {
+              let data = JSON.parse(localStorage.getItem("dataNuevoUsuario"));
+              localStorage.removeItem("dataNuevoUsuario");
+              this.setState(
+                {
+                  desdeQR: true,
+                  datosDni: data.datosDni,
+                  fotoDni: data.fotoDni,
+                  datosBasicos: {
+                    nombre: data.nombre,
+                    apellido: data.apellido,
+                    dni: "" + data.dni,
+                    fechaNacimiento: data.fechaNacimiento,
+                    sexoMasculino: data.sexoMasculino,
+                    idEstadoCivil: undefined
+                  }
+                },
+                () => {
+                  this.cambiarPagina(PAGINA_DATOS_ACCESO);
+                }
+              );
+            } else {
+              this.cambiarPagina(PAGINA_MODO);
+            }
           })
           .catch(error => {
             this.setState({
@@ -181,11 +202,8 @@ class NuevoUsuario extends React.Component {
 
       case "dni":
         {
-          if (isMobile) {
-            this.mostrarDniCamara();
-          } else {
-            this.mostrarDniFilePicker();
-          }
+          this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
+          // this.mostrarPanelNuevoUsuarioDni(isMobile ? "camara" : "file");
         }
         break;
     }
@@ -205,12 +223,6 @@ class NuevoUsuario extends React.Component {
 
       let comando = {
         comando: {
-          nombre: this.state.datosBasicos.nombre,
-          apellido: this.state.datosBasicos.apellido,
-          dni: this.state.datosBasicos.dni,
-          fechaNacimiento: this.convertirFechaNacimientoString(this.state.datosBasicos.fechaNacimiento),
-          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m",
-          idEstadoCivil: this.state.datosBasicos.idEstadoCivil,
           domicilio:
             this.state.datosDomicilio == undefined
               ? undefined
@@ -242,8 +254,39 @@ class NuevoUsuario extends React.Component {
         urlRetorno: window.location.origin + window.Config.BASE_URL + "/#/Login/" + this.state.codigo
       };
 
+      let conFoto = false;
+      if (this.state.desdeQR) {
+        if (this.state.fotoDni) {
+          conFoto = true;
+          comando.data = this.state.fotoDni;
+        } else {
+          comando.datosQR = this.state.datosDni;
+        }
+      } else {
+        comando.comando = {
+          ...comando.comando,
+          nombre: this.state.datosBasicos.nombre,
+          apellido: this.state.datosBasicos.apellido,
+          dni: this.state.datosBasicos.dni,
+          fechaNacimiento: this.convertirFechaNacimientoString(this.state.datosBasicos.fechaNacimiento),
+          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m",
+          idEstadoCivil: this.state.datosBasicos.idEstadoCivil
+        };
+      }
+
       this.setState({ cargando: true }, () => {
-        Rules_Usuario.registrar(comando)
+        let promesa;
+        if (this.state.desdeQR) {
+          if (conFoto) {
+            promesa = Rules_Usuario.registrarConQR(comando);
+          } else {
+            promesa = Rules_Usuario.registrarConDatosQR(comando);
+          }
+        } else {
+          promesa = Rules_Usuario.registrar(comando);
+        }
+
+        promesa
           .then(() => {
             this.setState({ paginaExtraActual: PAGINA_EXTRA_EXITO });
           })
@@ -284,7 +327,9 @@ class NuevoUsuario extends React.Component {
 
   onPaginaDatosBasicosBotonYaEstoyRegistradoClick = () => {
     this.setState({ visible: false }, () => {
-      this.props.redireccionar("/Login/" + this.state.codigo);
+      setTimeout(() => {
+        this.props.redireccionar("/Login/" + this.state.codigo);
+      }, 300);
     });
   };
 
@@ -333,9 +378,6 @@ class NuevoUsuario extends React.Component {
           >
             {this.renderContent()}
           </MiCardLogin>
-
-          {this.renderDniCamara()}
-          {this.renderDniFilePicker()}
         </div>
       </React.Fragment>
     );
@@ -446,11 +488,11 @@ class NuevoUsuario extends React.Component {
     return (
       <PaginaDatosBasicos
         padding={padding}
+        desdeQR={this.state.desdeQR || false}
         datosIniciales={this.state.datosBasicos}
         onCargando={this.onCargando}
         onReady={this.onDatosBasicosReady}
         onBotonVolverClick={this.onPaginaDatosBasicosBotonVolverClick}
-        // onBotonYaEstoyRegistradoClick={this.onPaginaDatosBasicosBotonYaEstoyRegistradoClick}
       />
     );
   }
@@ -459,6 +501,7 @@ class NuevoUsuario extends React.Component {
     return (
       <PaginaDatosAcceso
         padding={padding}
+        desdeQR={this.state.desdeQR || false}
         datosIniciales={this.state.datosAcceso}
         onCargando={this.onCargando}
         onReady={this.onDatosAccesoReady}
@@ -538,38 +581,6 @@ class NuevoUsuario extends React.Component {
         detalle={"Le enviamos un e-mail a " + email + " con las instrucciones para activarlo"}
         boton="Volver al inicio"
         onBotonClick={this.onPaginaExitoBotonInicioClick}
-      />
-    );
-  }
-
-  mostrarDniCamara = () => {
-    this.setState({ dniCamaraVisible: true, dniFilePickerVisible: false });
-  };
-
-  cerrarDniCamara = () => {
-    this.setState({ dniCamaraVisible: false });
-  };
-
-  renderDniCamara() {
-    return (
-      <PanelCamara visible={this.state.dniCamaraVisible} onClose={this.cerrarDniCamara} onBotonArchivoClick={this.mostrarDniFilePicker} />
-    );
-  }
-
-  mostrarDniFilePicker = () => {
-    this.setState({ dniFilePickerVisible: true, dniCamaraVisible: false });
-  };
-
-  cerrarDniFilePicker = () => {
-    this.setState({ dniFilePickerVisible: false });
-  };
-
-  renderDniFilePicker() {
-    return (
-      <PanelPicker
-        visible={this.state.dniFilePickerVisible}
-        onClose={this.cerrarDniFilePicker}
-        onBotonCamaraClick={this.mostrarDniCamara}
       />
     );
   }

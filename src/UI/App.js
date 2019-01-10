@@ -24,6 +24,8 @@ import CloseIcon from "@material-ui/icons/Close";
 //Mis componentes
 import Login from "./Login/index";
 import NuevoUsuario from "./NuevoUsuario";
+import NuevoUsuarioDNI from "./NuevoUsuarioDNI";
+
 import Pagina404 from "@UI/_Pagina404";
 import ProcesarRecuperarPassword from "@UI/ProcesarRecuperarPassword";
 import ProcesarActivacionUsuario from "@UI/ProcesarActivacionUsuario";
@@ -101,6 +103,7 @@ class App extends React.Component {
         <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
           <Route path={`${base}/Login/:codigo`} component={Login} />
           <Route path={`${base}/NuevoUsuario/:codigo`} component={NuevoUsuario} />
+          <Route path={`${base}/NuevoUsuarioDNI/:codigo`} component={NuevoUsuarioDNI} />
           <Route path={`${base}/ProcesarRecuperarPassword`} component={ProcesarRecuperarPassword} />
           <Route path={`${base}/ProcesarActivacionUsuario`} component={ProcesarActivacionUsuario} />
           <Route component={Pagina404} />
@@ -164,7 +167,7 @@ const styles = theme => {
   return {
     root: {
       display: "flex",
-      width:'100%',
+      width: "100%",
       height: "100%",
       overflow: "hidden"
     },

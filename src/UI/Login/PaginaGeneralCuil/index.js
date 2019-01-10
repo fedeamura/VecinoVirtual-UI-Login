@@ -224,7 +224,7 @@ class PaginaGenerarCUIL extends React.Component {
       >
         <div style={{ flex: 1 }}>
           <Button
-            variant="flat"
+            variant="text"
             color="primary"
             className={classes.button}
             onClick={this.props.onBotonVolverClick}
@@ -234,7 +234,7 @@ class PaginaGenerarCUIL extends React.Component {
         </div>
 
         <Button
-          variant="raised"
+          variant="contained"
           color="primary"
           className={classes.button}
           onClick={this.onBotonGenerarClick}
@@ -292,7 +292,7 @@ class PaginaGenerarCUIL extends React.Component {
       >
         <div style={{ flex: 1 }}>
           <Button
-            variant="flat"
+            variant="text"
             color="primary"
             className={classes.button}
             onClick={this.props.onBotonVolverClick}

@@ -504,7 +504,7 @@ class PaginaDatosDomicilio extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
@@ -515,7 +515,7 @@ class PaginaDatosDomicilio extends React.Component {
 
         <div style={{ marginLeft: "8px" }} />
 
-        <Button variant="raised" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>

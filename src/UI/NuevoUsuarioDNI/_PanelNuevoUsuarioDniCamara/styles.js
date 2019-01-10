@@ -1,20 +1,20 @@
 const styles = theme => {
   return {
-    contenedorCamara: {
+    root: {
       position: "absolute",
       left: 0,
       top: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: "black",
+      backgroundColor: "white",
       display: "flex",
       justifyContent: "center",
       alignContent: "center",
       flexDirection: "column",
       alignItems: "center",
-      opacity: 0,
+      transition: "opacity 0.5s",
       pointerEvents: "none",
-      transition: "all 0.3s",
+      opacity: 0,
       "&.visible": {
         pointerEvents: "all",
         opacity: 1

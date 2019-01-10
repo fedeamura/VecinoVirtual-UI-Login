@@ -120,7 +120,7 @@ class PaginaUsuariosRecientes extends React.Component {
       >
         <div style={{ flex: 1 }}>
           <Button
-            variant="flat"
+            variant="text"
             color="primary"
             className={classes.button}
             onClick={this.props.onBotonVolverClick}

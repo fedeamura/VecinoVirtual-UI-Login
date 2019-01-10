@@ -335,7 +335,7 @@ class ProcesarRecuperarPassword extends React.Component {
       >
         <div style={{ flex: 1 }} />
 
-        <Button variant="raised" color="primary" className={classes.button} onClick={this.recuperarPassword}>
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.recuperarPassword}>
           Recuperar contraseña
         </Button>
       </div>

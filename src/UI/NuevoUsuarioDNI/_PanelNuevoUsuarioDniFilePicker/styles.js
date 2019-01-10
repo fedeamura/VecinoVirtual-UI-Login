@@ -12,9 +12,9 @@ const styles = theme => {
       alignContent: "center",
       flexDirection: "column",
       alignItems: "center",
-      opacity: 0,
+      transition: "opacity 0.5s",
       pointerEvents: "none",
-      transition: "all 0.3s",
+      opacity: 0,
       "&.visible": {
         pointerEvents: "all",
         opacity: 1
@@ -47,6 +47,7 @@ const styles = theme => {
       }
     },
     hintCrop: {
+      pointerEvents: "none",
       position: "absolute",
       bottom: 120,
       textShadow: "0px 0px 20px #020000",
@@ -90,6 +91,19 @@ const styles = theme => {
         pointerEvents: "all",
         opacity: 1
       }
+    },
+    contenedorCargando: {
+      zIndex: 10,
+      display: "flex",
+      justifyContent: "center",
+      alignContent: "center",
+      alignItems: "center",
+      position: "absolute",
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      backgroundColor: "white"
     }
   };
 };

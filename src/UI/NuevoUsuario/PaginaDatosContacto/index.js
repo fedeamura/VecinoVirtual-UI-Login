@@ -63,10 +63,7 @@ class PaginaDatosContacto extends React.Component {
   }
 
   componentDidMount() {
-    loadCSS(
-      "https://use.fontawesome.com/releases/v5.3.1/css/all.css",
-      document.querySelector("#insertion-point-jss")
-    );
+    loadCSS("https://use.fontawesome.com/releases/v5.3.1/css/all.css", document.querySelector("#insertion-point-jss"));
   }
 
   onInputChange = e => {
@@ -99,15 +96,7 @@ class PaginaDatosContacto extends React.Component {
 
     //Email
     let errores = this.state.errores;
-    errores["email"] = Validador.validar(
-      [
-        Validador.requerido,
-        Validador.min(email, 5),
-        Validador.max(email, 40),
-        Validador.email
-      ],
-      email
-    );
+    errores["email"] = Validador.validar([Validador.requerido, Validador.min(email, 5), Validador.max(email, 40), Validador.email], email);
 
     //Repetir email
     errores["emailRepeat"] = Validador.validar(
@@ -125,35 +114,20 @@ class PaginaDatosContacto extends React.Component {
 
     //Celular area
     errores["telefonoCelularArea"] = Validador.validar(
-      [
-        Validador.min(telefonoCelularArea, 2),
-        Validador.max(telefonoCelularArea, 4),
-        Validador.numericoEntero
-      ],
+      [Validador.min(telefonoCelularArea, 2), Validador.max(telefonoCelularArea, 4), Validador.numericoEntero],
       telefonoCelularArea
     );
 
     //Celular numero
     errores["telefonoCelularNumero"] = Validador.validar(
-      [
-        Validador.min(telefonoCelularNumero, 4),
-        Validador.max(telefonoCelularNumero, 8),
-        Validador.numericoEntero
-      ],
+      [Validador.min(telefonoCelularNumero, 4), Validador.max(telefonoCelularNumero, 8), Validador.numericoEntero],
       telefonoCelularNumero
     );
 
     //Si no tiene errores en el telefono valido que si ingreso uno de los 2, este el otro
-    if (
-      errores["telefonoCelularArea"] == undefined &&
-      errores["telefonoCelularNumero"] == undefined
-    ) {
+    if (errores["telefonoCelularArea"] == undefined && errores["telefonoCelularNumero"] == undefined) {
       if ((telefonoCelularArea != "") != (telefonoCelularNumero != "")) {
-        errores[
-          telefonoCelularArea != ""
-            ? "telefonoCelularNumero"
-            : "telefonoCelularArea"
-        ] = "Dato requerido";
+        errores[telefonoCelularArea != "" ? "telefonoCelularNumero" : "telefonoCelularArea"] = "Dato requerido";
       }
     }
 
@@ -161,33 +135,20 @@ class PaginaDatosContacto extends React.Component {
 
     //Fijo Area
     errores["telefonoFijoArea"] = Validador.validar(
-      [
-        Validador.min(telefonoFijoArea, 2),
-        Validador.max(telefonoFijoArea, 4),
-        Validador.numericoEntero
-      ],
+      [Validador.min(telefonoFijoArea, 2), Validador.max(telefonoFijoArea, 4), Validador.numericoEntero],
       telefonoFijoArea
     );
 
     //Fijo numero
     errores["telefonoFijoNumero"] = Validador.validar(
-      [
-        Validador.min(telefonoFijoNumero, 4),
-        Validador.max(telefonoFijoNumero, 8),
-        Validador.numericoEntero
-      ],
+      [Validador.min(telefonoFijoNumero, 4), Validador.max(telefonoFijoNumero, 8), Validador.numericoEntero],
       telefonoFijoNumero
     );
 
     //Si no tiene errores en el telefono valido que si ingreso uno de los 2, este el otro
-    if (
-      errores["telefonoFijoArea"] == undefined &&
-      errores["telefonoFijoNumero"] == undefined
-    ) {
+    if (errores["telefonoFijoArea"] == undefined && errores["telefonoFijoNumero"] == undefined) {
       if ((telefonoFijoArea != "") != (telefonoFijoNumero != "")) {
-        errores[
-          telefonoFijoArea != "" ? "telefonoFijoNumero" : "telefonoFijoArea"
-        ] = "Dato requerido";
+        errores[telefonoFijoArea != "" ? "telefonoFijoNumero" : "telefonoFijoArea"] = "Dato requerido";
       }
     }
 
@@ -204,10 +165,7 @@ class PaginaDatosContacto extends React.Component {
     if (conError) return;
 
     //Valido que tenga algun telefono de contacto
-    if (
-      (telefonoFijoArea == undefined || telefonoFijoNumero == "") &&
-      (telefonoCelularArea == undefined || telefonoCelularNumero == "")
-    ) {
+    if ((telefonoFijoArea == undefined || telefonoFijoNumero == "") && (telefonoCelularArea == undefined || telefonoCelularNumero == "")) {
       this.setState({
         error: "Ingrese algún teléfono de contacto",
         mostrarError: true
@@ -262,9 +220,7 @@ class PaginaDatosContacto extends React.Component {
                 <div className={classes.encabezado}>
                   <Typography variant="headline">Nuevo Usuario</Typography>
                   <Icon>keyboard_arrow_right</Icon>
-                  <Typography variant="subheading">
-                    Datos de contacto
-                  </Typography>
+                  <Typography variant="subheading">Datos de contacto</Typography>
                 </div>
               </Grid>
 
@@ -292,9 +248,7 @@ class PaginaDatosContacto extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoEmailError">
-                        {this.state.errores["email"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoEmailError">{this.state.errores["email"]}</FormHelperText>
                     </FormControl>
                   </Grid>
                   {/* Repetir email */}
@@ -306,9 +260,7 @@ class PaginaDatosContacto extends React.Component {
                       error={this.state.errores["emailRepeat"] !== undefined}
                       aria-describedby="textoEmailRepeatError"
                     >
-                      <InputLabel htmlFor="inputEmailRepeat">
-                        Repita su e-mail
-                      </InputLabel>
+                      <InputLabel htmlFor="inputEmailRepeat">Repita su e-mail</InputLabel>
                       <Input
                         id="inputEmailRepeat"
                         value={this.state.emailRepeat}
@@ -320,18 +272,14 @@ class PaginaDatosContacto extends React.Component {
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
                       />
-                      <FormHelperText id="textoEmailRepeatError">
-                        {this.state.errores["emailRepeat"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoEmailRepeatError">{this.state.errores["emailRepeat"]}</FormHelperText>
                     </FormControl>
                   </Grid>
 
                   <Grid item xs={12} md={6}>
                     <Grid container spacing={16}>
                       <Grid item xs={12}>
-                        <Typography variant="body2">
-                          Teléfono Celular
-                        </Typography>
+                        <Typography variant="body2">Teléfono Celular</Typography>
                       </Grid>
 
                       {/* Telefono Celular */}
@@ -340,15 +288,10 @@ class PaginaDatosContacto extends React.Component {
                           className={classes.formControl}
                           fullWidth
                           margin="dense"
-                          error={
-                            this.state.errores["telefonoCelularArea"] !==
-                            undefined
-                          }
+                          error={this.state.errores["telefonoCelularArea"] !== undefined}
                           aria-describedby="textoTelefonoCelularAreaError"
                         >
-                          <InputLabel htmlFor="inputTelefonoCelularArea">
-                            Area
-                          </InputLabel>
+                          <InputLabel htmlFor="inputTelefonoCelularArea">Area</InputLabel>
                           <Input
                             id="inputTelefonoCelularArea"
                             value={this.state.telefonoCelularArea}
@@ -358,15 +301,11 @@ class PaginaDatosContacto extends React.Component {
                             onChange={this.onInputChange}
                             startAdornment={
                               <div style={{ display: "flex" }}>
-                                <InputAdornment position="start">
-                                  0
-                                </InputAdornment>
+                                <InputAdornment position="start">0</InputAdornment>
                               </div>
                             }
                           />
-                          <FormHelperText id="textoTelefonoCelularAreaError">
-                            {this.state.errores["telefonoCelularArea"]}
-                          </FormHelperText>
+                          <FormHelperText id="textoTelefonoCelularAreaError">{this.state.errores["telefonoCelularArea"]}</FormHelperText>
                         </FormControl>
                       </Grid>
                       <Grid item xs={9}>
@@ -374,15 +313,10 @@ class PaginaDatosContacto extends React.Component {
                           className={classes.formControl}
                           fullWidth
                           margin="dense"
-                          error={
-                            this.state.errores["telefonoCelularNumero"] !==
-                            undefined
-                          }
+                          error={this.state.errores["telefonoCelularNumero"] !== undefined}
                           aria-describedby="textoTelefonoCelularNumeroError"
                         >
-                          <InputLabel htmlFor="inputTelefonoCelularNumero">
-                            Número
-                          </InputLabel>
+                          <InputLabel htmlFor="inputTelefonoCelularNumero">Número</InputLabel>
                           <Input
                             id="inputTelefonoCelularNumero"
                             value={this.state.telefonoCelularNumero}
@@ -390,11 +324,7 @@ class PaginaDatosContacto extends React.Component {
                             type="number"
                             onKeyPress={this.onInputKeyPress}
                             onChange={this.onInputChange}
-                            startAdornment={
-                              <InputAdornment position="start">
-                                15
-                              </InputAdornment>
-                            }
+                            startAdornment={<InputAdornment position="start">15</InputAdornment>}
                           />
                           <FormHelperText id="textoTelefonoCelularNumeroError">
                             {this.state.errores["telefonoCelularNumero"]}
@@ -415,14 +345,10 @@ class PaginaDatosContacto extends React.Component {
                           className={classes.formControl}
                           fullWidth
                           margin="dense"
-                          error={
-                            this.state.errores["telefonoFijoArea"] !== undefined
-                          }
+                          error={this.state.errores["telefonoFijoArea"] !== undefined}
                           aria-describedby="textoTelefonoFijoAreaError"
                         >
-                          <InputLabel htmlFor="inputTelefonoFijoArea">
-                            Area
-                          </InputLabel>
+                          <InputLabel htmlFor="inputTelefonoFijoArea">Area</InputLabel>
                           <Input
                             id="telefonoFijoArea"
                             value={this.state.telefonoFijoArea}
@@ -432,15 +358,11 @@ class PaginaDatosContacto extends React.Component {
                             onChange={this.onInputChange}
                             startAdornment={
                               <div style={{ display: "flex" }}>
-                                <InputAdornment position="start">
-                                  0
-                                </InputAdornment>
+                                <InputAdornment position="start">0</InputAdornment>
                               </div>
                             }
                           />
-                          <FormHelperText id="textoTelefonoFijoAreaError">
-                            {this.state.errores["telefonoFijoArea"]}
-                          </FormHelperText>
+                          <FormHelperText id="textoTelefonoFijoAreaError">{this.state.errores["telefonoFijoArea"]}</FormHelperText>
                         </FormControl>
                       </Grid>
                       <Grid item xs={9}>
@@ -448,15 +370,10 @@ class PaginaDatosContacto extends React.Component {
                           className={classes.formControl}
                           fullWidth
                           margin="dense"
-                          error={
-                            this.state.errores["telefonoFijoNumero"] !==
-                            undefined
-                          }
+                          error={this.state.errores["telefonoFijoNumero"] !== undefined}
                           aria-describedby="textoTelefonoFijoNumeroError"
                         >
-                          <InputLabel htmlFor="inputTelefonoFijoNumero">
-                            Número
-                          </InputLabel>
+                          <InputLabel htmlFor="inputTelefonoFijoNumero">Número</InputLabel>
                           <Input
                             id="inputTelefonoFijoNumero"
                             value={this.state.telefonoFijoNumero}
@@ -465,9 +382,7 @@ class PaginaDatosContacto extends React.Component {
                             onKeyPress={this.onInputKeyPress}
                             onChange={this.onInputChange}
                           />
-                          <FormHelperText id="textoTelefonoFijoNumeroError">
-                            {this.state.errores["telefonoFijoNumero"]}
-                          </FormHelperText>
+                          <FormHelperText id="textoTelefonoFijoNumeroError">{this.state.errores["telefonoFijoNumero"]}</FormHelperText>
                         </FormControl>
                       </Grid>
                     </Grid>
@@ -498,20 +413,12 @@ class PaginaDatosContacto extends React.Component {
                         startAdornment={
                           <div style={{ display: "flex" }}>
                             <InputAdornment position="start">
-                              <i
-                                style={{ fontSize: 20, color: "#3b5998" }}
-                                className={classNames(
-                                  "fab",
-                                  "fa-facebook-square"
-                                )}
-                              />
+                              <i style={{ fontSize: 20, color: "#3b5998" }} className={classNames("fab", "fa-facebook-square")} />
                             </InputAdornment>
                           </div>
                         }
                       />
-                      <FormHelperText id="textoFacebookError">
-                        {this.state.errores["facebook"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoFacebookError">{this.state.errores["facebook"]}</FormHelperText>
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
@@ -535,20 +442,12 @@ class PaginaDatosContacto extends React.Component {
                         startAdornment={
                           <div style={{ display: "flex" }}>
                             <InputAdornment position="start">
-                              <i
-                                style={{ fontSize: 20, color: "#1da1f2" }}
-                                className={classNames(
-                                  "fab",
-                                  "fa-twitter-square"
-                                )}
-                              />
+                              <i style={{ fontSize: 20, color: "#1da1f2" }} className={classNames("fab", "fa-twitter-square")} />
                             </InputAdornment>
                           </div>
                         }
                       />
-                      <FormHelperText id="textoTwitterError">
-                        {this.state.errores["twitter"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoTwitterError">{this.state.errores["twitter"]}</FormHelperText>
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
@@ -559,9 +458,7 @@ class PaginaDatosContacto extends React.Component {
                       error={this.state.errores["instagram"] !== undefined}
                       aria-describedby="textoInstagramError"
                     >
-                      <InputLabel htmlFor="inputInstagram">
-                        Instagram
-                      </InputLabel>
+                      <InputLabel htmlFor="inputInstagram">Instagram</InputLabel>
                       <Input
                         id="inputInstagram"
                         value={this.state.instagram}
@@ -574,17 +471,12 @@ class PaginaDatosContacto extends React.Component {
                         startAdornment={
                           <div style={{ display: "flex" }}>
                             <InputAdornment position="start">
-                              <i
-                                style={{ fontSize: 20, color: "#e56969" }}
-                                className={classNames("fab", "fa-instagram")}
-                              />
+                              <i style={{ fontSize: 20, color: "#e56969" }} className={classNames("fab", "fa-instagram")} />
                             </InputAdornment>
                           </div>
                         }
                       />
-                      <FormHelperText id="textoInstagramError">
-                        {this.state.errores["instagram"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoInstagramError">{this.state.errores["instagram"]}</FormHelperText>
                     </FormControl>
                   </Grid>
                   <Grid item xs={6} md={3}>
@@ -608,17 +500,12 @@ class PaginaDatosContacto extends React.Component {
                         startAdornment={
                           <div style={{ display: "flex" }}>
                             <InputAdornment position="start">
-                              <i
-                                style={{ fontSize: 20, color: "#0077B5" }}
-                                className={classNames("fab", "fa-linkedin")}
-                              />
+                              <i style={{ fontSize: 20, color: "#0077B5" }} className={classNames("fab", "fa-linkedin")} />
                             </InputAdornment>
                           </div>
                         }
                       />
-                      <FormHelperText id="textoLinkedinError">
-                        {this.state.errores["linkedin"]}
-                      </FormHelperText>
+                      <FormHelperText id="textoLinkedinError">{this.state.errores["linkedin"]}</FormHelperText>
                     </FormControl>
                   </Grid>
                 </Grid>
@@ -643,22 +530,14 @@ class PaginaDatosContacto extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="flat"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
-            Volver
-          </Button>
+          {this.props.desdeQR == false && (
+            <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+              Volver
+            </Button>
+          )}
         </div>
 
-        <Button
-          variant="raised"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonSiguienteClick}
-        >
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>

@@ -57,8 +57,8 @@ class PaginaUsuarioNoActivado extends React.Component {
       password: password,
       urlRetorno: window.location.href
     })
-      .then(() => {
-        this.setState({ procesado: true, error: undefined });
+      .then(email => {
+        this.setState({ procesado: true, error: undefined, email: email });
       })
       .catch(error => {
         this.setState({ procesado: true, error: error });
@@ -112,12 +112,7 @@ class PaginaUsuarioNoActivado extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="flat"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
@@ -126,24 +121,17 @@ class PaginaUsuarioNoActivado extends React.Component {
   }
 
   renderMain() {
-    if (this.state.procesado === true || this.state.error !== undefined)
-      return null;
+    if (this.state.procesado === true || this.state.error !== undefined) return null;
 
     const { classes, padding } = this.props;
 
     return (
       <div className={classes.pagina} style={{ padding: padding }}>
         <Typography variant="headline" className={classes.texto}>
-          Su usuario no se encuentra activado. Si lo desea puede solicitar
-          nuevamente el e-mail de activación.
+          Su usuario no se encuentra activado. Si lo desea puede solicitar nuevamente el e-mail de activación.
         </Typography>
 
-        <Button
-          variant="outlined"
-          color="primary"
-          style={{ marginTop: "16px" }}
-          onClick={this.onBotonActivarClick}
-        >
+        <Button variant="outlined" color="primary" style={{ marginTop: "16px" }} onClick={this.onBotonActivarClick}>
           Solicitar e-mail de activación
         </Button>
       </div>
@@ -151,26 +139,29 @@ class PaginaUsuarioNoActivado extends React.Component {
   }
 
   renderOk() {
-    if (this.state.procesado === false || this.state.error !== undefined)
-      return null;
+    if (this.state.procesado === false || this.state.error !== undefined) return null;
 
     const { classes, padding } = this.props;
 
     return (
       <div className={classes.pagina} style={{ padding: padding }}>
-        <Lottie options={opcionesAnimExito} height={150} width={150} />
+        <Lottie options={opcionesAnimExito} height={120} width={120} style={{ minHeight: 120 }} />
 
-        <Typography variant="headline" className={classes.texto}>
-          Se ha enviado un e-mail a su casilla de correo con las instrucciones
-          para la activacion de su usuario
+        <Typography variant="headline" className={classes.texto} style={{ fontSize: 20, marginBottom: 16 }}>
+          Se ha enviado un e-mail {this.state.email} con las instrucciones para la activacion de su usuario
         </Typography>
+
+        <div>
+          <Button variant="outlined" color="primary">
+            ¿No tenes acceso a esa casilla de e-mail?
+          </Button>
+        </div>
       </div>
     );
   }
 
   renderError() {
-    if (this.state.procesado === false || this.state.error === undefined)
-      return null;
+    if (this.state.procesado === false || this.state.error === undefined) return null;
 
     const { classes, padding } = this.props;
 
@@ -182,11 +173,7 @@ class PaginaUsuarioNoActivado extends React.Component {
         <Typography variant="headline" className={classes.texto}>
           {this.state.error}
         </Typography>
-        <Button
-          variant="outlined"
-          style={{ marginTop: "16px" }}
-          onClick={this.onBotonReintentarClick}
-        >
+        <Button variant="outlined" style={{ marginTop: "16px" }} onClick={this.onBotonReintentarClick}>
           Reintentar
         </Button>
       </div>

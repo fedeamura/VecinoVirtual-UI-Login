@@ -211,7 +211,7 @@ class PaginaFoto extends React.Component {
                 </Button>
 
                 {this.state.foto != undefined && (
-                  <Button onClick={this.onBotonQuitarFotoClick} variant="flat" style={{ marginTop: "0.5rem", color: red["500"] }}>
+                  <Button onClick={this.onBotonQuitarFotoClick} variant="text" style={{ marginTop: "0.5rem", color: red["500"] }}>
                     Quitar foto
                   </Button>
                 )}
@@ -238,7 +238,7 @@ class PaginaFoto extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button variant="flat" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
@@ -258,7 +258,7 @@ class PaginaFoto extends React.Component {
         <div style={{ marginLeft: 8 }} />
 
         <Button
-          variant="raised"
+          variant="contained"
           // disabled={this.state.foto == undefined}
           color="primary"
           className={classes.button}
