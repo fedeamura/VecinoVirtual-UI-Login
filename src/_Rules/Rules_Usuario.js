@@ -248,7 +248,7 @@ const metodos = {
     });
   },
   iniciarActivacion: comando => {
-    const url = window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Iniciar";
+    const url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta";
     comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
     return new Promise((resolve, reject) => {

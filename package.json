@@ -37,6 +37,7 @@
     "image-js": "^0.21.4",
     "jest": "20.0.4",
     "material-ui-pickers": "^1.0.0-rc.14",
+    "mdi-material-ui": "^5.8.0",
     "moment": "^2.22.2",
     "object-assign": "4.1.1",
     "postcss-flexbugs-fixes": "3.2.0",

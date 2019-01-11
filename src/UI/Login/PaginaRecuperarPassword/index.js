@@ -13,15 +13,30 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
+//Componentes
+import { Typography, Button } from "@material-ui/core";
+import Lottie from "react-lottie";
+import * as animExito from "@Resources/animaciones/anim_success.json";
+
 //Mis compontentes
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import ContentSwapper from "@Componentes/ContentSwapper";
+import DialogoMensaje from "@Componentes/MiDialogoMensaje";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 
 const PAGINA_ERROR = "PAGINA_ERROR";
 const PAGINA_OK = "PAGINA_OK";
+
+const opcionesAnimExito = {
+  loop: false,
+  autoplay: true,
+  animationData: animExito,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice"
+  }
+};
 
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
@@ -84,6 +99,14 @@ class PaginaRecuperarPassword extends React.Component {
     );
   };
 
+  mostrarDialogoValidarDni = () => {
+    this.setState({ dialogoValidarDniVisible: true });
+  };
+
+  onDialogoValidarDniClose = () => {
+    this.setState({ dialogoValidarDniVisible: false });
+  };
+
   render() {
     const { classes } = this.props;
     return (
@@ -94,47 +117,49 @@ class PaginaRecuperarPassword extends React.Component {
           transitionLeaveTimeout={500}
           className={classes.contentSwapper}
         >
-          <div
-            key="paginaOK"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_OK)}
-          >
+          <div key="paginaOK" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_OK)}>
             {this.renderPaginaOk()}
           </div>
 
-          <div
-            key="paginaError"
-            className={classes.contentSwapperContent}
-            visible={"" + (this.state.paginaActual == PAGINA_ERROR)}
-          >
+          <div key="paginaError" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_ERROR)}>
             {this.renderPaginaError()}
           </div>
         </ContentSwapper>
+
+        <DialogoMensaje
+          mensaje="Si no recordás tu contraseña y tampoco tenés acceso a tu casilla de e-mail podes acceder al sistema validando tu DNI."
+          visible={this.state.dialogoValidarDniVisible}
+          onClose={this.onDialogoValidarDniClose}
+          textoSi="Validar con DNI"
+          onBotonSiClick={this.props.onBotonValidarDniClick}
+          textoNo="Cancelar"
+        />
       </div>
     );
   }
 
   renderPaginaOk() {
+    const { classes, padding } = this.props;
+
     return (
-      <MiPanelMensaje
-        lottieExito
-        mensaje=" Se ha enviado un e-mail a su casilla de correo con las instrucciones
-      para recuperar su contraseña"
-        boton="Volver"
-        onBotonClick={this.props.onBotonVolverClick}
-      />
+      <div className={classes.pagina} style={{ padding: padding }}>
+        <Lottie options={opcionesAnimExito} height={120} width={120} style={{ minHeight: 120 }} />
+
+        <Typography variant="headline" className={classes.texto} style={{ fontSize: 20, marginBottom: 16 }}>
+          Se ha enviado un e-mail a su casilla de correo con las instrucciones para recuperar tu contraseña
+        </Typography>
+
+        <div>
+          <Button variant="outlined" color="primary" onClick={this.mostrarDialogoValidarDni}>
+            ¿No tenes acceso a la casilla de e-mail?
+          </Button>
+        </div>
+      </div>
     );
   }
 
   renderPaginaError() {
-    return (
-      <MiPanelMensaje
-        boton="Volver"
-        onBotonClick={this.props.onBotonVolverClick}
-        error
-        mensaje={this.state.error}
-      />
-    );
+    return <MiPanelMensaje boton="Volver" onBotonClick={this.props.onBotonVolverClick} error mensaje={this.state.error} />;
   }
 }
 

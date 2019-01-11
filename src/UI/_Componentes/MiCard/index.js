@@ -15,15 +15,9 @@ class MiCard extends React.PureComponent {
     let sinPadding = "padding" in this.props && this.props.padding === false;
 
     return (
-      <div className={this.props.rootClassName}>
+      <div className={this.props.rootClassName} style={this.props.styleRoot}>
         {conTitulo && (
-          <Typography
-            className={classNames(
-              classes.titulo,
-              conMargin && classes.tituloMargin
-            )}
-            variant="headline"
-          >
+          <Typography className={classNames(classes.titulo, conMargin && classes.tituloMargin)} variant="headline">
             {titulo}
           </Typography>
         )}
@@ -39,11 +33,8 @@ class MiCard extends React.PureComponent {
           {...this.props.cardProps}
         >
           <CardContent
-            className={classNames(
-              classes.content,
-              this.props.contentClassName,
-              sinPadding && classes.cardSinPadding
-            )}
+            style={this.props.styleCardContent}
+            className={classNames(classes.content, this.props.contentClassName, sinPadding && classes.cardSinPadding)}
           >
             {this.props.children}
           </CardContent>

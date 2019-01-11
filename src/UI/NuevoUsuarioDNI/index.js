@@ -4,13 +4,14 @@ import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import styles from "./styles";
+import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
 
 //REDUX
 import { connect } from "react-redux";
-import { push } from "connected-react-router";
+import { push, goBack } from "connected-react-router";
 
 import { isMobile } from "react-device-detect";
-import { CircularProgress, Button } from "@material-ui/core";
+import { CircularProgress, Button, Typography } from "@material-ui/core";
 import { QueryString } from "@Componentes/urlUtils";
 
 //Mis Componentes
@@ -19,6 +20,7 @@ import PanelFilePicker from "./_PanelNuevoUsuarioDniFilePicker";
 import DialogoDniManual from "./_DialogoDniManual";
 import DialogoMensaje from "@Componentes/MiDialogoMensaje";
 import DialogoInput from "@Componentes/MiDialogoInput";
+import MiCardLogin from "@Componentes/MiCardLogin";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -27,6 +29,9 @@ import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
     dispatch(push(url));
+  },
+  goBack: () => {
+    dispatch(goBack());
   }
 });
 
@@ -45,7 +50,7 @@ class PanelNuevoUsuario extends React.Component {
       validandoCodigoErrorVisible: false,
       validandoCodigoErrorMensaje: false,
       infoLogin: undefined,
-      modo: "file"
+      modo: undefined
     };
   }
 
@@ -53,7 +58,7 @@ class PanelNuevoUsuario extends React.Component {
     localStorage.removeItem("dataNuevoUsuario");
 
     setTimeout(() => {
-      this.setState({ visible: true });
+      this.setState({ visible: true, modo: isMobile ? "camara" : "file", puedeCapturar: isMobile ? true : false });
     }, 500);
     this.validarCodigo();
   }
@@ -85,11 +90,11 @@ class PanelNuevoUsuario extends React.Component {
   };
 
   onBotonCamaraClick = () => {
-    this.setState({ modo: "camara" });
+    this.setState({ modo: "camara", puedeCapturar: true });
   };
 
   onBotonFileClick = () => {
-    this.setState({ modo: "file" });
+    this.setState({ modo: "file", puedeCapturar: false });
   };
 
   onClose = () => {
@@ -231,17 +236,20 @@ class PanelNuevoUsuario extends React.Component {
     this.setState({ dialogoNuevoUsuarioActivarUsuarioCargando: true }, () => {
       let data = this.state.dialogoNuevoUsuarioActivarUsuarioData;
 
+      let pathname = window.location.pathname != "/" ? window.location.pathname : "";
+      const urlRetorno = window.location.origin + pathname + "/#/Login/" + this.state.codigo;
+
       //Si es object voy por datos QR, sino por imagen QR
       let promesa;
       if (typeof data == "object") {
         promesa = Rules_Usuario.iniciarActivacionPorDatosQR({
           datosQR: data,
-          urlRetorno: window.location.href
+          urlRetorno: urlRetorno
         });
       } else {
         promesa = Rules_Usuario.iniciarActivacionPorQR({
           data: data,
-          urlRetorno: window.location.href
+          urlRetorno: urlRetorno
         });
       }
       promesa
@@ -297,19 +305,22 @@ class PanelNuevoUsuario extends React.Component {
       () => {
         let data = this.state.dialogoNuevoUsuarioActivarUsuarioData;
 
+        let pathname = window.location.pathname != "/" ? window.location.pathname : "";
+        const urlRetorno = window.location.origin + pathname + "/#/Login/" + this.state.codigo;
+
         //Si es object voy por datos QR, sino por imagen QR
         let promesa;
         if (typeof data == "object") {
           promesa = Rules_Usuario.iniciarActivacionPorDatosQR({
             datosQR: data,
             emailNuevo: email,
-            urlRetorno: window.location.href
+            urlRetorno: urlRetorno
           });
         } else {
           promesa = Rules_Usuario.iniciarActivacionPorQR({
             data: data,
             emailNuevo: email,
-            urlRetorno: window.location.href
+            urlRetorno: urlRetorno
           });
         }
 
@@ -407,26 +418,137 @@ class PanelNuevoUsuario extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
-    const { modo } = this.state;
+    const { classes, width } = this.props;
+    const { cargando, visible } = this.state;
+
+    let padding = "1rem";
+
+    let escritorio = isWidthUp("sm", width);
 
     return (
-      <div className={classNames(classes.root, this.state.visible && "visible")}>
+      <React.Fragment>
+        <div className={classes.root}>
+          <MiCardLogin
+            styleRoot={{
+              maxWidth: "900px",
+              maxHeight: escritorio ? "700px" : "none",
+              marginTop: escritorio ? "2rem" : 0,
+              marginBottom: escritorio ? "2rem" : 0
+            }}
+            styleCardContent={{
+              borderRadius: escritorio ? "17px" : 0,
+              overflow: "hidden",
+              position: "relative"
+            }}
+            styleCargando={{ position: "absolute" }}
+            headerVisible={false}
+            titulo="Vecino Virtual"
+            cargando={cargando}
+            visible={visible}
+            padding={padding}
+          >
+            <div className={classes.cardContent}>
+              {this.renderContent()}
+              {this.renderFooter()}
+            </div>
+          </MiCardLogin>
+        </div>
+      </React.Fragment>
+    );
+  }
+
+  onPuedeCapturar = puede => {
+    this.setState({ puedeCapturar: puede });
+  };
+
+  onBotonFotoClick = () => {
+    const { modo } = this.state;
+    if (modo == "camara") {
+      var event = new CustomEvent("camara-capturar", { detail: "Example of an event" });
+      window.dispatchEvent(event);
+    } else {
+      var event = new CustomEvent("file-seleccionar", { detail: "Example of an event" });
+      window.dispatchEvent(event);
+    }
+  };
+
+  onCargando = val => {
+    this.setState({ cargando: val });
+  };
+
+  onBotonCancelarClick = () => {
+    this.setState({ visible: false }, () => {
+      setTimeout(() => {
+        this.props.goBack();
+      }, 500);
+    });
+  };
+
+  renderContent() {
+    const { modo } = this.state;
+    const { classes } = this.props;
+
+    return (
+      <div className={classes.content}>
         <PanelCamara
           visible={modo == "camara"}
+          onPuedeCapturar={this.onPuedeCapturar}
           onBotonFileClick={this.onBotonFileClick}
+          onCargando={this.onCargando}
           onClose={this.onClose}
           onDni={this.onFotoDniReady}
         />
         <PanelFilePicker
           visible={modo == "file"}
+          onPuedeCapturar={this.onPuedeCapturar}
           onBotonCamaraClick={this.onBotonCamaraClick}
+          onCargando={this.onCargando}
           onClose={this.onClose}
           onDni={this.onFotoDniReady}
         />
-
         {this.renderDialogos()}
-        {this.renderCargando()}
+      </div>
+    );
+  }
+
+  onToggleModo = () => {
+    let modo = this.state.modo;
+    if (modo == "file") {
+      modo = "camara";
+    } else {
+      modo = "file";
+    }
+
+    this.setState({ modo });
+  };
+
+  renderFooter() {
+    const { classes } = this.props;
+    const { modo, puedeCapturar } = this.state;
+
+    const padding = "1rem";
+    const textoBoton = modo == "file" ? "Seleccionar" : "Capturar";
+
+    return (
+      <div
+        className={classes.footer}
+        style={{
+          padding: padding,
+          paddingBottom: "16px",
+          paddingTop: "16px"
+        }}
+      >
+        <div style={{ flex: 1 }}>
+          <Button variant="text" onClick={this.onBotonCancelarClick}>
+            Cancelar
+          </Button>
+        </div>
+
+        {puedeCapturar && (
+          <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonFotoClick}>
+            {textoBoton}
+          </Button>
+        )}
       </div>
     );
   }
@@ -574,6 +696,7 @@ class PanelNuevoUsuario extends React.Component {
 
 let componente = PanelNuevoUsuario;
 componente = withStyles(styles)(componente);
+componente = withWidth()(componente);
 componente = connect(
   mapStateToProps,
   mapDispatchToProps

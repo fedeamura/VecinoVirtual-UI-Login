@@ -46,11 +46,23 @@ const styles = theme => {
         opacity: 1
       }
     },
-    hintCrop: {
+    "@keyframes fadeAnimation": {
+      from: { opacity: 0.7 },
+      to: { opacity: 1 }
+    },
+    hint: {
+      animationDuration: "0.7s",
+      animationName: "fadeAnimation",
+      animationIterationCount: "infinite",
+      animationDirection: "alternate",
+      backgroundColor: "rgba(0,0,0,0.3)",
+      padding: 4,
+      paddingLeft: 8,
+      paddingRight: 8,
+      borderRadius: 4,
       pointerEvents: "none",
       position: "absolute",
-      bottom: 120,
-      textShadow: "0px 0px 20px #020000",
+      top: 72,
       color: "white"
     },
     fabCortar: {
@@ -69,7 +81,7 @@ const styles = theme => {
     },
     contenedorSlider: {
       position: "absolute",
-      bottom: 75,
+      bottom: 32,
       width: 300,
       borderRadius: 16,
       padding: 16,

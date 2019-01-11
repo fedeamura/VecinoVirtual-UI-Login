@@ -13,9 +13,20 @@ import _ from "lodash";
 import loadImage from "blueimp-load-image";
 import ImageJS from "image-js";
 import Slider from "@material-ui/lab/Slider";
+import Lottie from "react-lottie";
+import * as animScan from "@Resources/animaciones/anim_scan.json";
 
 //Mis componentes
 import DialogoMensaje from "@Componentes/MiDialogoMensaje";
+
+const lottieScan = {
+  loop: true,
+  autoplay: true,
+  animationData: animScan,
+  rendererSettings: {
+    preserveAspectRatio: "xMidYMid slice"
+  }
+};
 
 const MAX_SIZE = 2000;
 
@@ -24,7 +35,6 @@ class PanelPicker extends React.Component {
     super(props);
 
     this.state = {
-      cargando: false,
       cargandoFotoSeleccionada: false,
       cropVisible: false,
       foto: undefined,
@@ -40,6 +50,11 @@ class PanelPicker extends React.Component {
 
   componentDidMount() {
     this.filePicker.addEventListener("change", this.onFile, false);
+    window.addEventListener("file-seleccionar", this.onBotonSeleccionarImagenClick);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("file-seleccionar", this.onBotonSeleccionarImagenClick);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -50,7 +65,6 @@ class PanelPicker extends React.Component {
 
   resetState = () => {
     this.setState({
-      cargando: false,
       cargandoFotoSeleccionada: false,
       cropVisible: false,
       foto: undefined,
@@ -62,6 +76,10 @@ class PanelPicker extends React.Component {
         width: 80
       }
     });
+
+    if (this.ref) {
+      this.setState({ height: this.ref.clientHeight });
+    }
   };
 
   base64ToImage = foto => {
@@ -126,6 +144,7 @@ class PanelPicker extends React.Component {
               },
               () => {
                 setTimeout(() => {
+                  this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
                   this.setState({ cargandoFotoSeleccionada: false });
                 }, 200);
               }
@@ -143,64 +162,64 @@ class PanelPicker extends React.Component {
     this.setState({ crop: crop });
   };
 
+  onCargando = val => {
+    this.props.onCargando && this.props.onCargando(val);
+  };
+
   onBotonSeleccionarImagenClick = async () => {
     const { crop, foto, rotation } = this.state;
 
-    this.setState({ cargando: true }, () => {
-      this.base64ToImage(foto)
-        .catch(error => {
-          this.setState({ cargando: false });
-          this.mostrarDialogoError(error);
-        })
-        .then(imagen => {
-          let base64 = undefined;
-          try {
-            let imagenRotada = imagen.rotate(rotation);
-            let xNuevo = (imagenRotada.width - imagen.width) / 2;
-            if (xNuevo < 0) xNuevo *= -1;
+    this.onCargando(true);
+    this.base64ToImage(foto)
+      .catch(error => {
+        this.onCargando(false);
+        this.mostrarDialogoError(error);
+      })
+      .then(imagen => {
+        let base64 = undefined;
+        try {
+          let imagenRotada = imagen.rotate(rotation);
+          let xNuevo = (imagenRotada.width - imagen.width) / 2;
+          if (xNuevo < 0) xNuevo *= -1;
 
-            let yNuevo = (imagenRotada.height - imagen.height) / 2;
-            if (yNuevo < 0) yNuevo *= -1;
+          let yNuevo = (imagenRotada.height - imagen.height) / 2;
+          if (yNuevo < 0) yNuevo *= -1;
 
-            let imagenRecortada = imagenRotada.crop({
-              x: xNuevo,
-              y: yNuevo,
-              width: imagen.width,
-              height: imagen.height
-            });
+          let imagenRecortada = imagenRotada.crop({
+            x: xNuevo,
+            y: yNuevo,
+            width: imagen.width,
+            height: imagen.height
+          });
 
-            base64 = imagenRecortada
-              .crop({
-                x: imagen.width * (crop.x / 100),
-                y: imagen.height * (crop.y / 100),
-                width: imagen.width * (crop.width / 100),
-                height: imagen.height * (crop.height / 100)
-              })
-              .resize({
-                width: 1000
-              })
-              .toDataURL("image/png");
-          } catch (ex) {
-            this.setState({ cargando: false });
-            this.mostrarDialogoError("Error al procesar la imagen. Por favor revise la selección realizada");
-            return;
-          }
+          base64 = imagenRecortada
+            .crop({
+              x: imagen.width * (crop.x / 100),
+              y: imagen.height * (crop.y / 100),
+              width: imagen.width * (crop.width / 100),
+              height: imagen.height * (crop.height / 100)
+            })
+            .resize({
+              width: 1000
+            })
+            .toDataURL("image/png");
+        } catch (ex) {
+          this.onCargando(false);
+          this.mostrarDialogoError("Error al procesar la imagen. Por favor revise la selección realizada");
+          return;
+        }
 
-          if (base64 == undefined) {
-            this.setState({ cargando: false });
-            this.mostrarDialogoError("Error al procesar la imagen. Por favor revise la selección realizada");
-            return;
-          }
+        if (base64 == undefined) {
+          this.onCargando(false);
+          this.mostrarDialogoError("Error al procesar la imagen. Por favor revise la selección realizada");
+          return;
+        }
 
-          if (this.props.onDni) {
-            this.props.onDni(base64);
-          }
-
-          setTimeout(() => {
-            this.setState({ cargando: false });
-          }, 500);
-        });
-    });
+        this.onCargando(false);
+        if (this.props.onDni) {
+          this.props.onDni(base64);
+        }
+      });
   };
 
   onBotonCerrarClick = () => {
@@ -219,16 +238,30 @@ class PanelPicker extends React.Component {
     this.setState({ dialogoErrorVisible: false });
   };
 
+  onRef = ref => {
+    this.ref = ref;
+    if (ref) {
+      this.setState({ height: ref.clientHeight });
+    }
+  };
+
   render() {
     const { classes, visible } = this.props;
-    let { cropVisible, crop, foto, cargando, cargandoFotoSeleccionada } = this.state;
+    let { cropVisible, crop, foto, cargandoFotoSeleccionada } = this.state;
 
     return (
-      <div className={classNames(classes.root, visible && "visible")}>
+      <div className={classNames(classes.root, visible && "visible")} ref={this.onRef}>
         <input style={{ display: "none" }} ref={this.onFilePickerRef} type="file" id="pickerFile" accept="image/*" />
 
         <div className={classNames(classes.contenedor, visible && "visible")}>
-          <Typography variant="title" className="hint">
+          <Lottie
+            options={lottieScan}
+            height={130}
+            width={130}
+            style={{ minHeight: "100px", marginBottom: 16, backgroundColor: "rgba(0,0,0,0.1)", borderRadius: 8 }}
+          />
+
+          <Typography variant="title" className="hint" style={{ maxWidth: "300px" }}>
             Suba una foto del último ejemplar de su DNI para validar su identidad
           </Typography>
 
@@ -245,37 +278,34 @@ class PanelPicker extends React.Component {
               <Button variant="contained" color="primary" onClick={this.onBotonSeleccionarArchivoClick}>
                 Seleccionar archivo
               </Button>
-
-              <Button variant="outlined" color="primary" onClick={this.onBotonCamaraClick} style={{ marginTop: 16 }}>
-                Prefiero usar mi cámara
-              </Button>
             </div>
           </div>
         </div>
 
         <div className={classNames(classes.contenedor, visible && cropVisible && "visible")} style={{ backgroundColor: "black" }}>
-          <div>
+          <div style={{ maxHeight: this.state.height }}>
             <ReactCrop
               src={foto || ""}
               crop={crop}
               keepSelection={true}
               onChange={this.onCropChange}
-              style={{ backgroundColor: "black" }}
+              style={{ backgroundColor: "black", maxHeight: this.state.height }}
               imageStyle={{
-                maxHeight: "none",
+                // minHeight: this.state.height,
+                maxHeight: this.state.height,
+                // maxHeight: "none",
                 transform: "rotate(" + this.state.rotation + "deg)"
               }}
             />
           </div>
 
-          <Typography variant="title" className={classes.hintCrop}>
+          <Typography variant="body2" className={classes.hint}>
             Encuadre la tarjeta de su DNI
           </Typography>
 
-          <Button variant="contained" className={classes.botonVolver} onClick={this.onBotonVolverClick}>
-            <Icon style={{ color: "black", marginRight: 8 }}>arrow_back</Icon>
-            Cambiar imagen
-          </Button>
+          <Fab size="small" className={classes.botonVolver} onClick={this.onBotonVolverClick} style={{ left: 8, top: 8 }}>
+            <Icon style={{ color: "black" }}>arrow_back</Icon>
+          </Fab>
 
           <div className={classes.contenedorSlider}>
             <Icon>rotate_left</Icon>
@@ -288,25 +318,11 @@ class PanelPicker extends React.Component {
               onChange={this.onSliderRotationChange}
             />
           </div>
-
-          <Fab
-            variant="extended"
-            onClick={this.onBotonSeleccionarImagenClick}
-            color="primary"
-            className={classNames(classes.fabCortar, visible && crop && "visible")}
-          >
-            Seleccionar imagen
-          </Fab>
         </div>
 
-        <Button variant="contained" className={classes.botonCerrar} onClick={this.onBotonCerrarClick}>
-          <Icon style={{ color: "black", marginRight: 8 }}>close</Icon>
-          Cancelar
+        <Button variant="contained" onClick={this.onBotonCamaraClick} style={{ position: "absolute", top: 12, right: 12 }}>
+          Prefiero usar mi cámara
         </Button>
-
-        <div className={classNames(classes.hideView, visible && cargando && "visible", classes.contenedorCargando)}>
-          <CircularProgress />
-        </div>
 
         {/* Dialogo error */}
         <DialogoMensaje

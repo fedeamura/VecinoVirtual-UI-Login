@@ -7,11 +7,8 @@ import { connect } from "react-redux";
 
 //Componentes
 import Button from "@material-ui/core/Button";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import { Grid } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import Grid from "@material-ui/core/Grid";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -114,58 +111,38 @@ class PaginaPassword extends React.Component {
 
     return (
       <div className={classes.content} style={{ padding: padding }}>
-        <Grid container>
+        <Grid container spacing={16}>
           <Grid item xs={12} className={classes.fixPadding}>
             <HintUsuarioSeleccionado
               dataUsuario={this.props.dataUsuario}
-              onBotonVerUsuariosRecientesClick={
-                this.props.onBotonVerUsuariosRecientesClick
-              }
+              onBotonVerUsuariosRecientesClick={this.props.onBotonVerUsuariosRecientesClick}
             />
           </Grid>
           <Grid item xs={12} className={classes.fixPadding}>
-            <FormControl
-              className={classes.formControl}
+            <TextField
               fullWidth
-              margin="normal"
+              label="Contraseña"
+              margin="dense"
+              variant="outlined"
               error={this.state.error !== undefined}
-              aria-describedby="textoPasswordError"
-            >
-              <InputLabel htmlFor="inputPassword">Contraseña</InputLabel>
-              <Input
-                id="inputPassword"
-                autoFocus
-                value={this.state.password}
-                name="password"
-                type={this.state.showPassword ? "text" : "password"}
-                onKeyPress={this.onInputKeyPress}
-                onChange={this.onInputChange}
-                endAdornment={
+              helperText={this.state.error}
+              name="password"
+              type={this.state.showPassword ? "text" : "password"}
+              onKeyPress={this.onInputKeyPress}
+              onChange={this.onInputChange}
+              InputProps={{
+                endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton
-                      aria-label="Toggle password visibility"
-                      onClick={this.onBotonShowPasswordClick}
-                    >
-                      {this.state.showPassword ? (
-                        <VisibilityOff />
-                      ) : (
-                        <Visibility />
-                      )}
+                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick}>
+                      {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
-                }
-              />
-              <FormHelperText id="textoPasswordError">
-                {this.state.error}
-              </FormHelperText>
-            </FormControl>
+                )
+              }}
+            />
           </Grid>
           <Grid item xs={12}>
-            <Button
-              variant="text"
-              color="primary"
-              onClick={this.props.onBotonRecuperarPassword}
-            >
+            <Button variant="text" color="primary" onClick={this.props.onBotonRecuperarPassword}>
               ¿No recordás tu contraseña?
             </Button>
           </Grid>
@@ -187,22 +164,12 @@ class PaginaPassword extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="text"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
 
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonAccederClick}
-        >
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonAccederClick}>
           Acceder
         </Button>
       </div>
@@ -229,8 +196,8 @@ const styles = theme => {
       color: theme.palette.primary.main
     },
     fixPadding: {
-      marginLeft: "16px",
-      marginRight: "16px"
+      marginLeft: "8px",
+      marginRight: "8px"
     },
     footer: {
       borderTop: "1px solid rgba(0,0,0,0.1)",

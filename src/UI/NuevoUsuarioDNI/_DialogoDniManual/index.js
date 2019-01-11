@@ -70,7 +70,7 @@ class DialogoDni extends React.Component {
   onTextFieldFocus = e => {
     this.setState({ inputFocus: e.currentTarget.name });
   };
-  
+
   onTextFieldBlur = e => {
     this.setState({ inputFocus: undefined });
   };
@@ -293,6 +293,9 @@ class DialogoDni extends React.Component {
             </Grid>
           </DialogContent>
           <DialogActions>
+            <Button color="primary" onClick={this.onClose}>
+              Cancelar
+            </Button>
             <Button color="primary" onClick={this.onReady}>
               Aceptar
             </Button>

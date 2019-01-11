@@ -5,6 +5,7 @@ import classNames from "classnames";
 //Styles
 import "@UI/transitions.css";
 import styles from "./styles";
+import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
 
 //Router
 import { withRouter } from "react-router-dom";
@@ -49,7 +50,7 @@ const mapStateToProps = state => {
   return {};
 };
 
-const padding = "2rem";
+let padding = "2rem";
 
 class Login extends React.Component {
   constructor(props) {
@@ -167,7 +168,7 @@ class Login extends React.Component {
   onPaginaUsernameBotonNuevoUsuarioClick = () => {
     this.setState({ visible: false }, () => {
       setTimeout(() => {
-        this.props.redireccionar("/NuevoUsuario/" + this.state.codigo);
+        this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
       }, 500);
     });
   };
@@ -228,16 +229,16 @@ class Login extends React.Component {
   };
 
   render() {
-    const { classes } = this.props;
-
+    const { classes, width } = this.props;
     const nombreSistema = this.state.infoLogin != undefined ? this.state.infoLogin.aplicacionNombre : "";
-
     const cargando = this.state.cargando || this.state.validandoCodigo;
 
+    // padding = isWidthUp("sm", width) ? "2rem" : "1rem";
+    padding = "1rem";
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCardLogin titulo="Vecino Virtual" subtitulo={nombreSistema} cargando={cargando} visible={this.state.visible}>
+          <MiCardLogin titulo="Vecino Virtual" subtitulo={nombreSistema} padding={padding} cargando={cargando} visible={this.state.visible}>
             {this.renderContent()}
           </MiCardLogin>
         </div>
@@ -260,16 +261,6 @@ class Login extends React.Component {
     return (
       <div className={classes.content}>
         <ContentSwapper transitionName={anim} transitionEnterTimeout={500} transitionLeaveTimeout={500} className={classes.contentSwapper}>
-          {/* <div
-          key="paginaErrorValidandoCodigo"
-          className={classes.contentSwapperContent}
-          visible={
-            "" + (this.state.paginaActual == PAGINA_ERROR_VALIDANDO_CODIGO)
-          }
-        >
-          {this.renderPaginaErrorValidandoCodigo()}
-        </div> */}
-
           <div key="paginaUsername" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_USERNAME)}>
             {this.renderPaginaUsername()}
           </div>
@@ -391,6 +382,7 @@ class Login extends React.Component {
     return (
       <PaginaRecuperarPassword
         padding={padding}
+        onBotonValidarDniClick={this.onPaginaUsernameBotonNuevoUsuarioClick}
         onBotonVolverClick={this.onPaginaRecuperarPasswordBotonVolverClick}
         onCargando={this.onCargando}
         username={username}
@@ -416,6 +408,7 @@ class Login extends React.Component {
 
 let componente = Login;
 componente = withStyles(styles)(componente);
+componente = withWidth()(componente);
 componente = withRouter(componente);
 componente = connect(
   mapStateToProps,

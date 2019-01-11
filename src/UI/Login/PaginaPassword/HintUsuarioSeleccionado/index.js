@@ -1,16 +1,11 @@
 import React from "react";
 import { withStyles } from "@material-ui/core/styles";
 
-//Componentes
-import Button from "@material-ui/core/Button";
-import IconButton from "@material-ui/core/IconButton";
-
-import TextField from "@material-ui/core/TextField";
-
 //REDUX
 import { connect } from "react-redux";
 
-import { Typography, Grid, Icon } from "@material-ui/core";
+//Componentes
+import { Typography, Icon } from "@material-ui/core";
 
 const mapDispatchToProps = dispatch => ({});
 
@@ -27,24 +22,14 @@ class HintUsuarioSeleccionado extends React.PureComponent {
     if (this.props.dataUsuario == undefined) return null;
 
     const { classes } = this.props;
-    const urlFoto =
-      "https://servicios2.cordoba.gov.ar/cordobafiles/archivo/" +
-      this.props.dataUsuario.identificadorFotoPersonal +
-      "/3";
-    const nombre =
-      this.props.dataUsuario.nombre + " " + this.props.dataUsuario.apellido;
+    const urlFoto = "https://servicios2.cordoba.gov.ar/cordobafiles/archivo/" + this.props.dataUsuario.identificadorFotoPersonal + "/3";
+    const nombre = this.props.dataUsuario.nombre + " " + this.props.dataUsuario.apellido;
 
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <div
-            className={classes.content}
-            onClick={this.props.onBotonVerUsuariosRecientesClick}
-          >
-            <div
-              className={classes.imagen}
-              style={{ backgroundImage: "url(" + urlFoto + ")" }}
-            />
+          <div className={classes.content} onClick={this.props.onBotonVerUsuariosRecientesClick}>
+            <div className={classes.imagen} style={{ backgroundImage: "url(" + urlFoto + ")" }} />
             <Typography variant="body2">{nombre}</Typography>
             <Icon className={classes.botonMas}>keyboard_arrow_down</Icon>
           </div>
@@ -66,7 +51,7 @@ const styles = theme => {
       border: "1px solid rgba(0,0,0,0.1)",
       borderRadius: "32px",
       alignSelf: "flex-start",
-      padding: "8px",
+      padding: "4px",
       transition: "all 0.3s",
       cursor: "pointer",
       "& *": {

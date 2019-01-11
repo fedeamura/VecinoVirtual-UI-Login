@@ -6,11 +6,10 @@ import { connect } from "react-redux";
 
 //Componentes
 import Button from "@material-ui/core/Button";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import { Typography, Grid } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import Grid from "@material-ui/core/Grid";
+import IconDNI from "mdi-material-ui/AccountCardDetails";
 
 //Mis componentes
 import Validador from "@Componentes/_Validador";
@@ -43,14 +42,7 @@ class PaginaUsername extends React.Component {
   onBotonSiguienteClick = () => {
     let { username } = this.state;
 
-    let errorUsername = Validador.validar(
-      [
-        Validador.requerido,
-        Validador.min(username, 5),
-        Validador.max(username, 20)
-      ],
-      username
-    );
+    let errorUsername = Validador.validar([Validador.requerido, Validador.min(username, 5), Validador.max(username, 20)], username);
     this.setState({ error: errorUsername });
 
     if (errorUsername != undefined) return;
@@ -105,43 +97,40 @@ class PaginaUsername extends React.Component {
     return (
       <div className={classes.content} style={{ padding: padding }}>
         <Grid container spacing={16}>
-          <Grid item xs={12} className={classes.fixPadding}>
+          <Grid item xs={12} className={classes.fixPadding} style={{ marginTop: "14px" }}>
             <Typography variant="title">Iniciar Sesión</Typography>
           </Grid>
           <Grid item xs={12} className={classes.fixPadding}>
-            <FormControl
-              className={classes.formControl}
+            <TextField
+              // className={classes.formControl}
               fullWidth
+              name="username"
               margin="dense"
+              variant="outlined"
               error={this.state.error !== undefined}
-              aria-describedby="textoUsernameError"
-            >
-              <InputLabel htmlFor="inputUsername">
-                CUIL o Nombre de Usuario
-              </InputLabel>
-              <Input
-                id="inputUsername"
-                autoFocus
-                inputProps={{
-                  maxLength: 20
-                }}
-                value={this.state.username}
-                name="username"
-                onKeyPress={this.onInputKeyPress}
-                onChange={this.onInputChange}
-              />
-              <FormHelperText id="textoUsernameError">
-                {this.state.error}
-              </FormHelperText>
-            </FormControl>
+              helperText={this.state.error}
+              label="CUIL o Nombre de Usuario"
+              inputProps={{
+                maxLength: 20
+              }}
+              value={this.state.username}
+              onKeyPress={this.onInputKeyPress}
+              onChange={this.onInputChange}
+            />
           </Grid>
           <Grid item xs={12}>
-            <Button
-              variant="text"
-              color="primary"
-              onClick={this.onBotonGenerarCuilClick}
-            >
+            <Button variant="text" color="primary" onClick={this.onBotonGenerarCuilClick}>
               ¿No recordás tu CUIL?
+            </Button>
+          </Grid>
+
+          <Grid item xs={12}>
+            <div style={{ width: "100%", backgroundColor: "rgba(0,0,0,0.1)", height: "1px", marginTop: "16px", marginBottom: "16px" }} />
+          </Grid>
+          <Grid item xs={12} className={classes.fixPadding} style={{ marginBottom: "16px" }}>
+            <Button variant="outlined" color="primary" onClick={this.props.onBotonNuevoUsuarioClick}>
+              <IconDNI style={{ marginRight: 8 }} />
+              Acceder con DNI
             </Button>
           </Grid>
         </Grid>
@@ -162,22 +151,12 @@ class PaginaUsername extends React.Component {
         }}
       >
         <div style={{ flex: 1 }}>
-          <Button
-            variant="text"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonNuevoUsuarioClick}
-          >
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonNuevoUsuarioClick}>
             Nuevo usuario
           </Button>
         </div>
 
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonSiguienteClick}
-        >
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>
           Siguiente
         </Button>
       </div>
@@ -208,8 +187,8 @@ const styles = theme => {
       display: "flex"
     },
     fixPadding: {
-      marginLeft: "16px",
-      marginRight: "16px"
+      marginLeft: "8px",
+      marginRight: "8px"
     }
   };
 };

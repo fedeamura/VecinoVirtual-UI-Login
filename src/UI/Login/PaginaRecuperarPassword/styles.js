@@ -5,7 +5,10 @@ const styles = theme => {
       display: "flex",
       flexDirection: "column",
       flex: 1,
-      height: "100%"
+      height: "100%",
+      "& > div": {
+        overflow: "auto"
+      }
     },
     content: {
       flex: 1,
@@ -15,16 +18,27 @@ const styles = theme => {
       alignItems: "center"
       // justifyContent: "center"
     },
-    contentSwapper: {
-      height: "100%",
+    pagina: {
       flex: 1,
-      display: "flex",
-      "& > span": { width: "100%" }
-    },
-    contentSwapperContent: {
-      height: "100%",
       width: "100%",
-      flex: 1
+      overflow: "auto",
+      padding: "16px",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center"
+    },
+    icono: {
+      fontSize: "104px"
+    },
+    texto: {
+      marginTop: "16px",
+      maxWidth: "400px",
+      textAlign: "center"
+    },
+    footer: {
+      borderTop: "1px solid rgba(0,0,0,0.1)",
+      padding: "16px",
+      display: "flex"
     }
   };
 };

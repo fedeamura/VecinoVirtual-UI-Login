@@ -153,6 +153,25 @@ const styles = theme => {
         opacity: 1
       }
     },
+    "@keyframes fadeAnimation": {
+      from: { opacity: 0.7 },
+      to: { opacity: 1 }
+    },
+    hint: {
+      animationDuration: "0.7s",
+      animationName: "fadeAnimation",
+      animationIterationCount: "infinite",
+      animationDirection: "alternate",
+      backgroundColor: "rgba(0,0,0,0.3)",
+      padding: 4,
+      paddingLeft: 8,
+      paddingRight: 8,
+      borderRadius: 4,
+      pointerEvents: "none",
+      position: "absolute",
+      top: 72,
+      color: "white"
+    },
     tomandoFoto: {
       position: "absolute",
       top: 0,
@@ -168,10 +187,14 @@ const styles = theme => {
         opacity: 1
       }
     },
-    camaraBotonCerrar: {
-      position: "absolute",
-      top: 16,
-      right: 16
+    hideView: {
+      opacity: 0,
+      pointerEvents: "none",
+      transition: "all 0.3s",
+      "&.visible": {
+        pointerEvents: "all",
+        opacity: 1
+      }
     }
   };
 };

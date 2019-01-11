@@ -25,8 +25,8 @@ class PanelCamara extends React.Component {
     super(props);
 
     this.state = {
-      infoVisible: false,
-      camaraVisible: false
+      infoVisible: localStorage.getItem("camaraInfo") == undefined,
+      camaraVisible: props.visible
     };
   }
 
@@ -53,16 +53,21 @@ class PanelCamara extends React.Component {
       }
       this.setState({ width: w, height: h });
     }, 200);
+
+    // this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
+    window.addEventListener("camara-capturar", this.onBotonCamaraClick);
   }
 
   componentWillUnmount() {
     clearInterval(this.intervalo);
+    window.removeEventListener("camara-capturar", this.onBotonCamaraClick);
   }
 
   componentWillReceiveProps(nextProps) {
     if (nextProps.visible != this.props.visible) {
       if (nextProps.visible) {
-        this.setState({ infoVisible: true, camaraVisible: true });
+        // this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
+        this.setState({ infoVisible: localStorage.getItem("camaraInfo") == undefined, camaraVisible: true });
       } else {
         setTimeout(() => {
           this.setState({ camaraVisible: false });
@@ -72,6 +77,7 @@ class PanelCamara extends React.Component {
   }
 
   onBotonCamaraInfoClick = () => {
+    localStorage.setItem("camaraInfo", "true");
     this.setState({ infoVisible: false });
   };
 
@@ -97,6 +103,11 @@ class PanelCamara extends React.Component {
     });
   };
 
+  onBotonInfoClick = () => {
+    localStorage.removeItem("camaraInfo");
+    this.setState({ infoVisible: true });
+  };
+
   render() {
     const { classes, visible } = this.props;
     let { infoVisible, width, height, tomandoFoto, camaraVisible } = this.state;
@@ -112,6 +123,8 @@ class PanelCamara extends React.Component {
 
     const encuadreTop = this.encuadre ? (this.encuadre.clientHeight - height) / 2 : 0;
     const encuadreLeft = this.encuadre ? (this.encuadre.clientWidth - width) / 2 : 0;
+
+    infoVisible = false;
 
     return (
       <div className={classNames(classes.root, visible && "visible")} ref={this.onEncuadreRef}>
@@ -158,12 +171,12 @@ class PanelCamara extends React.Component {
           <div className={classNames(classes.tomandoFoto, visible && tomandoFoto && "visible")} />
         </div>
 
-        <div className={classNames(classes.contenedorCamaraInfo, visible && infoVisible && "visible")}>
+        {/* <div className={classNames(classes.contenedorCamaraInfo, visible && infoVisible && "visible")}>
           <Lottie
             options={lottieScan}
-            height={150}
-            width={150}
-            style={{ minHeight: "150px", backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 8 }}
+            height={100}
+            width={100}
+            style={{ minHeight: "100px", backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 8 }}
           />
           <Typography variant="title" style={{ maxWidth: "300px", textAlign: "center", marginTop: 32, color: "white" }}>
             Encuadre el último ejemplar de su DNI para poder validar su identidad
@@ -172,31 +185,14 @@ class PanelCamara extends React.Component {
           <Button onClick={this.onBotonCamaraInfoClick} variant="contained" color="primary" style={{ marginTop: 16 }}>
             Aceptar
           </Button>
+        </div> */}
 
-          <Button
-            onClick={this.props.onBotonFileClick}
-            variant="outlined"
-            color="primary"
-            style={{ color: "white", marginTop: 16, borderColor: "white" }}
-          >
-            Prefiero subir un archivo
-          </Button>
-        </div>
+        <Typography variant="body2" className={classes.hint}>
+          Encuadre la tarjeta de su DNI
+        </Typography>
 
-        {/* boton camara */}
-        <Fab
-          variant="extended"
-          onClick={this.onBotonCamaraClick}
-          color="primary"
-          style={{ bottom: 16 }}
-          className={classNames(classes.botonCamara, visible && infoVisible == false && "visible")}
-        >
-          Capturar
-        </Fab>
-
-        <Button className={classes.camaraBotonCerrar} variant="contained" onClick={this.onBotonCerrarClick}>
-          <Icon style={{ marginRight: 8 }}>close</Icon>
-          Cancelar
+        <Button onClick={this.props.onBotonFileClick} variant="contained" style={{ position: "absolute", top: 12, right: 12 }}>
+          Prefiero subir un archivo
         </Button>
       </div>
     );
