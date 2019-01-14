@@ -92,17 +92,21 @@ class PaginaUsername extends React.Component {
   }
 
   renderContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div className={classes.content} style={{ padding: padding }}>
+      <div className={classes.content}>
         <Grid container spacing={16}>
-          <Grid item xs={12} className={classes.fixPadding} style={{ marginTop: "14px" }}>
+          <Grid item xs={12} />
+          <Grid item xs={12} />
+
+          <Grid item xs={12}>
             <Typography variant="title">Iniciar Sesión</Typography>
           </Grid>
-          <Grid item xs={12} className={classes.fixPadding}>
+          <Grid item xs={12} />
+
+          <Grid item xs={12}>
             <TextField
-              // className={classes.formControl}
               fullWidth
               name="username"
               margin="dense"
@@ -139,17 +143,10 @@ class PaginaUsername extends React.Component {
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingTop: "1rem",
-          paddingBottom: "1rem"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
           <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonNuevoUsuarioClick}>
             Nuevo usuario
@@ -175,7 +172,13 @@ const styles = theme => {
     },
     content: {
       flex: 1,
-      overflow: "auto"
+      overflow: "auto",
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     },
     botonRecuperarCUIL: {
       cursor: "pointer",
@@ -184,11 +187,15 @@ const styles = theme => {
     },
     footer: {
       borderTop: "1px solid rgba(0,0,0,0.1)",
-      display: "flex"
-    },
-    fixPadding: {
-      marginLeft: "8px",
-      marginRight: "8px"
+      display: "flex",
+      paddingTop: theme.spacing.unit,
+      paddingBottom: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     }
   };
 };

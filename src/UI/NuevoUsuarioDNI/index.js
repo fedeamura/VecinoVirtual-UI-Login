@@ -526,21 +526,13 @@ class PanelNuevoUsuario extends React.Component {
     const { classes } = this.props;
     const { modo, puedeCapturar } = this.state;
 
-    const padding = "1rem";
     const textoBoton = modo == "file" ? "Seleccionar" : "Capturar";
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          <Button variant="text" onClick={this.onBotonCancelarClick}>
-            Cancelar
+          <Button variant="text" color="primary" onClick={this.onBotonCancelarClick}>
+            Volver
           </Button>
         </div>
 

@@ -13,8 +13,7 @@ import { connect } from "react-redux";
 
 //Componentes
 import { Typography, Icon, Button, Grid } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
+import TextField from "@material-ui/core/TextField";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import _ from "lodash";
@@ -49,8 +48,8 @@ class PaginaDatosDomicilio extends React.Component {
 
     let datosIniciales = props.datosIniciales || {};
 
-    let idProvincia = datosIniciales.provinciaId || undefined;
-    let idCiudad = datosIniciales.ciudadId || undefined;
+    let idProvincia = datosIniciales.provinciaId || PROVINCIA_CORDOBA;
+    let idCiudad = datosIniciales.ciudadId || CIUDAD_CORDOBA;
 
     let ciudades = [];
     if (idProvincia != undefined) {
@@ -64,12 +63,6 @@ class PaginaDatosDomicilio extends React.Component {
     let provincias = Provincias.map(item => {
       return { value: item.id, label: item.nombre.toTitleCase() };
     });
-    provincias.unshift({
-      value: -1,
-      label: "Seleccione..."
-    });
-
-    console.log(provincias);
 
     this.state = {
       provincias: provincias,
@@ -82,8 +75,8 @@ class PaginaDatosDomicilio extends React.Component {
       torre: datosIniciales.torre || "",
       piso: datosIniciales.piso || "",
       depto: datosIniciales.depto || "",
-      idProvincia: datosIniciales.idProvincia || undefined,
-      idCiudad: datosIniciales.idCiudad || undefined,
+      idProvincia: idProvincia,
+      idCiudad: idCiudad,
       idBarrio: datosIniciales.idBarrio || undefined,
       mostrarError: false,
       errores: []
@@ -109,12 +102,19 @@ class PaginaDatosDomicilio extends React.Component {
   };
 
   onProvinciaChange = e => {
-    let errores = this.state.errores || [];
-    errores["provincia"] = undefined;
+    console.log("Provincia", e);
+
+    if (e == undefined) {
+      this.setState({
+        idProvincia: undefined,
+        idCiudad: undefined,
+        idBarrio: undefined,
+        errores: { ...this.state.errores, provincia: undefined }
+      });
+      return;
+    }
 
     let idProvincia = e.value;
-    if (idProvincia == -1) idProvincia = undefined;
-
     let idCiudad = undefined;
     if (idProvincia == PROVINCIA_CORDOBA) {
       idCiudad = CIUDAD_CORDOBA;
@@ -125,7 +125,10 @@ class PaginaDatosDomicilio extends React.Component {
         idProvincia: idProvincia,
         idCiudad: idCiudad,
         idBarrio: undefined,
-        errores: errores,
+        errores: {
+          ...this.state.errores,
+          provincia: undefined
+        },
         ciudades: _.filter(Ciudades, item => {
           return item.id_provincia == e.value;
         }).map(item => {
@@ -141,12 +144,22 @@ class PaginaDatosDomicilio extends React.Component {
   };
 
   onCiudadChange = e => {
-    let errores = this.state.errores || [];
-    errores["ciudad"] = undefined;
+    if (e == undefined) {
+      this.setState({
+        idCiudad: undefined,
+        idBarrio: undefined,
+        errores: { ...this.state.errores, ciudad: undefined }
+      });
+      return;
+    }
+
     this.setState({
       idCiudad: e.value,
       idBarrio: undefined,
-      errores: errores
+      errores: {
+        ...this.state.errores,
+        ciudad: undefined
+      }
     });
 
     if (e.value == CIUDAD_CORDOBA) {
@@ -155,11 +168,20 @@ class PaginaDatosDomicilio extends React.Component {
   };
 
   onBarrioChange = e => {
-    let errores = this.state.errores || [];
-    errores["barrio"] = undefined;
+    if (e == undefined) {
+      this.setState({
+        idBarrio: undefined,
+        errores: { ...this.state.errores, barrio: undefined }
+      });
+      return;
+    }
+
     this.setState({
       idBarrio: e.value,
-      errores: errores
+      errores: {
+        ...this.state.errores,
+        barrio: undefined
+      }
     });
   };
 
@@ -260,249 +282,211 @@ class PaginaDatosDomicilio extends React.Component {
     );
   }
 
-  renderContent() {
-    const { classes, padding } = this.props;
+  onErrorClose = () => {
+    this.setState({ mostrarError: false });
+  };
 
-    console.log(this.state.idProvincia);
+  renderContent() {
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
         {/* Error */}
-        <MiBanerError
-          visible={this.mostrarError}
-          mensaje={this.state.error}
-          onClose={() => {
-            this.setState({ mostrarError: false });
-          }}
-        />
+        <MiBanerError visible={this.mostrarError} mensaje={this.state.error} onClose={this.onErrorClose} />
 
         {/* Contenido */}
         <div className={classes.content}>
-          <div style={{ padding: padding, paddingTop: 0 }}>
-            <Grid container spacing={16}>
-              <Grid item xs={12}>
-                <div className={classes.encabezado}>
-                  <Typography variant="headline">Nuevo Usuario</Typography>
-                  <Icon>keyboard_arrow_right</Icon>
-                  <Typography variant="subheading">Domicilio</Typography>
-                </div>
-              </Grid>
-              <Grid item xs={12}>
-                <Grid container spacing={16}>
-                  {/* Direccion */}
-                  <Grid item xs={9} sm={10}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["direccion"] !== undefined}
-                      aria-describedby="textoDireccionError"
-                    >
-                      <InputLabel htmlFor="inputDireccion">Direccion</InputLabel>
-                      <Input
-                        id="inputDireccion"
-                        autoFocus
-                        inputProps={{
-                          maxLength: 80
-                        }}
-                        value={this.state.direccion}
-                        name="direccion"
-                        type="text"
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoDireccionError">{this.state.errores["direccion"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
+          <Grid container spacing={16}>
+            <Grid item xs={12} />
+            <Grid item xs={12}>
+              <div className={classes.encabezado}>
+                <Typography variant="headline">Nuevo Usuario</Typography>
+                <Icon>keyboard_arrow_right</Icon>
+                <Typography variant="subheading">Domicilio</Typography>
+              </div>
+            </Grid>
+            <Grid item xs={12} />
 
-                  {/* Altura */}
-                  <Grid item xs={3} sm={2}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["altura"] !== undefined}
-                      aria-describedby="textoAlturaError"
-                    >
-                      <InputLabel htmlFor="inputAltura">Altura</InputLabel>
-                      <Input
-                        id="inputAltura"
-                        value={this.state.altura}
-                        name="altura"
-                        inputProps={{
-                          maxLength: 10
-                        }}
-                        type="text"
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoAlturaError">{this.state.errores["altura"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={12} />
-
-                  {/* Torre */}
-                  <Grid item xs={4}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["torre"] !== undefined}
-                      aria-describedby="textoTorreError"
-                    >
-                      <InputLabel htmlFor="inputTorre">Torre</InputLabel>
-                      <Input
-                        id="inputTorre"
-                        value={this.state.torre}
-                        name="torre"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        type="text"
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoTorreError">{this.state.errores["torre"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Piso */}
-                  <Grid item xs={4}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["piso"] !== undefined}
-                      aria-describedby="textoPisoError"
-                    >
-                      <InputLabel htmlFor="inputPiso">Piso</InputLabel>
-                      <Input
-                        id="inputPiso"
-                        value={this.state.piso}
-                        name="piso"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        type="text"
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoPisoError">{this.state.errores["piso"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Depto */}
-                  <Grid item xs={4}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["depto"] !== undefined}
-                      aria-describedby="textoDeptoError"
-                    >
-                      <InputLabel htmlFor="inputDepto">Depto</InputLabel>
-                      <Input
-                        id="inputTorre"
-                        value={this.state.depto}
-                        name="depto"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        type="text"
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoDeptoError">{this.state.errores["depto"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Provincias */}
-                  <Grid item xs={12} sm={4}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["provincia"] !== undefined}
-                      aria-describedby="textoProvinciaError"
-                    >
-                      <MiSelect
-                        value={this.state.idProvincia}
-                        style={{ width: "100%" }}
-                        label="Provincia"
-                        placeholder="Seleccione..."
-                        onChange={this.onProvinciaChange}
-                        options={this.state.provincias}
-                      />
-                      <FormHelperText id="textoProvinciaError">{this.state.errores["provincia"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Ciudades */}
-                  <Grid item xs={12} sm={4}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["ciudad"] !== undefined}
-                      aria-describedby="textoCiudadError"
-                    >
-                      <MiSelect
-                        disabled={this.state.idProvincia == undefined}
-                        value={this.state.idCiudad}
-                        style={{ width: "100%" }}
-                        label="Ciudad"
-                        placeholder="Seleccione..."
-                        onChange={this.onCiudadChange}
-                        options={this.state.ciudades}
-                      />
-                      <FormHelperText id="textoCiudadError">{this.state.errores["ciudad"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  {/* Barrio */}
-                  {this.state.idCiudad == 543 && (
-                    <Grid item xs={12} sm={4}>
-                      <FormControl
-                        className={classes.formControl}
-                        fullWidth
-                        margin="dense"
-                        error={this.state.errores["barrio"] !== undefined}
-                        aria-describedby="textoBarrioError"
-                      >
-                        <MiSelect
-                          value={this.state.idBarrio}
-                          style={{ width: "100%" }}
-                          label="Barrio"
-                          placeholder="Seleccione..."
-                          onChange={this.onBarrioChange}
-                          options={this.state.barrios}
-                        />
-                        <FormHelperText id="textoBarrioError">{this.state.errores["barrio"]}</FormHelperText>
-                      </FormControl>
-                    </Grid>
-                  )}
+            <Grid item xs={12}>
+              <Grid container spacing={16}>
+                {/* Direccion */}
+                <Grid item xs={9} sm={10}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    margin="dense"
+                    autoComplete="off"
+                    error={this.state.errores["direccion"] !== undefined}
+                    helperText={this.state.errores["direccion"]}
+                    label="Dirección"
+                    id="inputDireccion"
+                    autoFocus
+                    inputProps={{
+                      maxLength: 80
+                    }}
+                    value={this.state.direccion}
+                    name="direccion"
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
                 </Grid>
+
+                {/* Altura */}
+                <Grid item xs={3} sm={2}>
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    variant="outlined"
+                    autoComplete="off"
+                    error={this.state.errores["altura"] !== undefined}
+                    helperText={this.state.errores["altura"]}
+                    label="Altura"
+                    id="inputAltura"
+                    value={this.state.altura}
+                    name="altura"
+                    inputProps={{
+                      maxLength: 10
+                    }}
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                </Grid>
+
+                {/* Torre */}
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    variant="outlined"
+                    autoComplete="off"
+                    error={this.state.errores["torre"] !== undefined}
+                    helperText={this.state.errores["torre"]}
+                    label="Torre"
+                    id="inputTorre"
+                    value={this.state.torre}
+                    name="torre"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                </Grid>
+
+                {/* Piso */}
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    variant="outlined"
+                    autoComplete="off"
+                    error={this.state.errores["piso"] !== undefined}
+                    helperText={this.state.errores["piso"]}
+                    label="Piso"
+                    id="inputPiso"
+                    value={this.state.piso}
+                    name="piso"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                </Grid>
+
+                {/* Depto */}
+                <Grid item xs={4}>
+                  <TextField
+                    fullWidth
+                    margin="dense"
+                    autoComplete="off"
+                    error={this.state.errores["depto"] !== undefined}
+                    helperText={this.state.errores["depto"]}
+                    label="Depto"
+                    variant="outlined"
+                    id="inputTorre"
+                    value={this.state.depto}
+                    name="depto"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                </Grid>
+
+                {/* Provincias */}
+                <Grid item xs={12} sm={4}>
+                  <MiSelect
+                    margin="dense"
+                    fullWidth
+                    variant="outlined"
+                    autoComplete="off"
+                    value={this.state.idProvincia}
+                    style={{ width: "100%" }}
+                    error={this.state.errores["provincia"] !== undefined}
+                    helperText={this.state.errores["provincia"]}
+                    label="Provincia"
+                    placeholder="Seleccione..."
+                    onChange={this.onProvinciaChange}
+                    options={this.state.provincias}
+                  />
+                </Grid>
+
+                {/* Ciudades */}
+                {this.state.idProvincia != undefined && (
+                  <Grid item xs={12} sm={4}>
+                    <MiSelect
+                      fullWidth
+                      margin="dense"
+                      variant="outlined"
+                      error={this.state.errores["ciudad"] !== undefined}
+                      helperText={this.state.errores["ciudad"]}
+                      disabled={this.state.idProvincia == undefined}
+                      value={this.state.idCiudad}
+                      label="Ciudad"
+                      placeholder="Seleccione..."
+                      onChange={this.onCiudadChange}
+                      options={this.state.ciudades}
+                    />
+                  </Grid>
+                )}
+
+                {/* Barrio */}
+                {this.state.idCiudad == 543 && (
+                  <Grid item xs={12} sm={4}>
+                    <MiSelect
+                      fullWidth
+                      margin="dense"
+                      variant="outlined"
+                      error={this.state.errores["barrio"] !== undefined}
+                      helperText={this.state.errores["barrio"]}
+                      value={this.state.idBarrio}
+                      label="Barrio"
+                      placeholder="Seleccione..."
+                      onChange={this.onBarrioChange}
+                      options={this.state.barrios}
+                    />
+                  </Grid>
+                )}
               </Grid>
             </Grid>
-          </div>
+          </Grid>
         </div>
       </div>
     );
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
           <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver

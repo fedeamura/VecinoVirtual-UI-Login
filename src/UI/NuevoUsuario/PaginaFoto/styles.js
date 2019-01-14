@@ -5,57 +5,77 @@ const styles = theme => {
       display: "flex",
       flexDirection: "column",
       flex: 1,
-      height: "100%"
+      height: "100%",
+      overflowX: "hidden"
     },
     content: {
       flex: 1,
       overflow: "auto",
       display: "flex",
-      flexDirection: "column"
+      flexDirection: "column",
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     },
     encabezado: {
+      minHeight: "fit-content",
       display: "flex",
       alignItems: "center"
     },
     footer: {
       borderTop: "1px solid rgba(0,0,0,0.1)",
-      padding: "16px",
-      display: "flex"
-    },
-    contenedorError: {
       display: "flex",
+      paddingTop: theme.spacing.unit,
+      paddingBottom: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
+    },
+    dropZone: {
+      cursor: "pointer",
+      width: 250,
+      border: "dotted 1px rgba(0,0,0,0.2)",
+      transition: "all 0.3s",
+      height: 250,
+      display: "flex",
+      justifyContent: "center",
+      alignContent: "center",
       alignItems: "center",
-      backgroundColor: "rgba(0,0,0,0.05)",
-      minHeight: 0,
-      maxHeight: 0,
-      height: "100%",
-      padding: 0,
-      paddingLeft: "2rem",
-      paddingRigth: "2rem",
-      overflow: "hidden",
+      borderRadius: "1rem",
+      padding: "1rem",
+      position: "relative",
+      flexDirection: "column",
+      "&:hover": {
+        backgroundColor: "rgba(0,0,0,0.025) !important"
+      },
       "& > div": {
-        width: "100%",
-        minHeight: "3rem",
+        left: 0,
+        position: "relative",
+        top: 0,
+        right: 0,
+        bottom: 0,
+        position: "absolute",
         display: "flex",
-        alignItems: "center"
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+        transition: "all 0.3s"
       },
-      "& > div > .material-icons": {
-        marginRight: "0.5rem"
-      },
-      "& > div > .texto": {
-        flex: 1
-      },
-      opacity: 0,
-      transition: "min-height 0.3s 0.3s, max-height 0.3s 0.3s, opacity 0.3s",
-      "&.visible": {
-        transition: "min-height 0.3s, max-height 0.3s, opacity 0.3s 0.3s",
-        minHeight: "3rem",
-        maxHeight: "3rem",
-        opacity: 1
+      "& .img": {
+        width: "100px",
+        height: "100px",
+        backgroundSize: "contain",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
       }
     },
     contenedorForm: {
-      marginTop: "2rem",
       display: "flex",
       flex: 1,
       flexDirection: "column",
@@ -71,6 +91,18 @@ const styles = theme => {
       "&.procesando": {
         opacity: 0
       }
+    },
+    contenedorSlider: {
+      display: "flex",
+      width: "250px",
+      marginTop: theme.spacing.unit * 2,
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row"
+    },
+    slider: {
+      marginLeft: theme.spacing.unit * 2,
+      marginRight: theme.spacing.unit * 2
     }
   };
 };

@@ -139,20 +139,30 @@ class PaginaRecuperarPassword extends React.Component {
   }
 
   renderPaginaOk() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div className={classes.pagina} style={{ padding: padding }}>
-        <Lottie options={opcionesAnimExito} height={120} width={120} style={{ minHeight: 120 }} />
+      <div className={classes.pagina}>
+        <div className={classes.content}>
 
-        <Typography variant="headline" className={classes.texto} style={{ fontSize: 20, marginBottom: 16 }}>
-          Se ha enviado un e-mail a su casilla de correo con las instrucciones para recuperar tu contraseña
-        </Typography>
+          <Lottie options={opcionesAnimExito} height={120} width={120} style={{ minHeight: 120 }} />
 
-        <div>
-          <Button variant="outlined" color="primary" onClick={this.mostrarDialogoValidarDni}>
-            ¿No tenes acceso a la casilla de e-mail?
-          </Button>
+          <Typography variant="headline" className={classes.texto} style={{ fontSize: 20, marginBottom: 16 }}>
+            Se ha enviado un e-mail a su casilla de correo con las instrucciones para recuperar tu contraseña
+          </Typography>
+
+          <div style={{  }}>
+            <Button variant="outlined" color="primary" onClick={this.mostrarDialogoValidarDni}>
+              ¿No tenes acceso a la casilla de e-mail?
+            </Button>
+          </div>
+        </div>
+        <div className={classes.footer}>
+          <div style={{ flex: 1 }}>
+            <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+              Volver
+            </Button>
+          </div>
         </div>
       </div>
     );

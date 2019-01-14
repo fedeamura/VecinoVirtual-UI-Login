@@ -41,8 +41,15 @@ const styles = theme => {
     },
     footer: {
       borderTop: "1px solid rgba(0,0,0,0.1)",
-      padding: "16px",
-      display: "flex"
+      display: "flex",
+      paddingTop: theme.spacing.unit,
+      paddingBottom: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     },
     paginaExtra: {
       position: "absolute",

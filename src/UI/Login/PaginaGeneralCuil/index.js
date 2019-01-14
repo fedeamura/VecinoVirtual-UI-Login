@@ -8,6 +8,7 @@ import styles from "./styles";
 //Componentes
 import { Typography, Icon, Button, Grid } from "@material-ui/core";
 import Input from "@material-ui/core/Input";
+import TextField from "@material-ui/core/TextField";
 import InputLabel from "@material-ui/core/InputLabel";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -58,15 +59,7 @@ class PaginaGenerarCUIL extends React.Component {
 
     this.setState({ errorDni: undefined, mostrarError: false });
 
-    let errorDni = Validador.validar(
-      [
-        Validador.requerido,
-        Validador.numericoEntero,
-        Validador.min(dni, 7),
-        Validador.max(dni, 8)
-      ],
-      dni
-    );
+    let errorDni = Validador.validar([Validador.requerido, Validador.numericoEntero, Validador.min(dni, 7), Validador.max(dni, 8)], dni);
 
     if (errorDni != undefined) {
       this.setState({ errorDni: errorDni });
@@ -131,7 +124,7 @@ class PaginaGenerarCUIL extends React.Component {
   }
 
   renderPaginaFormContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
@@ -143,33 +136,33 @@ class PaginaGenerarCUIL extends React.Component {
           mensaje={this.state.error}
         />
 
-        <div className={classes.content} style={{ padding: padding }}>
+        <div className={classes.content}>
           <Grid container spacing={16}>
+            <Grid item xs={12} />
+            <Grid item xs={12} />
+
             <Grid item xs={12}>
               <Typography variant="title">Generar CUIL</Typography>
             </Grid>
+            <Grid item xs={12} />
+
             <Grid item xs={12}>
-              <FormControl
-                className={classes.formControl}
+              <TextField
                 fullWidth
                 margin="dense"
+                variant="outlined"
+                autoComplete="off"
                 error={this.state.errorDni !== undefined}
-                aria-describedby="textoDniError"
-              >
-                <InputLabel htmlFor="inputPassword">N° de Documento</InputLabel>
-                <Input
-                  id="inputDni"
-                  autoFocus
-                  value={this.state.password}
-                  name="dni"
-                  type="number"
-                  onKeyPress={this.onInputKeyPress}
-                  onChange={this.onInputChange}
-                />
-                <FormHelperText id="textoDniError">
-                  {this.state.errorDni}
-                </FormHelperText>
-              </FormControl>
+                helperText={this.state.errorDni}
+                label="N° de Documento"
+                id="inputDni"
+                autoFocus
+                value={this.state.password}
+                name="dni"
+                type="number"
+                onKeyPress={this.onInputKeyPress}
+                onChange={this.onInputChange}
+              />
             </Grid>
             <Grid item xs={12}>
               <FormControl
@@ -188,21 +181,11 @@ class PaginaGenerarCUIL extends React.Component {
                   value={this.state.sexo}
                   onChange={this.onSexoChange}
                 >
-                  <FormControlLabel
-                    value="m"
-                    control={<Radio />}
-                    label="Masculino"
-                  />
+                  <FormControlLabel value="m" control={<Radio />} label="Masculino" />
 
-                  <FormControlLabel
-                    value="f"
-                    control={<Radio />}
-                    label="Femenino"
-                  />
+                  <FormControlLabel value="f" control={<Radio />} label="Femenino" />
                 </RadioGroup>
-                {this.state.errorSexo != undefined && (
-                  <FormHelperText>{this.state.errorSexo}</FormHelperText>
-                )}
+                {this.state.errorSexo != undefined && <FormHelperText>{this.state.errorSexo}</FormHelperText>}
               </FormControl>
             </Grid>
           </Grid>
@@ -211,34 +194,17 @@ class PaginaGenerarCUIL extends React.Component {
     );
   }
   renderPaginaFormFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingTop: "1rem",
-          paddingBottom: "1rem"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          <Button
-            variant="text"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
 
-        <Button
-          variant="contained"
-          color="primary"
-          className={classes.button}
-          onClick={this.onBotonGenerarClick}
-        >
+        <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonGenerarClick}>
           Obtener CUIL
         </Button>
       </div>
@@ -257,7 +223,7 @@ class PaginaGenerarCUIL extends React.Component {
   }
 
   renderPaginaErrorContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.contenedorError}>
@@ -267,11 +233,7 @@ class PaginaGenerarCUIL extends React.Component {
         <Typography variant="headline" className={classes.textoError}>
           {this.state.error || "Error procesando la solicitud"}
         </Typography>
-        <Button
-          variant="outlined"
-          style={{ marginTop: "16px" }}
-          onClick={this.onBotonGenerarClick}
-        >
+        <Button variant="outlined" style={{ marginTop: "16px" }} onClick={this.onBotonGenerarClick}>
           Reintentar
         </Button>
       </div>
@@ -279,24 +241,12 @@ class PaginaGenerarCUIL extends React.Component {
   }
 
   renderPaginaErrorFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingTop: "1rem",
-          paddingBottom: "1rem"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          <Button
-            variant="text"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>

@@ -81,6 +81,14 @@ const styles = theme => {
     },
     header: {
       paddingBottom: "0",
+      paddingBottom: theme.spacing.unit * 2,
+      paddingTop: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit,
+      paddingRight: theme.spacing.unit,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 3,
+        paddingRight: theme.spacing.unit * 3
+      },
       display: "flex",
       alignItems: "center",
       minHeight: "fit-content"
@@ -92,8 +100,7 @@ const styles = theme => {
       width: "64px",
       height: "64px",
       minWidth: "64px",
-      backgroundImage:
-        "url(https://servicios2.cordoba.gov.ar/VecinoVirtualUtils_Internet/Resources/Imagenes/escudo_verde.png)",
+      backgroundImage: "url(https://servicios2.cordoba.gov.ar/VecinoVirtualUtils_Internet/Resources/Imagenes/escudo_verde.png)",
       backgroundRepeat: "no-repeat",
       backgroundSize: "contain",
       backgroundPosition: "center"

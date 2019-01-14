@@ -5,10 +5,11 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
 import "./style.css";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
+import 'react-virtualized/styles.css'
 
 //Router
 import { withRouter } from "react-router-dom";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { AnimatedSwitch } from "react-router-transition";
 
 //REDUX

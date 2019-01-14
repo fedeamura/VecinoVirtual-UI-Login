@@ -320,7 +320,11 @@ class PanelPicker extends React.Component {
           </div>
         </div>
 
-        <Button variant="contained" onClick={this.onBotonCamaraClick} style={{ position: "absolute", top: 12, right: 12 }}>
+        <Button
+          variant="contained"
+          onClick={this.onBotonCamaraClick}
+          style={{ position: "absolute", top: 12, right: 12, backgroundColor: "white" }}
+        >
           Prefiero usar mi cámara
         </Button>
 

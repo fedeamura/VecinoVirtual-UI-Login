@@ -12,11 +12,9 @@ import { Typography } from "@material-ui/core";
 //Mis componentes
 import MiCard from "@Componentes/MiCard";
 
-// const PADDING = "32px";
-
 class MiCardLogin extends React.PureComponent {
   render() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     let headerVisible = !"headerVisible" in this.props || this.props.headerVisible != false;
 
@@ -31,15 +29,7 @@ class MiCardLogin extends React.PureComponent {
         <LinearProgress className={classNames(classes.progress, this.props.cargando && "visible")} style={this.props.styleCargando} />
 
         {headerVisible == true && (
-          <div
-            className={classes.header}
-            style={{
-              padding: padding,
-              paddingBottom: "1rem",
-              paddingTop: "0.5rem"
-              // paddingTop: "calc(" + PADDING + " - 8px)"
-            }}
-          >
+          <div className={classes.header}>
             <div className={classes.imagenLogoMuni} />
             <div className={classes.contenedorTextosSistema}>
               <Typography variant="headline" noWrap style={{ fontWeight: 200 }}>

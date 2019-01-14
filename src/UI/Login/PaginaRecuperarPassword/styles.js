@@ -5,27 +5,49 @@ const styles = theme => {
       display: "flex",
       flexDirection: "column",
       flex: 1,
+      height: "100%"
+    },
+    contentSwapper: {
       height: "100%",
-      "& > div": {
-        overflow: "auto"
-      }
+      flex: 1,
+      display: "flex",
+      "& > span": { display: "flex", flex: 1, height: "100%" },
+      "& > span > div": { display: "flex", flex: 1, height: "100%" }
+    },
+
+    pagina: {
+      height: "100%",
+      width: "100%",
+      display: "flex",
+      flexDirection: "column"
     },
     content: {
+      paddingBottom: theme.spacing.unit * 2,
+      paddingTop: theme.spacing.unit * 2,
       flex: 1,
       overflow: "auto",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center"
-      // justifyContent: "center"
-    },
-    pagina: {
-      flex: 1,
       width: "100%",
-      overflow: "auto",
-      padding: "16px",
       display: "flex",
       flexDirection: "column",
-      alignItems: "center"
+      alignItems: "center",
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
+    },
+    footer: {
+      borderTop: "1px solid rgba(0,0,0,0.1)",
+      display: "flex",
+      paddingTop: theme.spacing.unit,
+      paddingBottom: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     },
     icono: {
       fontSize: "104px"
@@ -34,11 +56,6 @@ const styles = theme => {
       marginTop: "16px",
       maxWidth: "400px",
       textAlign: "center"
-    },
-    footer: {
-      borderTop: "1px solid rgba(0,0,0,0.1)",
-      padding: "16px",
-      display: "flex"
     }
   };
 };

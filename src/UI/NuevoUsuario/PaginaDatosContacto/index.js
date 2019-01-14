@@ -13,11 +13,8 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 //Componentes
-import { Typography, Icon, Button, Grid, IconButton } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
+import { Typography, Icon, Button, Grid } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import _ from "lodash";
 
@@ -198,339 +195,309 @@ class PaginaDatosContacto extends React.Component {
     );
   }
 
+  onErrorClose = () => {
+    this.setState({ mostrarError: false });
+  };
   renderContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
         {/* Error */}
-        <MiBanerError
-          visible={this.state.mostrarError}
-          mensaje={this.state.error}
-          onClose={() => {
-            this.setState({ mostrarError: false });
-          }}
-        />
+        <MiBanerError visible={this.state.mostrarError} mensaje={this.state.error} onClose={this.onErrorClose} />
 
         {/* Contenido */}
         <div className={classes.content}>
-          <div style={{ padding: padding, paddingTop: 0 }}>
-            <Grid container spacing={16}>
-              <Grid item xs={12}>
-                <div className={classes.encabezado}>
-                  <Typography variant="headline">Nuevo Usuario</Typography>
-                  <Icon>keyboard_arrow_right</Icon>
-                  <Typography variant="subheading">Datos de contacto</Typography>
-                </div>
-              </Grid>
+          <Grid container spacing={16}>
+            <Grid item xs={12} />
+            <Grid item xs={12}>
+              <div className={classes.encabezado}>
+                <Typography variant="headline">Nuevo Usuario</Typography>
+                <Icon>keyboard_arrow_right</Icon>
+                <Typography variant="subheading">Datos de contacto</Typography>
+              </div>
+            </Grid>
+            <Grid item xs={12} />
 
-              <Grid item xs={12}>
-                <Grid container spacing={16}>
-                  {/* Email */}
-                  <Grid item xs={12} sm={6}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["email"] !== undefined}
-                      aria-describedby="textoEmailError"
-                    >
-                      <InputLabel htmlFor="inputEmail">E-mail</InputLabel>
-                      <Input
-                        id="inputEmail"
-                        autoFocus
-                        inputProps={{
-                          maxLength: 50
-                        }}
-                        value={this.state.email}
-                        name="email"
-                        type="text"
+            <Grid item xs={12}>
+              <Grid container spacing={16}>
+                {/* Email */}
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    label="E-Mail"
+                    autoComplete="off"
+                    margin="dense"
+                    error={this.state.errores["email"] !== undefined}
+                    helperText={this.state.errores["email"]}
+                    id="inputEmail"
+                    autoFocus
+                    inputProps={{
+                      maxLength: 50
+                    }}
+                    value={this.state.email}
+                    name="email"
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                </Grid>
+                {/* Repetir email */}
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    variant="outlined"
+                    autoComplete="off"
+                    fullWidth
+                    margin="dense"
+                    label="Repita el E-Mail"
+                    error={this.state.errores["emailRepeat"] !== undefined}
+                    helperText={this.state.errores["emailRepeat"]}
+                    id="inputEmailRepeat"
+                    value={this.state.emailRepeat}
+                    inputProps={{
+                      maxLength: 50
+                    }}
+                    name="emailRepeat"
+                    type="text"
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                  />
+                </Grid>
+
+                <Grid item xs={12} />
+                <Grid item xs={12} md={6}>
+                  <Grid container spacing={16}>
+                    <Grid item xs={12}>
+                      <Typography variant="body2">Teléfono Celular</Typography>
+                    </Grid>
+
+                    {/* Telefono Celular */}
+                    <Grid item xs={4}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        label="Área"
+                        margin="dense"
+                        error={this.state.errores["telefonoCelularArea"] !== undefined}
+                        helperText={this.state.errores["telefonoCelularArea"]}
+                        id="inputTelefonoCelularArea"
+                        value={this.state.telefonoCelularArea}
+                        name="telefonoCelularArea"
+                        type="number"
+                        autoComplete="off"
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoEmailError">{this.state.errores["email"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                  {/* Repetir email */}
-                  <Grid item xs={12} sm={6}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["emailRepeat"] !== undefined}
-                      aria-describedby="textoEmailRepeatError"
-                    >
-                      <InputLabel htmlFor="inputEmailRepeat">Repita su e-mail</InputLabel>
-                      <Input
-                        id="inputEmailRepeat"
-                        value={this.state.emailRepeat}
-                        inputProps={{
-                          maxLength: 50
+                        InputProps={{
+                          startAdornment: (
+                            <div style={{ display: "flex" }}>
+                              <InputAdornment position="start">0</InputAdornment>
+                            </div>
+                          )
                         }}
-                        name="emailRepeat"
-                        type="text"
+                      />
+                    </Grid>
+                    <Grid item xs={8}>
+                      <TextField
+                        fullWidth
+                        label="Número"
+                        variant="outlined"
+                        margin="dense"
+                        autoComplete="off"
+                        error={this.state.errores["telefonoCelularNumero"] !== undefined}
+                        helperText={this.state.errores["telefonoCelularNumero"]}
+                        id="inputTelefonoCelularNumero"
+                        value={this.state.telefonoCelularNumero}
+                        name="telefonoCelularNumero"
+                        type="number"
                         onKeyPress={this.onInputKeyPress}
                         onChange={this.onInputChange}
+                        InputProps={{ startAdornment: <InputAdornment position="start">15</InputAdornment> }}
                       />
-                      <FormHelperText id="textoEmailRepeatError">{this.state.errores["emailRepeat"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <Grid container spacing={16}>
-                      <Grid item xs={12}>
-                        <Typography variant="body2">Teléfono Celular</Typography>
-                      </Grid>
-
-                      {/* Telefono Celular */}
-                      <Grid item xs={3}>
-                        <FormControl
-                          className={classes.formControl}
-                          fullWidth
-                          margin="dense"
-                          error={this.state.errores["telefonoCelularArea"] !== undefined}
-                          aria-describedby="textoTelefonoCelularAreaError"
-                        >
-                          <InputLabel htmlFor="inputTelefonoCelularArea">Area</InputLabel>
-                          <Input
-                            id="inputTelefonoCelularArea"
-                            value={this.state.telefonoCelularArea}
-                            name="telefonoCelularArea"
-                            type="number"
-                            onKeyPress={this.onInputKeyPress}
-                            onChange={this.onInputChange}
-                            startAdornment={
-                              <div style={{ display: "flex" }}>
-                                <InputAdornment position="start">0</InputAdornment>
-                              </div>
-                            }
-                          />
-                          <FormHelperText id="textoTelefonoCelularAreaError">{this.state.errores["telefonoCelularArea"]}</FormHelperText>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={9}>
-                        <FormControl
-                          className={classes.formControl}
-                          fullWidth
-                          margin="dense"
-                          error={this.state.errores["telefonoCelularNumero"] !== undefined}
-                          aria-describedby="textoTelefonoCelularNumeroError"
-                        >
-                          <InputLabel htmlFor="inputTelefonoCelularNumero">Número</InputLabel>
-                          <Input
-                            id="inputTelefonoCelularNumero"
-                            value={this.state.telefonoCelularNumero}
-                            name="telefonoCelularNumero"
-                            type="number"
-                            onKeyPress={this.onInputKeyPress}
-                            onChange={this.onInputChange}
-                            startAdornment={<InputAdornment position="start">15</InputAdornment>}
-                          />
-                          <FormHelperText id="textoTelefonoCelularNumeroError">
-                            {this.state.errores["telefonoCelularNumero"]}
-                          </FormHelperText>
-                        </FormControl>
-                      </Grid>
                     </Grid>
                   </Grid>
+                </Grid>
 
-                  <Grid item xs={12} md={6}>
-                    <Grid container spacing={16}>
-                      <Grid item xs={12}>
-                        <Typography variant="body2">Teléfono Fijo</Typography>
-                      </Grid>
+                <Grid item xs={12} />
+                <Grid item xs={12} md={6}>
+                  <Grid container spacing={16}>
+                    <Grid item xs={12}>
+                      <Typography variant="body2">Teléfono Fijo</Typography>
+                    </Grid>
 
-                      <Grid item xs={3}>
-                        <FormControl
-                          className={classes.formControl}
-                          fullWidth
-                          margin="dense"
-                          error={this.state.errores["telefonoFijoArea"] !== undefined}
-                          aria-describedby="textoTelefonoFijoAreaError"
-                        >
-                          <InputLabel htmlFor="inputTelefonoFijoArea">Area</InputLabel>
-                          <Input
-                            id="telefonoFijoArea"
-                            value={this.state.telefonoFijoArea}
-                            name="telefonoFijoArea"
-                            type="number"
-                            onKeyPress={this.onInputKeyPress}
-                            onChange={this.onInputChange}
-                            startAdornment={
-                              <div style={{ display: "flex" }}>
-                                <InputAdornment position="start">0</InputAdornment>
-                              </div>
-                            }
-                          />
-                          <FormHelperText id="textoTelefonoFijoAreaError">{this.state.errores["telefonoFijoArea"]}</FormHelperText>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={9}>
-                        <FormControl
-                          className={classes.formControl}
-                          fullWidth
-                          margin="dense"
-                          error={this.state.errores["telefonoFijoNumero"] !== undefined}
-                          aria-describedby="textoTelefonoFijoNumeroError"
-                        >
-                          <InputLabel htmlFor="inputTelefonoFijoNumero">Número</InputLabel>
-                          <Input
-                            id="inputTelefonoFijoNumero"
-                            value={this.state.telefonoFijoNumero}
-                            name="telefonoFijoNumero"
-                            type="number"
-                            onKeyPress={this.onInputKeyPress}
-                            onChange={this.onInputChange}
-                          />
-                          <FormHelperText id="textoTelefonoFijoNumeroError">{this.state.errores["telefonoFijoNumero"]}</FormHelperText>
-                        </FormControl>
-                      </Grid>
+                    <Grid item xs={4}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        margin="dense"
+                        label="Área"
+                        autoComplete="off"
+                        error={this.state.errores["telefonoFijoArea"] !== undefined}
+                        helperText={this.state.errores["telefonoFijoArea"]}
+                        id="telefonoFijoArea"
+                        value={this.state.telefonoFijoArea}
+                        name="telefonoFijoArea"
+                        type="number"
+                        onKeyPress={this.onInputKeyPress}
+                        onChange={this.onInputChange}
+                        InputProps={{
+                          startAdornment: (
+                            <div style={{ display: "flex" }}>
+                              <InputAdornment position="start">0</InputAdornment>
+                            </div>
+                          )
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={8}>
+                      <TextField
+                        fullWidth
+                        margin="dense"
+                        variant="outlined"
+                        label="Número"
+                        autoComplete="off"
+                        error={this.state.errores["telefonoFijoNumero"] !== undefined}
+                        helperText={this.state.errores["telefonoFijoNumero"]}
+                        id="inputTelefonoFijoNumero"
+                        value={this.state.telefonoFijoNumero}
+                        name="telefonoFijoNumero"
+                        type="number"
+                        onKeyPress={this.onInputKeyPress}
+                        onChange={this.onInputChange}
+                      />
                     </Grid>
                   </Grid>
+                </Grid>
 
-                  {/* Telefono Fijo */}
-                  <Grid item xs={12}>
-                    <Typography variant="body2">Redes sociales</Typography>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["facebook"] !== undefined}
-                      aria-describedby="textoFacebookError"
-                    >
-                      <InputLabel htmlFor="inputFacebook">Facebook</InputLabel>
-                      <Input
-                        id="inputFacebook"
-                        value={this.state.facebook}
-                        name="facebook"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                        startAdornment={
-                          <div style={{ display: "flex" }}>
-                            <InputAdornment position="start">
-                              <i style={{ fontSize: 20, color: "#3b5998" }} className={classNames("fab", "fa-facebook-square")} />
-                            </InputAdornment>
-                          </div>
-                        }
-                      />
-                      <FormHelperText id="textoFacebookError">{this.state.errores["facebook"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["twitter"] !== undefined}
-                      aria-describedby="textoTwitterError"
-                    >
-                      <InputLabel htmlFor="inputTwitter">Twitter</InputLabel>
-                      <Input
-                        id="inputTwitter"
-                        value={this.state.twitter}
-                        name="twitter"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                        startAdornment={
-                          <div style={{ display: "flex" }}>
-                            <InputAdornment position="start">
-                              <i style={{ fontSize: 20, color: "#1da1f2" }} className={classNames("fab", "fa-twitter-square")} />
-                            </InputAdornment>
-                          </div>
-                        }
-                      />
-                      <FormHelperText id="textoTwitterError">{this.state.errores["twitter"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["instagram"] !== undefined}
-                      aria-describedby="textoInstagramError"
-                    >
-                      <InputLabel htmlFor="inputInstagram">Instagram</InputLabel>
-                      <Input
-                        id="inputInstagram"
-                        value={this.state.instagram}
-                        name="instagram"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                        startAdornment={
-                          <div style={{ display: "flex" }}>
-                            <InputAdornment position="start">
-                              <i style={{ fontSize: 20, color: "#e56969" }} className={classNames("fab", "fa-instagram")} />
-                            </InputAdornment>
-                          </div>
-                        }
-                      />
-                      <FormHelperText id="textoInstagramError">{this.state.errores["instagram"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={6} md={3}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["linkedin"] !== undefined}
-                      aria-describedby="textoLinkedinError"
-                    >
-                      <InputLabel htmlFor="inputLinkedin">LinkedIn</InputLabel>
-                      <Input
-                        id="inputLinkedin"
-                        value={this.state.linkedin}
-                        name="linkedin"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                        startAdornment={
-                          <div style={{ display: "flex" }}>
-                            <InputAdornment position="start">
-                              <i style={{ fontSize: 20, color: "#0077B5" }} className={classNames("fab", "fa-linkedin")} />
-                            </InputAdornment>
-                          </div>
-                        }
-                      />
-                      <FormHelperText id="textoLinkedinError">{this.state.errores["linkedin"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
+                {/* Redes */}
+                <Grid item xs={12} />
+                <Grid item xs={12}>
+                  <Typography variant="body2">Redes sociales</Typography>
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Facebook"
+                    margin="dense"
+                    autoComplete="off"
+                    error={this.state.errores["facebook"] !== undefined}
+                    helperText={this.state.errores["facebook"]}
+                    id="inputFacebook"
+                    value={this.state.facebook}
+                    name="facebook"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                    InputProps={{
+                      startAdornment: (
+                        <div style={{ display: "flex" }}>
+                          <InputAdornment position="start">
+                            <i style={{ fontSize: 20, color: "#3b5998" }} className={classNames("fab", "fa-facebook-square")} />
+                          </InputAdornment>
+                        </div>
+                      )
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Twitter"
+                    margin="dense"
+                    autoComplete="off"
+                    error={this.state.errores["twitter"] !== undefined}
+                    id="inputTwitter"
+                    value={this.state.twitter}
+                    name="twitter"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                    InputProps={{
+                      startAdornment: (
+                        <div style={{ display: "flex" }}>
+                          <InputAdornment position="start">
+                            <i style={{ fontSize: 20, color: "#1da1f2" }} className={classNames("fab", "fa-twitter-square")} />
+                          </InputAdornment>
+                        </div>
+                      )
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="Instagram"
+                    margin="dense"
+                    autoComplete="off"
+                    error={this.state.errores["instagram"] !== undefined}
+                    id="inputInstagram"
+                    value={this.state.instagram}
+                    name="instagram"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                    InputProps={{
+                      startAdornment: (
+                        <div style={{ display: "flex" }}>
+                          <InputAdornment position="start">
+                            <i style={{ fontSize: 20, color: "#e56969" }} className={classNames("fab", "fa-instagram")} />
+                          </InputAdornment>
+                        </div>
+                      )
+                    }}
+                  />
+                </Grid>
+                <Grid item xs={6} md={3}>
+                  <TextField
+                    fullWidth
+                    variant="outlined"
+                    placeholder="LinkedIn"
+                    margin="dense"
+                    autoComplete="off"
+                    error={this.state.errores["linkedin"] !== undefined}
+                    id="inputLinkedin"
+                    value={this.state.linkedin}
+                    name="linkedin"
+                    inputProps={{
+                      maxLength: 20
+                    }}
+                    onKeyPress={this.onInputKeyPress}
+                    onChange={this.onInputChange}
+                    InputProps={{
+                      startAdornment: (
+                        <div style={{ display: "flex" }}>
+                          <InputAdornment position="start">
+                            <i style={{ fontSize: 20, color: "#0077B5" }} className={classNames("fab", "fa-linkedin")} />
+                          </InputAdornment>
+                        </div>
+                      )
+                    }}
+                  />
                 </Grid>
               </Grid>
             </Grid>
-          </div>
+          </Grid>
         </div>
       </div>
     );
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          {this.props.desdeQR == false && (
+          {this.props.desdeQR != true && (
             <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
               Volver
             </Button>

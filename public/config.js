@@ -4,11 +4,12 @@ const LOCAL = 3;
 const ENTORNO = LOCAL;
 
 //WS Turnero
-const URL_WS_LOCAL = "http://localhost:7294";
-// const URL_WS_LOCAL = "http://localhost:1868";
+// const URL_WS_LOCAL = "http://localhost:7294";
+const URL_WS_LOCAL = "http://localhost:1868";
 const URL_WS_TEST = "https://srv-dev04.cordoba.local/WSVecinoVirtual_Bridge";
 const URL_WS_DEPLOY = "https://servicios2.cordoba.gov.ar/WSVecinoVirtual_Bridge";
 let URL_WS = URL_WS_DEPLOY;
+
 
 //Segun el entorno, cargo las variables
 switch (ENTORNO) {

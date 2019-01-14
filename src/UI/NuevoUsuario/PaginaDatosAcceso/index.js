@@ -13,16 +13,11 @@ import { connect } from "react-redux";
 
 //Componentes
 import { Typography, Icon, Button, Grid, IconButton } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
+import TextField from "@material-ui/core/TextField";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
 import _ from "lodash";
-import orange from "@material-ui/core/colors/orange";
-import green from "@material-ui/core/colors/green";
 
 //Mis componentes
 import MiBanerError from "@Componentes/MiBanerError";
@@ -166,7 +161,7 @@ class PaginaDatosAcceso extends React.Component {
   }
 
   renderContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
       <div className={classes.root}>
@@ -181,8 +176,9 @@ class PaginaDatosAcceso extends React.Component {
 
         <div className={classes.content}>
           {/* Contenido  */}
-          <div style={{ padding: padding, paddingTop: 0 }}>
+          <div>
             <Grid container spacing={16}>
+              <Grid item xs={12} />
               <Grid item xs={12}>
                 <div className={classes.encabezado}>
                   <Typography variant="headline">Nuevo Usuario</Typography>
@@ -190,111 +186,102 @@ class PaginaDatosAcceso extends React.Component {
                   <Typography variant="subheading">Datos de acceso</Typography>
                 </div>
               </Grid>
+              <Grid item xs={12} />
 
               <Grid item xs={12}>
-                <Grid container spacing={16}>
-                  <Grid item xs={12}>
-                    <div className={classes.contenedorInfoUsername}>
-                      <Icon style={{ color: green["500"], marginBottom: 16 }}>check_circle</Icon>
-                      <Typography variant="body1">
-                        Sus datos han sido validados correctamente con el Registro Nacional de Personas
-                      </Typography>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["username"] !== undefined}
-                      aria-describedby="textoUsernameError"
-                    >
-                      <InputLabel htmlFor="inputUsername">Nombre de usuario</InputLabel>
-                      <Input
-                        id="inputUsername"
-                        autoFocus
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        value={this.state.username}
-                        name="username"
-                        type="text"
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                      />
-                      <FormHelperText id="textoUsernameError">{this.state.errores["username"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <div className={classes.contenedorInfoUsername}>
-                      <Icon style={{ color: orange["500"] }}>info</Icon>
-                      <Typography variant="body1">
-                        Su nombre de usuario por defecto es su número de CUIL pero, si usted lo desea, puede indicar uno. Tenga en cuenta
-                        que si lo hace, usted todavía podrá acceder con su número de CUIL.
-                      </Typography>
-                    </div>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["password"] !== undefined}
-                      aria-describedby="textoPasswordError"
-                    >
-                      <InputLabel htmlFor="inputPassword">Contraseña</InputLabel>
-                      <Input
-                        id="inputPassword"
-                        value={this.state.password}
-                        name="password"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        type={this.state.showPassword ? "text" : "password"}
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                        endAdornment={
-                          <InputAdornment position="end">
-                            <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick} tabIndex="-1">
-                              {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        }
-                      />
-                      <FormHelperText id="textoPasswordError">{this.state.errores["password"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl
-                      className={classes.formControl}
-                      fullWidth
-                      margin="dense"
-                      error={this.state.errores["passwordRepeat"] !== undefined}
-                      aria-describedby="textoPasswordRepeatError"
-                    >
-                      <InputLabel htmlFor="passwordRepeat">Repetir contraseña</InputLabel>
-                      <Input
-                        id="inputPasswordRepeat"
-                        value={this.state.passwordRepeat}
-                        name="passwordRepeat"
-                        inputProps={{
-                          maxLength: 20
-                        }}
-                        type={this.state.showPasswordRepeat ? "text" : "password"}
-                        onKeyPress={this.onInputKeyPress}
-                        onChange={this.onInputChange}
-                        endAdornment={
-                          <InputAdornment position="end">
-                            <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick} tabIndex="-1">
-                              {this.state.showPasswordRepeat ? <VisibilityOff /> : <Visibility />}
-                            </IconButton>
-                          </InputAdornment>
-                        }
-                      />
-                      <FormHelperText id="textoPasswordRepeatError">{this.state.errores["passwordRepeat"]}</FormHelperText>
-                    </FormControl>
-                  </Grid>
-                </Grid>
+                <div className={classes.contenedorInfoRenaper}>
+                  <Icon>check_circle</Icon>
+                  <Typography variant="body1" className="texto">
+                    Sus datos han sido validados correctamente con el Registro Nacional de Personas
+                  </Typography>
+                </div>
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="inputUsername"
+                  margin="dense"
+                  autoFocus
+                  autoComplete="off"
+                  variant="outlined"
+                  label="Nombre de usuario"
+                  inputProps={{
+                    maxLength: 20
+                  }}
+                  error={this.state.errores["username"] !== undefined}
+                  helperText={this.state.errores["username"]}
+                  value={this.state.username}
+                  name="username"
+                  type="text"
+                  onKeyPress={this.onInputKeyPress}
+                  onChange={this.onInputChange}
+                />
+              </Grid>
+              <Grid item xs={12}>
+                <div className={classes.contenedorInfoUsername}>
+                  <Icon>info</Icon>
+                  <Typography variant="body1" className="texto">
+                    Su nombre de usuario por defecto es su número de CUIL pero, si usted lo desea, puede indicar uno. Tenga en cuenta que si
+                    lo hace, usted todavía podrá acceder con su número de CUIL.
+                  </Typography>
+                </div>
+              </Grid>
+              <Grid item xs={12} />
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="inputPassword"
+                  margin="dense"
+                  variant="outlined"
+                  label="Contraseña"
+                  inputProps={{
+                    maxLength: 20
+                  }}
+                  error={this.state.errores["password"] !== undefined}
+                  helperText={this.state.errores["password"]}
+                  value={this.state.password}
+                  name="password"
+                  type={this.state.showPassword ? "text" : "password"}
+                  onKeyPress={this.onInputKeyPress}
+                  onChange={this.onInputChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick} tabIndex="-1">
+                          {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                <TextField
+                  fullWidth
+                  id="inputPasswordRepeat"
+                  margin="dense"
+                  variant="outlined"
+                  label="Repita su contraseña"
+                  inputProps={{
+                    maxLength: 20
+                  }}
+                  error={this.state.errores["passwordRepeat"] !== undefined}
+                  helperText={this.state.errores["passwordRepeat"]}
+                  value={this.state.passwordRepeat}
+                  name="passwordRepeat"
+                  type={this.state.showPasswordRepeat ? "text" : "password"}
+                  onKeyPress={this.onInputKeyPress}
+                  onChange={this.onInputChange}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick} tabIndex="-1">
+                          {this.state.showPasswordRepeat ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    )
+                  }}
+                />
               </Grid>
             </Grid>
           </div>
@@ -304,17 +291,10 @@ class PaginaDatosAcceso extends React.Component {
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
           {this.props.desdeQR != true && (
             <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>

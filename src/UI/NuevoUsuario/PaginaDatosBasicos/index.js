@@ -12,12 +12,14 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 //Componentes
-import { Typography, Icon, Button, Grid } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
+import Typography from "@material-ui/core/Typography";
+import Icon from "@material-ui/core/Icon";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
-import { DatePicker } from "material-ui-pickers";
+import { InlineDatePicker as DatePicker } from "material-ui-pickers";
 import MiSelect from "@Componentes/MiSelect";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
@@ -77,7 +79,7 @@ class PaginaDatosBasicos extends React.Component {
           let estadosCiviles = data.map(item => {
             return { value: item.id, label: item.nombre };
           });
-          estadosCiviles.unshift({ value: -1, label: "Seleccione..." });
+          // estadosCiviles.unshift({ value: -1, label: "Seleccione..." });
           this.setState({
             estadosCiviles: estadosCiviles
           });
@@ -112,9 +114,12 @@ class PaginaDatosBasicos extends React.Component {
   };
 
   onInputEstadoCivilChange = e => {
-    let errores = this.state.errores || [];
-    errores["estadoCivil"] = undefined;
-    this.setState({ idEstadoCivil: e.value, errores: errores });
+    if (e == undefined) {
+      this.setState({ idEstadoCivil: undefined, errores: { ...this.state.errores, estadoCivil: undefined } });
+      return;
+    }
+
+    this.setState({ idEstadoCivil: e.value, errores: { ...this.state.errores, estadoCivil: undefined } });
   };
 
   onInputSexoChange = e => {
@@ -200,178 +205,161 @@ class PaginaDatosBasicos extends React.Component {
     );
   }
 
+  onBanerClose = () => {
+    this.setState({ mostrarError: false });
+  };
   renderContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
+    let { mostrarError, error } = this.state;
+
     return (
       <div className={classes.root}>
         {/* Error  */}
-        <MiBanerError
-          visible={this.state.mostrarError}
-          mensaje={this.state.error}
-          onClose={() => {
-            this.setState({ mostrarError: false });
-          }}
-        />
+        <MiBanerError visible={mostrarError} mensaje={error} onClose={this.onBanerClose} />
 
         {/* Contenido */}
         <div className={classes.content}>
-          <div style={{ padding: padding, paddingTop: "16px" }}>
-            <div className={classes.encabezado}>
-              <Typography variant="headline">Nuevo Usuario</Typography>
-              <Icon>keyboard_arrow_right</Icon>
-              <Typography variant="subheading">Datos personales</Typography>
-            </div>
-
-            <Grid container spacing={16}>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  className={classes.formControl}
-                  fullWidth
-                  disabled={this.props.desdeQR}
-                  margin="dense"
-                  error={this.state.errores["nombre"] !== undefined}
-                  aria-describedby="textoNombreError"
-                >
-                  <InputLabel htmlFor="inputNombre">Nombre</InputLabel>
-                  <Input
-                    id="inputNombre"
-                    autoFocus
-                    value={this.state.nombre}
-                    name="nombre"
-                    inputProps={{
-                      maxLength: 30
-                    }}
-                    type="text"
-                    onKeyPress={this.onInputKeyPress}
-                    onChange={this.onInputChange}
-                  />
-                  <FormHelperText id="textoNombreError">{this.state.errores["nombre"]}</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  className={classes.formControl}
-                  fullWidth
-                  margin="dense"
-                  disabled={this.props.desdeQR}
-                  error={this.state.errores["apellido"] !== undefined}
-                  aria-describedby="textoApellidoError"
-                >
-                  <InputLabel htmlFor="inputApellido">Apellido</InputLabel>
-                  <Input
-                    id="inputApellido"
-                    value={this.state.apellido}
-                    name="apellido"
-                    inputProps={{
-                      maxLength: 30
-                    }}
-                    type="text"
-                    onKeyPress={this.onInputKeyPress}
-                    onChange={this.onInputChange}
-                  />
-                  <FormHelperText id="textoApellidoError">{this.state.errores["apellido"]}</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  className={classes.formControl}
-                  fullWidth
-                  margin="dense"
-                  disabled={this.props.desdeQR}
-                  error={this.state.errores["dni"] !== undefined}
-                  aria-describedby="textoDniError"
-                >
-                  <InputLabel htmlFor="inputDni">N° de Documento</InputLabel>
-                  <Input
-                    id="inputDni"
-                    value={this.state.dni}
-                    name="dni"
-                    type="number"
-                    onKeyPress={this.onInputKeyPress}
-                    onChange={this.onInputChange}
-                  />
-                  <FormHelperText id="textoDniError">{this.state.errores["dni"]}</FormHelperText>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <DatePicker
-                  keyboard
-                  style={{ marginTop: "4px", width: "100%" }}
-                  label="Fecha de nacimiento"
-                  format="dd/MM/yyyy"
-                  disabled={this.props.desdeQR}
-                  openToYearSelection={true}
-                  disableFuture={true}
-                  labelFunc={this.renderLabelFecha}
-                  invalidDateMessage="Fecha inválida"
-                  maxDateMessage="Fecha inválida"
-                  minDateMessage="Fecha inválida"
-                  mask={value => (value ? [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/] : [])}
-                  value={this.state.fechaNacimiento}
-                  onChange={this.onInputFechaNacimientoChange}
-                  disableOpenOnEnter
-                  animateYearScrolling={false}
-                />
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  className={classes.formControl}
-                  fullWidth
-                  margin="dense"
-                  error={this.state.errores["estadoCivil"] !== undefined}
-                  aria-describedby="textoEstadoCivilError"
-                >
-                  <MiSelect
-                    value={this.state.idEstadoCivil}
-                    style={{ width: "100%" }}
-                    label="Estado civil"
-                    placeholder="Seleccione..."
-                    onChange={this.onInputEstadoCivilChange}
-                    options={this.state.estadosCiviles}
-                  />
-                  <FormHelperText id="textoEstadoCivilError">{this.state.errores["estadoCivil"]}</FormHelperText>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} style={{ marginTop: "16px" }}>
-                <FormControl component="fieldset" className={classes.formControl}>
-                  <FormLabel component="legend">Sexo</FormLabel>
-                  <RadioGroup
-                    disabled={this.props.desdeQR}
-                    aria-label="Sexo"
-                    name="sexo"
-                    style={{ flexDirection: "row" }}
-                    value={this.state.sexo}
-                    onChange={this.onInputSexoChange}
-                  >
-                    <FormControlLabel value="m" control={<Radio disabled={this.props.desdeQR} />} label="Masculino" />
-                    <FormControlLabel value="f" control={<Radio disabled={this.props.desdeQR} />} label="Femenino" />
-                  </RadioGroup>
-                </FormControl>
-              </Grid>
+          <Grid container spacing={16}>
+            <Grid item xs={12} />
+            <Grid item xs={12}>
+              <div className={classes.encabezado}>
+                <Typography variant="headline">Nuevo Usuario</Typography>
+                <Icon>keyboard_arrow_right</Icon>
+                <Typography variant="subheading">Datos personales</Typography>
+              </div>
             </Grid>
-          </div>
+            <Grid item xs={12} />
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                margin="dense"
+                error={this.state.errores["nombre"] !== undefined}
+                helperText={this.state.errores["nombre"]}
+                label="Nombre"
+                variant="outlined"
+                autoFocus
+                autoComplete="off"
+                value={this.state.nombre}
+                name="nombre"
+                inputProps={{
+                  maxLength: 30
+                }}
+                type="text"
+                onKeyPress={this.onInputKeyPress}
+                onChange={this.onInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                margin="dense"
+                error={this.state.errores["apellido"] !== undefined}
+                helperText={this.state.errores["apellido"]}
+                label="Apellido"
+                autoComplete="off"
+                id="inputApellido"
+                value={this.state.apellido}
+                name="apellido"
+                inputProps={{
+                  maxLength: 30
+                }}
+                type="text"
+                onKeyPress={this.onInputKeyPress}
+                onChange={this.onInputChange}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                margin="dense"
+                error={this.state.errores["dni"] !== undefined}
+                helperText={this.state.errores["dni"]}
+                label="N° de Documento"
+                id="inputDni"
+                variant="outlined"
+                autoComplete="off"
+                value={this.state.dni}
+                name="dni"
+                type="number"
+                onKeyPress={this.onInputKeyPress}
+                onChange={this.onInputChange}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <DatePicker
+                keyboard
+                variant="outlined"
+                fullWidth
+                margin="dense"
+                label="Fecha de nacimiento"
+                openToYearSelection={true}
+                disableFuture={true}
+                format="dd/MM/yyyy"
+                labelFunc={this.renderLabelFecha}
+                invalidDateMessage="Fecha inválida"
+                maxDateMessage="Fecha inválida"
+                minDateMessage="Fecha inválida"
+                mask={value => (value ? [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/] : [])}
+                value={this.state.fechaNacimiento}
+                onChange={this.onInputFechaNacimientoChange}
+                disableOpenOnEnter
+                animateYearScrolling={false}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <FormControl
+                className={classes.formControl}
+                fullWidth
+                margin="dense"
+                error={this.state.errores["estadoCivil"] !== undefined}
+                aria-describedby="textoEstadoCivilError"
+              >
+                <MiSelect
+                  variant="outlined"
+                  value={this.state.idEstadoCivil}
+                  style={{ width: "100%" }}
+                  label="Estado civil"
+                  placeholder="Seleccione..."
+                  onChange={this.onInputEstadoCivilChange}
+                  options={this.state.estadosCiviles}
+                />
+                <FormHelperText id="textoEstadoCivilError">{this.state.errores["estadoCivil"]}</FormHelperText>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+              <FormControl component="fieldset" className={classes.formControl}>
+                <FormLabel component="legend">Sexo</FormLabel>
+                <RadioGroup
+                  aria-label="Sexo"
+                  name="sexo"
+                  margin="dense"
+                  style={{ flexDirection: "row" }}
+                  value={this.state.sexo}
+                  onChange={this.onInputSexoChange}
+                >
+                  <FormControlLabel value="m" control={<Radio />} label="Masculino" />
+                  <FormControlLabel value="f" control={<Radio />} label="Femenino" />
+                </RadioGroup>
+              </FormControl>
+            </Grid>
+          </Grid>
         </div>
       </div>
     );
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+          {/* <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
-          </Button>
+          </Button> */}
         </div>
 
         <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>

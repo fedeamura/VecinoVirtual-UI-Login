@@ -191,7 +191,11 @@ class PanelCamara extends React.Component {
           Encuadre la tarjeta de su DNI
         </Typography>
 
-        <Button onClick={this.props.onBotonFileClick} variant="contained" style={{ position: "absolute", top: 12, right: 12 }}>
+        <Button
+          onClick={this.props.onBotonFileClick}
+          variant="contained"
+          style={{ position: "absolute", top: 12, right: 12, backgroundColor: "white" }}
+        >
           Prefiero subir un archivo
         </Button>
       </div>

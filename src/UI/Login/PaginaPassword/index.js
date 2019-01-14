@@ -97,7 +97,7 @@ class PaginaPassword extends React.Component {
   };
 
   render() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
     return (
       <div className={classes.root}>
         {this.renderContent()}
@@ -107,18 +107,20 @@ class PaginaPassword extends React.Component {
   }
 
   renderContent() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div className={classes.content} style={{ padding: padding }}>
+      <div className={classes.content}>
         <Grid container spacing={16}>
-          <Grid item xs={12} className={classes.fixPadding}>
+          <Grid item xs={12} />
+          <Grid item xs={12}>
             <HintUsuarioSeleccionado
               dataUsuario={this.props.dataUsuario}
               onBotonVerUsuariosRecientesClick={this.props.onBotonVerUsuariosRecientesClick}
             />
           </Grid>
-          <Grid item xs={12} className={classes.fixPadding}>
+          <Grid item xs={12} />
+          <Grid item xs={12}>
             <TextField
               fullWidth
               label="Contraseña"
@@ -152,17 +154,10 @@ class PaginaPassword extends React.Component {
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
           <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
@@ -188,20 +183,31 @@ const styles = theme => {
     },
     content: {
       flex: 1,
-      overflow: "auto"
+      overflow: "auto",
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     },
     botonRecuperarCUIL: {
       cursor: "pointer",
       textDecoration: "underline",
       color: theme.palette.primary.main
     },
-    fixPadding: {
-      marginLeft: "8px",
-      marginRight: "8px"
-    },
+
     footer: {
       borderTop: "1px solid rgba(0,0,0,0.1)",
-      display: "flex"
+      display: "flex",
+      paddingTop: theme.spacing.unit,
+      paddingBottom: theme.spacing.unit,
+      paddingLeft: theme.spacing.unit * 2,
+      paddingRight: theme.spacing.unit * 2,
+      [theme.breakpoints.up("sm")]: {
+        paddingLeft: theme.spacing.unit * 4,
+        paddingRight: theme.spacing.unit * 4
+      }
     }
   };
 };

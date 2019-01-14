@@ -1,7 +1,7 @@
 import React from "react";
 
 //Styles
-import { withStyles } from "@material-ui/core/styles";
+import { withStyles, withTheme } from "@material-ui/core/styles";
 import classNames from "classnames";
 import styles from "./styles";
 
@@ -12,10 +12,11 @@ import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
 
 //Componentes
-import { Typography, Icon, Button, Grid, IconButton } from "@material-ui/core";
+import { Typography, Icon, Button, Grid } from "@material-ui/core";
 import _ from "lodash";
-import red from "@material-ui/core/colors/red";
 import ReCAPTCHA from "react-google-recaptcha";
+import Checkbox from "@material-ui/core/Checkbox";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 //Mis componentes
 import MiBanerError from "@Componentes/MiBanerError";
@@ -57,22 +58,22 @@ class PaginaConfirmacion extends React.Component {
   };
 
   onBotonSiguienteClick = () => {
-    const { recaptcha } = this.state;
+    // const { recaptcha } = this.state;
 
-    this.setState({
-      mostrarError: false
-    });
+    // this.setState({
+    //   mostrarError: false
+    // });
 
-    if (recaptcha == undefined) {
-      this.setState({
-        mostrarError: true,
-        error: "Debe completar el ReCAPTCHA"
-      });
-      return;
-    }
+    // if (recaptcha == undefined) {
+    //   this.setState({
+    //     mostrarError: true,
+    //     error: "Debe completar el ReCAPTCHA"
+    //   });
+    //   return;
+    // }
 
     this.props.onReady({
-      recaptcha: recaptcha
+      recaptcha: ""
     });
   };
 
@@ -87,8 +88,12 @@ class PaginaConfirmacion extends React.Component {
     );
   }
 
+  handleChange = e => {
+    this.setState({ terminos: !(this.state.terminos || false) });
+  };
+
   renderContent() {
-    const { classes, padding } = this.props;
+    const { classes, theme } = this.props;
 
     return (
       <div className={classes.root}>
@@ -102,11 +107,9 @@ class PaginaConfirmacion extends React.Component {
         />
 
         {/* Contenido */}
-        <div
-          className={classes.content}
-          style={{ padding: padding, paddingTop: 0 }}
-        >
+        <div className={classes.content}>
           <Grid container spacing={16}>
+            <Grid item xs={12} />
             <Grid item xs={12}>
               <div className={classes.encabezado}>
                 <Typography variant="headline">Nuevo Usuario</Typography>
@@ -114,14 +117,13 @@ class PaginaConfirmacion extends React.Component {
                 <Typography variant="subheading">Confirmación</Typography>
               </div>
             </Grid>
+            <Grid item xs={12} />
 
-            <Grid item xs={12}>
-              <Typography variant="subheading">
-                Por favor complete el ReCAPTCHA para verificar su identidad
-              </Typography>
-            </Grid>
+            {/* <Grid item xs={12}>
+              <Typography variant="subheading">Por favor complete el ReCAPTCHA para verificar su identidad</Typography>
+            </Grid> */}
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <ReCAPTCHA
                 size="normal"
                 theme="light"
@@ -131,6 +133,16 @@ class PaginaConfirmacion extends React.Component {
                 onChange={this.onReCaptchaCallback}
               />
             </Grid>
+            <Grid item xs={12} /> */}
+
+            <Grid item xs={12}>
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <Checkbox checked={this.state.terminos} onChange={this.handleChange} name="terminos" />
+                <Typography>
+                  Al hacer click en "REGISTRAR" acepto los <a className={classes.link}>términos y condiciones</a>
+                </Typography>
+              </div>
+            </Grid>
           </Grid>
         </div>
       </div>
@@ -138,31 +150,19 @@ class PaginaConfirmacion extends React.Component {
   }
 
   renderFooter() {
-    const { classes, padding } = this.props;
+    const { classes } = this.props;
 
     return (
-      <div
-        className={classes.footer}
-        style={{
-          padding: padding,
-          paddingBottom: "16px",
-          paddingTop: "16px"
-        }}
-      >
+      <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          <Button
-            variant="text"
-            color="primary"
-            className={classes.button}
-            onClick={this.props.onBotonVolverClick}
-          >
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
           </Button>
         </div>
 
         <Button
           variant="contained"
-          disabled={this.state.recaptcha == undefined}
+          disabled={this.state.terminos != true}
           color="primary"
           className={classes.button}
           onClick={this.onBotonSiguienteClick}
@@ -176,6 +176,8 @@ class PaginaConfirmacion extends React.Component {
 
 let componente = PaginaConfirmacion;
 componente = withStyles(styles)(componente);
+componente = withTheme()(componente);
+
 componente = withRouter(componente);
 componente = connect(
   mapStateToProps,

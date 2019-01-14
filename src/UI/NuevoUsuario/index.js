@@ -19,7 +19,6 @@ import { QueryString } from "@Componentes/urlUtils";
 import MiCardLogin from "@Componentes/MiCardLogin";
 import ContentSwapper from "@Componentes/ContentSwapper";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
-import PaginaModo from "./PaginaModo";
 import PaginaDatosBasicos from "./PaginaDatosBasicos";
 import PaginaDatosAcceso from "./PaginaDatosAcceso";
 import PaginaDatosContacto from "./PaginaDatosContacto";
@@ -41,13 +40,10 @@ const mapStateToProps = state => {
   return {};
 };
 
-const padding = "2rem";
-
 const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO = "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
 const PAGINA_EXTRA_EXITO = "PAGINA_EXTRA_EXITO";
 const PAGINA_EXTRA_ERROR_REGISTRANDO = "PAGINA_EXTRA_ERROR_REGISTRANDO";
 
-const PAGINA_MODO = 0;
 const PAGINA_DATOS_BASICOS = 1;
 const PAGINA_DATOS_ACCESO = 2;
 const PAGINA_DATOS_CONTACTO = 3;
@@ -123,7 +119,9 @@ class NuevoUsuario extends React.Component {
                 }
               );
             } else {
-              this.cambiarPagina(PAGINA_MODO);
+              this.cambiarPagina(PAGINA_DATOS_BASICOS);
+              // this.cambiarPagina(PAGINA_FOTO);
+
             }
           })
           .catch(error => {
@@ -190,23 +188,6 @@ class NuevoUsuario extends React.Component {
 
   onFotoReady = () => {
     this.cambiarPagina(PAGINA_CONFIRMACION);
-  };
-
-  onModo = modo => {
-    switch (modo) {
-      case "manual":
-        {
-          this.cambiarPagina(PAGINA_DATOS_BASICOS);
-        }
-        break;
-
-      case "dni":
-        {
-          this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
-          // this.mostrarPanelNuevoUsuarioDni(isMobile ? "camara" : "file");
-        }
-        break;
-    }
   };
 
   onConfirmacionReady = recaptcha => {
@@ -321,9 +302,6 @@ class NuevoUsuario extends React.Component {
     return dia + "/" + mes + "/" + año;
   };
 
-  onPaginaDatosBasicosBotonVolverClick = () => {
-    this.cambiarPagina(PAGINA_MODO);
-  };
 
   onPaginaDatosBasicosBotonYaEstoyRegistradoClick = () => {
     this.setState({ visible: false }, () => {
@@ -396,9 +374,7 @@ class NuevoUsuario extends React.Component {
     return (
       <div className={classes.content}>
         <ContentSwapper transitionName={anim} transitionEnterTimeout={500} transitionLeaveTimeout={500} className={classes.contentSwapper}>
-          <div key="paginaModo" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_MODO)}>
-            {this.renderPaginaModo()}
-          </div>
+         
 
           <div
             key="paginaDatosBasicos"
@@ -473,21 +449,9 @@ class NuevoUsuario extends React.Component {
     return <MiPanelMensaje error mensaje={this.state.errorValidandoCodigo} />;
   }
 
-  renderPaginaModo() {
-    return (
-      <PaginaModo
-        padding={padding}
-        onCargando={this.onCargando}
-        onModo={this.onModo}
-        onBotonYaEstoyRegistradoClick={this.onPaginaDatosBasicosBotonYaEstoyRegistradoClick}
-      />
-    );
-  }
-
   renderPaginaDatosBasicos() {
     return (
       <PaginaDatosBasicos
-        padding={padding}
         desdeQR={this.state.desdeQR || false}
         datosIniciales={this.state.datosBasicos}
         onCargando={this.onCargando}
@@ -500,7 +464,6 @@ class NuevoUsuario extends React.Component {
   renderPaginaDatosAcceso() {
     return (
       <PaginaDatosAcceso
-        padding={padding}
         desdeQR={this.state.desdeQR || false}
         datosIniciales={this.state.datosAcceso}
         onCargando={this.onCargando}
@@ -513,7 +476,6 @@ class NuevoUsuario extends React.Component {
   renderPaginaDatosContacto() {
     return (
       <PaginaDatosContacto
-        padding={padding}
         datosIniciales={this.state.datosContacto}
         onCargando={this.onCargando}
         onReady={this.onDatosContactoReady}
@@ -525,7 +487,6 @@ class NuevoUsuario extends React.Component {
   renderPaginaDatosDomicilio() {
     return (
       <PaginaDatosDomicilio
-        padding={padding}
         datosIniciales={this.state.datosDomicilio}
         onCargando={this.onCargando}
         onReady={this.onDatosDomicilioReady}
@@ -539,7 +500,6 @@ class NuevoUsuario extends React.Component {
 
     return (
       <PaginaFoto
-        padding={padding}
         datosIniciales={this.state.foto}
         onCargando={this.onCargando}
         onFoto={this.onFoto}
@@ -553,7 +513,6 @@ class NuevoUsuario extends React.Component {
   renderPaginaConfirmacion() {
     return (
       <PaginaConfirmacion
-        padding={padding}
         onCargando={this.onCargando}
         onReady={this.onConfirmacionReady}
         onBotonVolverClick={this.onPaginaConfirmacionBotonVolverClick}
