@@ -21,6 +21,11 @@ const styles = theme => {
       }
     },
     contenedor: {
+      maxWidth: "100%",
+      borderTopLeftRadius: "16px",
+      borderTopRightRadius: "16px",
+      overflow: "hidden",
+      /* position: relative; */
       width: "100%",
       height: "100%",
       position: "absolute",
@@ -79,9 +84,21 @@ const styles = theme => {
       top: 16,
       right: 16
     },
-    contenedorSlider: {
+    contenedorSliderRotate: {
       position: "absolute",
-      bottom: 32,
+      bottom: 16,
+      width: 300,
+      borderRadius: 16,
+      padding: 16,
+      height: 20,
+      backgroundColor: "white",
+      alignItems: "center",
+      display: "flex",
+      boxShadow: "0 2px 2px 0 rgba(0,0,0,0.14), 0 3px 1px -2px rgba(0,0,0,0.12), 0 1px 5px 0 rgba(0,0,0,0.2);"
+    },
+    contenedorSliderZoom: {
+      position: "absolute",
+      bottom: 60,
       width: 300,
       borderRadius: 16,
       padding: 16,
@@ -93,7 +110,8 @@ const styles = theme => {
     },
     slider: {
       flex: 1,
-      marginLeft: 8
+      marginLeft: 8,
+      marginRight: 8
     },
     hideView: {
       opacity: 0,

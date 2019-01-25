@@ -228,7 +228,7 @@ class PaginaFoto extends React.Component {
                       <Icon>zoom_out</Icon>
                       <Slider
                         classes={{ container: classes.slider }}
-                        value={this.state.zoom}
+                        value={this.state.zoom || 1}
                         aria-labelledby="label"
                         min={1}
                         max={2}

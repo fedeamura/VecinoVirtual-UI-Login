@@ -10,8 +10,9 @@ import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
 import { connect } from "react-redux";
 import { push, goBack } from "connected-react-router";
 
+//Componentes
 import { isMobile } from "react-device-detect";
-import { CircularProgress, Button, Typography } from "@material-ui/core";
+import { CircularProgress, Button } from "@material-ui/core";
 import { QueryString } from "@Componentes/urlUtils";
 
 //Mis Componentes
@@ -58,7 +59,10 @@ class PanelNuevoUsuario extends React.Component {
     localStorage.removeItem("dataNuevoUsuario");
 
     setTimeout(() => {
-      this.setState({ visible: true, modo: isMobile ? "camara" : "file", puedeCapturar: isMobile ? true : false });
+      let modo = isMobile ? "camara" : "file";
+      modo = "file";
+
+      this.setState({ visible: true, modo: modo, puedeCapturar: modo == "camara" ? true : false });
     }, 500);
     this.validarCodigo();
   }
@@ -95,10 +99,6 @@ class PanelNuevoUsuario extends React.Component {
 
   onBotonFileClick = () => {
     this.setState({ modo: "file", puedeCapturar: false });
-  };
-
-  onClose = () => {
-    this.props.redireccionar("/Login/" + this.state.codigo);
   };
 
   // Mando a logear
@@ -205,6 +205,12 @@ class PanelNuevoUsuario extends React.Component {
     this.onLogin(this.state.dialogoNuevoUsuarioLoginData);
   };
 
+  onDialogoLoginClose = () => {
+    this.setState({
+      dialogoNuevoUsuarioLoginVisible: false
+    });
+  };
+
   //Dialogo exito al analizar dni
   mostrarDialogoScanExito = data => {
     this.setState({
@@ -215,6 +221,10 @@ class PanelNuevoUsuario extends React.Component {
 
   onDialogoScanExitoBotonAceptarClick = () => {
     this.crearUsuarioConDatos();
+  };
+
+  onDialogoScanExitoClose = () => {
+    this.setState({ dialogoNuevoUsuarioExitoVisible: false });
   };
 
   // Dialogo debe activar usuario
@@ -282,6 +292,12 @@ class PanelNuevoUsuario extends React.Component {
       dialogoNuevoUsuarioActivarUsuarioCambiarEmailErrorVisible: false,
       dialogoNuevoUsuarioActivarUsuarioExitoVisible: false,
       dialogoNuevoUsuarioActivarUsuarioCambiarEmailVisible: true
+    });
+  };
+
+  onDialogoEmailActivacionEnviadoClose = () => {
+    this.setState({
+      dialogoNuevoUsuarioActivarUsuarioExitoVisible: false
     });
   };
 
@@ -479,8 +495,14 @@ class PanelNuevoUsuario extends React.Component {
   onBotonCancelarClick = () => {
     this.setState({ visible: false }, () => {
       setTimeout(() => {
-        this.props.goBack();
-      }, 500);
+        let q = QueryString(window.location.href);
+        if (q.url) {
+          let url = q.url;
+          window.location.href = url;
+        } else {
+          this.props.goBack();
+        }
+      }, 300);
     });
   };
 
@@ -495,7 +517,6 @@ class PanelNuevoUsuario extends React.Component {
           onPuedeCapturar={this.onPuedeCapturar}
           onBotonFileClick={this.onBotonFileClick}
           onCargando={this.onCargando}
-          onClose={this.onClose}
           onDni={this.onFotoDniReady}
         />
         <PanelFilePicker
@@ -503,7 +524,6 @@ class PanelNuevoUsuario extends React.Component {
           onPuedeCapturar={this.onPuedeCapturar}
           onBotonCamaraClick={this.onBotonCamaraClick}
           onCargando={this.onCargando}
-          onClose={this.onClose}
           onDni={this.onFotoDniReady}
         />
         {this.renderDialogos()}
@@ -555,7 +575,7 @@ class PanelNuevoUsuario extends React.Component {
           onClose={this.onDialogoNuevoUsuarioDniErrorClose}
           icon={"error"}
           iconColor="red"
-          botonNoVisible={false}
+          textoNo="Cancelar"
           textoSi="Aceptar"
         >
           <Button variant="outlined" color="primary" style={{ marginTop: 16 }} onClick={this.mostrarDialogoDatosManualmente}>
@@ -576,23 +596,25 @@ class PanelNuevoUsuario extends React.Component {
         {/* Dialogo  Nuevo usuario Login */}
         <DialogoMensaje
           visible={this.state.dialogoNuevoUsuarioLoginVisible || false}
-          mensaje={"Su usuario ya existe. Al presionar 'Continuar' usted accederá al sistema"}
+          mensaje={"Sus datos se han validado correctamente."}
           icon={"check_circle_outline"}
           iconColor="green"
-          botonNoVisible={false}
           onBotonSiClick={this.onLogin}
-          textoSi="Continuar"
+          textoNo="Cancelar"
+          textoSi="Acceder al sistema"
+          onClose={this.onDialogoLoginClose}
         />
 
         {/* Dialogo Nuevo Usuario Exito */}
         <DialogoMensaje
           visible={this.state.dialogoNuevoUsuarioExitoVisible || false}
-          mensaje={"Su DNI se ha analizado correctamente. Al presionar 'Continuar' usted podrá continuar con el registro de su usuario"}
-          botonNoVisible={false}
+          mensaje={"Sus datos se han validado correctamente."}
           icon={"check_circle_outline"}
           iconColor="green"
           onBotonSiClick={this.onDialogoScanExitoBotonAceptarClick}
-          textoSi="Continuar"
+          textoSi="Continuar con el registro"
+          textoNo="Cancelar"
+          onClose={this.onDialogoScanExitoClose}
         />
 
         {/* Dialogo Activar usuario */}
@@ -601,9 +623,8 @@ class PanelNuevoUsuario extends React.Component {
           cargando={this.state.dialogoNuevoUsuarioActivarUsuarioCargando || false}
           visible={this.state.dialogoNuevoUsuarioActivarUsuarioVisible || false}
           onClose={this.onDialogoDebeActivarUsuarioClose}
-          mensaje={
-            "Usted ya posee un usuario registrado, pero el mismo no se encuentra activado por e-mail. Si lo desea puede solicitar nuevamente el e-mail de activacion."
-          }
+          mensaje="Sus datos se han validado correctamente"
+          mensaje1="Pero su usuario no se encuentra validado por e-mail. Si lo desea puede solicitar nuevamente el e-mail de activación"
           textoSi="Reenviar e-mail"
           onBotonSiClick={this.onDialogoDebeActivarUsuarioBotonAceptarClick}
           textoNo="Cancelar"
@@ -614,11 +635,12 @@ class PanelNuevoUsuario extends React.Component {
           visible={this.state.dialogoNuevoUsuarioActivarUsuarioExitoVisible || false}
           mensaje={`Se ha enviado un e-mail a ${this.state.dialogoNuevoUsuarioActivarUsuarioExitoEmail ||
             ""} con las instrucciones para la activacion de su usuario`}
-          botonNoVisible={false}
           icon={"check_circle_outline"}
           iconColor="green"
           onBotonSiClick={this.onDialogoEmailActivacionEnviadoBotonAceptarClick}
-          textoSi="Aceptar"
+          textoNo="Cancelar"
+          textoSi="Ir al inicio"
+          onClose={this.onDialogoEmailActivacionEnviadoClose}
         >
           <Button
             onClick={this.onDialogoEmailActivacionEnviadoBotonCambiarEmailClick}

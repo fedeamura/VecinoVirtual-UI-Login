@@ -357,9 +357,9 @@ class PaginaDatosBasicos extends React.Component {
     return (
       <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          {/* <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
             Volver
-          </Button> */}
+          </Button>
         </div>
 
         <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>

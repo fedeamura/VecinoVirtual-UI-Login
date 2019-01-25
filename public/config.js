@@ -1,7 +1,7 @@
 const DEPLOY = 1;
 const TEST = 2;
 const LOCAL = 3;
-const ENTORNO = LOCAL;
+const ENTORNO = DEPLOY;
 
 //WS Turnero
 // const URL_WS_LOCAL = "http://localhost:7294";

@@ -7,11 +7,10 @@ import styles from "./styles";
 
 //Componentes
 import { Typography, Button, Icon, CircularProgress, Fab } from "@material-ui/core";
-import ReactCrop from "react-image-crop";
-import "react-image-crop/dist/ReactCrop.css";
 import _ from "lodash";
 import loadImage from "blueimp-load-image";
-import ImageJS from "image-js";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 import Slider from "@material-ui/lab/Slider";
 import Lottie from "react-lottie";
 import * as animScan from "@Resources/animaciones/anim_scan.json";
@@ -39,12 +38,7 @@ class PanelPicker extends React.Component {
       cropVisible: false,
       foto: undefined,
       rotation: 0,
-      crop: {
-        x: 10,
-        y: 10,
-        height: 80,
-        width: 80
-      }
+      zoom: 1
     };
   }
 
@@ -69,43 +63,12 @@ class PanelPicker extends React.Component {
       cropVisible: false,
       foto: undefined,
       rotation: 0,
-      crop: {
-        x: 10,
-        y: 10,
-        height: 80,
-        width: 80
-      }
+      zoom: 1
     });
 
-    if (this.ref) {
-      this.setState({ height: this.ref.clientHeight });
-    }
-  };
-
-  base64ToImage = foto => {
-    return new Promise((resolve, reject) => {
-      try {
-        var canvas = document.createElement("canvas");
-        var ctx = canvas.getContext("2d");
-
-        var image = new Image();
-        image.onload = () => {
-          ctx.drawImage(image, 0, 0);
-          canvas.width = image.width;
-          canvas.height = image.height;
-          ctx.drawImage(image, 0, 0, image.width, image.height);
-
-          let imagenJs = ImageJS.fromCanvas(canvas);
-          resolve(imagenJs);
-        };
-        image.onerror = () => {
-          reject("Error procesando la imagen. Por favor revise la selección realizada");
-        };
-        image.src = foto;
-      } catch (ex) {
-        reject("Error procesando la imagen. Por favor revise la selección realizada");
-      }
-    });
+    this.props.onPuedeCapturar && this.props.onPuedeCapturar(false);
+    this.setState({ cargandoFotoSeleccionada: false });
+    this.filePicker.value = "";
   };
 
   onFilePickerRef = ref => {
@@ -122,7 +85,6 @@ class PanelPicker extends React.Component {
   };
 
   onBotonVolverClick = () => {
-    this.filePicker.value = "";
     this.resetState();
   };
 
@@ -137,7 +99,7 @@ class PanelPicker extends React.Component {
         file,
         canvas => {
           let foto = canvas.toDataURL("image/png", 0.7);
-          this.setState({ foto: foto }, () => {
+          this.setState({ foto: foto, zoom: 1, rotate: 0 }, () => {
             this.setState(
               {
                 cropVisible: true
@@ -156,70 +118,20 @@ class PanelPicker extends React.Component {
     });
   };
 
-  onCropChange = crop => {
-    if (crop == undefined || crop.width == 0 || crop.height == 0) return;
-
-    this.setState({ crop: crop });
-  };
+  crop = data => {};
 
   onCargando = val => {
     this.props.onCargando && this.props.onCargando(val);
   };
 
   onBotonSeleccionarImagenClick = async () => {
-    const { crop, foto, rotation } = this.state;
-
     this.onCargando(true);
-    this.base64ToImage(foto)
-      .catch(error => {
-        this.onCargando(false);
-        this.mostrarDialogoError(error);
-      })
-      .then(imagen => {
-        let base64 = undefined;
-        try {
-          let imagenRotada = imagen.rotate(rotation);
-          let xNuevo = (imagenRotada.width - imagen.width) / 2;
-          if (xNuevo < 0) xNuevo *= -1;
-
-          let yNuevo = (imagenRotada.height - imagen.height) / 2;
-          if (yNuevo < 0) yNuevo *= -1;
-
-          let imagenRecortada = imagenRotada.crop({
-            x: xNuevo,
-            y: yNuevo,
-            width: imagen.width,
-            height: imagen.height
-          });
-
-          base64 = imagenRecortada
-            .crop({
-              x: imagen.width * (crop.x / 100),
-              y: imagen.height * (crop.y / 100),
-              width: imagen.width * (crop.width / 100),
-              height: imagen.height * (crop.height / 100)
-            })
-            .resize({
-              width: 1000
-            })
-            .toDataURL("image/png");
-        } catch (ex) {
-          this.onCargando(false);
-          this.mostrarDialogoError("Error al procesar la imagen. Por favor revise la selección realizada");
-          return;
-        }
-
-        if (base64 == undefined) {
-          this.onCargando(false);
-          this.mostrarDialogoError("Error al procesar la imagen. Por favor revise la selección realizada");
-          return;
-        }
-
-        this.onCargando(false);
-        if (this.props.onDni) {
-          this.props.onDni(base64);
-        }
-      });
+    setTimeout(() => {
+      const base64 = this.refs.cropper.getCroppedCanvas().toDataURL();
+      if (this.props.onDni) {
+        this.props.onDni(base64);
+      }
+    }, 300);
   };
 
   onBotonCerrarClick = () => {
@@ -230,6 +142,10 @@ class PanelPicker extends React.Component {
     this.setState({ rotation: value });
   };
 
+  onSliderZoomChange = (e, value) => {
+    this.setState({ zoom: value });
+  };
+
   mostrarDialogoError = error => {
     this.setState({ dialogoErrorError: error, dialogoErrorVisible: true });
   };
@@ -238,19 +154,12 @@ class PanelPicker extends React.Component {
     this.setState({ dialogoErrorVisible: false });
   };
 
-  onRef = ref => {
-    this.ref = ref;
-    if (ref) {
-      this.setState({ height: ref.clientHeight });
-    }
-  };
-
   render() {
     const { classes, visible } = this.props;
-    let { cropVisible, crop, foto, cargandoFotoSeleccionada } = this.state;
+    let { cropVisible, foto, cargandoFotoSeleccionada } = this.state;
 
     return (
-      <div className={classNames(classes.root, visible && "visible")} ref={this.onRef}>
+      <div className={classNames(classes.root, visible && "visible")}>
         <input style={{ display: "none" }} ref={this.onFilePickerRef} type="file" id="pickerFile" accept="image/*" />
 
         <div className={classNames(classes.contenedor, visible && "visible")}>
@@ -283,19 +192,22 @@ class PanelPicker extends React.Component {
         </div>
 
         <div className={classNames(classes.contenedor, visible && cropVisible && "visible")} style={{ backgroundColor: "black" }}>
-          <div style={{ maxHeight: this.state.height }}>
-            <ReactCrop
+          <div style={{ maxHeight: "100%", maxWidth: "100%", width: "100%", height: "100%" }}>
+            <Cropper
+              ref="cropper"
               src={foto || ""}
-              crop={crop}
-              keepSelection={true}
-              onChange={this.onCropChange}
-              style={{ backgroundColor: "black", maxHeight: this.state.height }}
-              imageStyle={{
-                // minHeight: this.state.height,
-                maxHeight: this.state.height,
-                // maxHeight: "none",
-                transform: "rotate(" + this.state.rotation + "deg)"
-              }}
+              dragMode="move"
+              style={{ height: "100%", width: "100%" }}
+              aspectRatio={8.5 / 5.5}
+              guides={true}
+              zoomOnWheel={true}
+              zoomOnTouch={true}
+              rotateTo={this.state.rotation || 0}
+              // zoom={1}
+              // viewMode={1}
+              // zoomTo={this.state.zoom || 1}
+              // scaleY={this.state.zoom || 1}
+              crop={this.crop}
             />
           </div>
 
@@ -307,7 +219,7 @@ class PanelPicker extends React.Component {
             <Icon style={{ color: "black" }}>arrow_back</Icon>
           </Fab>
 
-          <div className={classes.contenedorSlider}>
+          <div className={classes.contenedorSliderRotate}>
             <Icon>rotate_left</Icon>
             <Slider
               classes={{ container: classes.slider }}
@@ -317,16 +229,30 @@ class PanelPicker extends React.Component {
               max={180}
               onChange={this.onSliderRotationChange}
             />
+            <Icon>rotate_right</Icon>
           </div>
+
+          {/* <div className={classes.contenedorSliderZoom}>
+            <Icon>zoom_out</Icon>
+            <Slider
+              classes={{ container: classes.slider }}
+              value={this.state.zoom}
+              aria-labelledby="label"
+              min={1}
+              max={4}
+              onChange={this.onSliderZoomChange}
+            />
+            <Icon>zoom_int</Icon>
+          </div> */}
         </div>
 
-        <Button
+        {/* <Button
           variant="contained"
           onClick={this.onBotonCamaraClick}
           style={{ position: "absolute", top: 12, right: 12, backgroundColor: "white" }}
         >
           Prefiero usar mi cámara
-        </Button>
+        </Button> */}
 
         {/* Dialogo error */}
         <DialogoMensaje

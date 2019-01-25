@@ -1,4 +1,6 @@
 "use strict";
+const UglifyJsPlugin = require("uglifyjs-webpack-plugin");
+// const Uglify = require("uglify-es");
 
 const autoprefixer = require("autoprefixer");
 const path = require("path");
@@ -71,8 +73,7 @@ module.exports = {
     // We inferred the "public path" (such as / or /my-project) from homepage.
     publicPath: publicPath,
     // Point sourcemap entries to original disk location (format as URL on Windows)
-    devtoolModuleFilenameTemplate: info =>
-      path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, "/")
+    devtoolModuleFilenameTemplate: info => path.relative(paths.appSrc, info.absoluteResourcePath).replace(/\\/g, "/")
   },
   resolve: {
     // This allows you to set a fallback for where Webpack should look for modules.
@@ -151,6 +152,7 @@ module.exports = {
           {
             test: /\.(js|jsx|mjs)$/,
             include: paths.appSrc,
+            // include: [paths.appSrc, path.resolve(__dirname, "node_modules/image-js")],
             loader: require.resolve("babel-loader"),
             options: {
               compact: true,
@@ -267,6 +269,13 @@ module.exports = {
     // Otherwise React will be compiled in the very slow development mode.
     new webpack.DefinePlugin(env.stringified),
     // Minify the code.
+
+    // new UglifyJsPlugin(),
+    // new webpack.DefinePlugin({
+    //   "process.env": {
+    //     NODE_ENV: JSON.stringify("production")
+    //   }
+    // }),
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false,

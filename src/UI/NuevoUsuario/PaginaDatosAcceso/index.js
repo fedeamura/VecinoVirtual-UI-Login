@@ -296,11 +296,9 @@ class PaginaDatosAcceso extends React.Component {
     return (
       <div className={classes.footer}>
         <div style={{ flex: 1 }}>
-          {this.props.desdeQR != true && (
-            <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
-              Volver
-            </Button>
-          )}
+          <Button variant="text" color="primary" className={classes.button} onClick={this.props.onBotonVolverClick}>
+            Volver
+          </Button>
         </div>
 
         <Button variant="contained" color="primary" className={classes.button} onClick={this.onBotonSiguienteClick}>

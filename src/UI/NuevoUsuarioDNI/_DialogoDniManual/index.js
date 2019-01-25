@@ -192,7 +192,7 @@ class DialogoDni extends React.Component {
     }
     return (
       <React.Fragment>
-        <Dialog open={this.props.visible} onClose={this.onClose} fullScreen={fullScreen} fullWidth maxWidth="md">
+        <Dialog open={this.props.visible || false} onClose={this.onClose} fullScreen={fullScreen} fullWidth maxWidth="md">
           <MiBaner
             visible={this.state.errorVisible}
             mensaje={this.state.errorMensaje}

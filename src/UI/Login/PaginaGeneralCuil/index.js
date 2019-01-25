@@ -149,6 +149,7 @@ class PaginaGenerarCUIL extends React.Component {
             <Grid item xs={12}>
               <TextField
                 fullWidth
+                autoFocus
                 margin="dense"
                 variant="outlined"
                 autoComplete="off"

@@ -182,7 +182,7 @@ class MiSelect extends React.Component {
             </div>
 
             {/* <List> */}
-            <div style={{ width: "100%", flex: 1 }}>
+            <div style={{ width: "100%", flex: 1, minHeight: 300 }}>
               <AutoSizer>
                 {({ width, height }) => (
                   <List

@@ -7,18 +7,12 @@ import styles from "./styles";
 
 //Componentes
 import Webcam from "react-webcam";
-import Lottie from "react-lottie";
-import * as animScan from "@Resources/animaciones/anim_scan.json";
-import { Typography, Button, Icon, Fab } from "@material-ui/core";
+// import ImageJS from "image-js";
+import Typography from "@material-ui/core/Typography";
+import Button from "@material-ui/core/Button";
 
-const lottieScan = {
-  loop: true,
-  autoplay: true,
-  animationData: animScan,
-  rendererSettings: {
-    preserveAspectRatio: "xMidYMid slice"
-  }
-};
+//Mis componentes
+import DialogoMensaje from "@Componentes/MiDialogoMensaje";
 
 class PanelCamara extends React.Component {
   constructor(props) {
@@ -60,6 +54,7 @@ class PanelCamara extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.intervalo);
+    this.intervaloCamara && clearInterval(this.intervaloCamara);
     window.removeEventListener("camara-capturar", this.onBotonCamaraClick);
   }
 
@@ -68,7 +63,12 @@ class PanelCamara extends React.Component {
       if (nextProps.visible) {
         // this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
         this.setState({ infoVisible: localStorage.getItem("camaraInfo") == undefined, camaraVisible: true });
+
+        this.intervaloCamara = setInterval(() => {
+          this.setState({ camaraVisible: true });
+        }, 300);
       } else {
+        this.intervaloCamara && clearImmediate(this.intervaloCamara);
         setTimeout(() => {
           this.setState({ camaraVisible: false });
         }, 500);
@@ -94,18 +94,95 @@ class PanelCamara extends React.Component {
   };
 
   onBotonCamaraClick = () => {
-    const imageSrc = this.webcam.getScreenshot();
+    // if (this.state.tomandoFoto == true) return;
 
-    this.setState({ tomandoFoto: true }, () => {
-      setTimeout(() => {
-        this.setState({ tomandoFoto: false });
-      }, 100);
-    });
+    // this.setState({ tomandoFoto: true }, () => {
+    //   setTimeout(() => {
+    //     const base64 = this.webcam.getScreenshot();
+    //     this.base64ToImage(base64)
+    //       .then(imagen => {
+    //         const { width, height } = this.state;
+
+    //         const contenedorWidth = this.encuadre.clientWidth;
+    //         const contenedorHeight = this.encuadre.clientHeight;
+    //         const contenedorAspectRatio = contenedorWidth / contenedorHeight;
+
+    //         const imagenWidth = imagen.width;
+    //         const imagenHeight = imagen.height;
+    //         const imagenAspectRatio = imagenWidth / imagenHeight;
+    //         const imagenWidth2 = imagenHeight * contenedorAspectRatio;
+    //         const diffWidth = (imagenWidth - imagenWidth2) / 2;
+
+    //         const encuadreLeft = (contenedorWidth - width) / 2;
+    //         const porcentajeLeft = encuadreLeft / contenedorWidth;
+    //         const encuadreTop = (contenedorHeight - height) / 2;
+    //         const porcentajeTop = encuadreTop / contenedorHeight;
+
+    //         let x = diffWidth + (imagen.width - diffWidth * 2) * porcentajeLeft;
+    //         let imagenCortada = imagen.crop({
+    //           x: x,
+    //           y: imagen.height * porcentajeTop,
+    //           width: imagen.width - x * 2,
+    //           height: imagen.height - imagen.height * porcentajeTop * 2
+    //         });
+    //         if (imagenCortada.width > 1000 || imagenCortada.height > 1000) {
+    //           imagenCortada = imagenCortada.resize({
+    //             width: 1000
+    //           });
+    //         }
+    //         const dniBase64 = imagenCortada.toDataURL("image/png");
+    //         this.setState({ miniatura: dniBase64 });
+    //         this.props.onDni && this.props.onDni(dniBase64);
+    //         this.setState({ tomandoFoto: false });
+    //       })
+    //       .catch(error => {
+    //         this.setState({ tomandoFoto: false });
+    //         this.mostrarDialogoError(error);
+    //       });
+    //   }, 300);
+    // });
   };
+
+  // base64ToImage = foto => {
+  //   return new Promise((resolve, reject) => {
+  //     try {
+  //       var canvas = document.createElement("canvas");
+  //       var ctx = canvas.getContext("2d");
+
+  //       var image = new Image();
+  //       image.onload = () => {
+  //         ctx.drawImage(image, 0, 0);
+  //         canvas.width = image.width;
+  //         canvas.height = image.height;
+  //         ctx.drawImage(image, 0, 0, image.width, image.height);
+
+  //         let imagenJs = ImageJS.fromCanvas(canvas);
+  //         resolve(imagenJs);
+  //       };
+  //       image.onerror = () => {
+  //         reject("Error procesando la imagen. Por favor revise la selección realizada");
+  //       };
+  //       image.src = foto;
+  //     } catch (ex) {
+  //       reject("Error procesando la imagen. Por favor revise la selección realizada");
+  //     }
+  //   });
+  // };
 
   onBotonInfoClick = () => {
     localStorage.removeItem("camaraInfo");
     this.setState({ infoVisible: true });
+  };
+
+  mostrarDialogoError = mensaje => {
+    this.setState({
+      dialogoErrorVisible: true,
+      dialogoErrorMensaje: mensaje
+    });
+  };
+  
+  onDialogoErrorClose = () => {
+    this.setState({ dialogoErrorVisible: false });
   };
 
   render() {
@@ -115,7 +192,7 @@ class PanelCamara extends React.Component {
     const videoConstraints = {
       width: width,
       height: height,
-      facingMode: "user"
+      facingMode: "environment"
     };
 
     const encuadreWidth = this.encuadre ? this.encuadre.clientWidth : 0;
@@ -171,22 +248,6 @@ class PanelCamara extends React.Component {
           <div className={classNames(classes.tomandoFoto, visible && tomandoFoto && "visible")} />
         </div>
 
-        {/* <div className={classNames(classes.contenedorCamaraInfo, visible && infoVisible && "visible")}>
-          <Lottie
-            options={lottieScan}
-            height={100}
-            width={100}
-            style={{ minHeight: "100px", backgroundColor: "rgba(255,255,255,0.2)", borderRadius: 8 }}
-          />
-          <Typography variant="title" style={{ maxWidth: "300px", textAlign: "center", marginTop: 32, color: "white" }}>
-            Encuadre el último ejemplar de su DNI para poder validar su identidad
-          </Typography>
-
-          <Button onClick={this.onBotonCamaraInfoClick} variant="contained" color="primary" style={{ marginTop: 16 }}>
-            Aceptar
-          </Button>
-        </div> */}
-
         <Typography variant="body2" className={classes.hint}>
           Encuadre la tarjeta de su DNI
         </Typography>
@@ -198,6 +259,15 @@ class PanelCamara extends React.Component {
         >
           Prefiero subir un archivo
         </Button>
+
+        {/* Dialogo Nuevo Usuario Exito */}
+        <DialogoMensaje
+          visible={this.state.dialogoErrorVisible || false}
+          mensaje={this.state.dialogoErrorMensaje}
+          textoSi="Aceptar"
+          botonNoVisible={false}
+          onClose={this.onDialogoErrorClose}
+        />
       </div>
     );
   }

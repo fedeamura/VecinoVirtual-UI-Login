@@ -53,6 +53,8 @@ class DialogoMensaje extends React.PureComponent {
                     <Icon style={{ color: this.props.iconColor || "black", fontSize: 40, marginBottom: 16 }}>{this.props.icon}</Icon>
                   )}
                   {this.props.mensaje && <Typography variant="body1">{this.props.mensaje}</Typography>}
+                  {this.props.mensaje2 && <Typography variant="body1">{this.props.mensaje2}</Typography>}
+                  
                 </div>
               </Grid>
               {this.props.children && (

@@ -74,10 +74,8 @@ const styles = theme => {
       }
     },
     camara: {
-      backgroundImage: "url(https://www.elintransigente.com/u/fotografias/fotosnoticias/2018/8/7/467495.jpg)",
-      backgroundSize: "cover",
-      backgroundPosition: "center",
       position: "absolute",
+      objectFit: "cover", 
       left: 0,
       top: 0,
       right: 0,

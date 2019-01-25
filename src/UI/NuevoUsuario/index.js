@@ -11,14 +11,17 @@ import { withRouter } from "react-router-dom";
 
 //REDUX
 import { connect } from "react-redux";
-import { push } from "connected-react-router";
+import { push, goBack } from "connected-react-router";
 
+//Componentes
 import { QueryString } from "@Componentes/urlUtils";
 
 //Mis componentes
 import MiCardLogin from "@Componentes/MiCardLogin";
 import ContentSwapper from "@Componentes/ContentSwapper";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
+
+import PaginaModo from "./PaginaModo";
 import PaginaDatosBasicos from "./PaginaDatosBasicos";
 import PaginaDatosAcceso from "./PaginaDatosAcceso";
 import PaginaDatosContacto from "./PaginaDatosContacto";
@@ -33,6 +36,9 @@ import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
 const mapDispatchToProps = dispatch => ({
   redireccionar: url => {
     dispatch(push(url));
+  },
+  goBack: () => {
+    dispatch(goBack());
   }
 });
 
@@ -44,6 +50,7 @@ const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO = "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO
 const PAGINA_EXTRA_EXITO = "PAGINA_EXTRA_EXITO";
 const PAGINA_EXTRA_ERROR_REGISTRANDO = "PAGINA_EXTRA_ERROR_REGISTRANDO";
 
+const PAGINA_MODO = 0;
 const PAGINA_DATOS_BASICOS = 1;
 const PAGINA_DATOS_ACCESO = 2;
 const PAGINA_DATOS_CONTACTO = 3;
@@ -99,6 +106,10 @@ class NuevoUsuario extends React.Component {
             let q = QueryString(window.location.href);
             if (q.conData == "true") {
               let data = JSON.parse(localStorage.getItem("dataNuevoUsuario"));
+              if (data == undefined) {
+                this.cambiarPagina(PAGINA_MODO);
+                return;
+              }
               localStorage.removeItem("dataNuevoUsuario");
               this.setState(
                 {
@@ -119,9 +130,8 @@ class NuevoUsuario extends React.Component {
                 }
               );
             } else {
-              this.cambiarPagina(PAGINA_DATOS_BASICOS);
+              this.cambiarPagina(PAGINA_MODO);
               // this.cambiarPagina(PAGINA_FOTO);
-
             }
           })
           .catch(error => {
@@ -146,6 +156,23 @@ class NuevoUsuario extends React.Component {
       paginaAnterior: this.state.paginaActual,
       paginaActual: pagina
     });
+  };
+
+  onPaginaModoBotonVolverClick = () => {
+    this.volver();
+  };
+
+  onModo = modo => {
+    console.log("modo");
+    if (modo == "dni") {
+      this.setState({ visible: false }, () => {
+        setTimeout(() => {
+          this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
+        }, 300);
+      });
+    } else {
+      this.cambiarPagina(PAGINA_DATOS_BASICOS);
+    }
   };
 
   onDatosBasicosReady = datos => {
@@ -302,17 +329,30 @@ class NuevoUsuario extends React.Component {
     return dia + "/" + mes + "/" + año;
   };
 
+  onPaginaDatosBasicosBotonVolverClick = () => {
+    this.cambiarPagina(PAGINA_MODO);
+  };
 
-  onPaginaDatosBasicosBotonYaEstoyRegistradoClick = () => {
+  volver = () => {
     this.setState({ visible: false }, () => {
       setTimeout(() => {
-        this.props.redireccionar("/Login/" + this.state.codigo);
+        let q = QueryString(window.location.href);
+        if (q.url) {
+          let url = q.url;
+          window.location.href = url;
+        } else {
+          this.props.goBack();
+        }
       }, 300);
     });
   };
 
   onPaginaDatosAccesoBotonVolverClick = () => {
-    this.cambiarPagina(PAGINA_DATOS_BASICOS);
+    if (this.state.desdeQR == true) {
+      this.volver();
+    } else {
+      this.cambiarPagina(PAGINA_DATOS_BASICOS);
+    }
   };
 
   onPaginaDatosContactoBotonVolverClick = () => {
@@ -374,7 +414,9 @@ class NuevoUsuario extends React.Component {
     return (
       <div className={classes.content}>
         <ContentSwapper transitionName={anim} transitionEnterTimeout={500} transitionLeaveTimeout={500} className={classes.contentSwapper}>
-         
+          <div key="paginaModo" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_MODO)}>
+            {this.renderPaginaModo()}
+          </div>
 
           <div
             key="paginaDatosBasicos"
@@ -447,6 +489,10 @@ class NuevoUsuario extends React.Component {
 
   renderPaginaErrorValidandoCodigo() {
     return <MiPanelMensaje error mensaje={this.state.errorValidandoCodigo} />;
+  }
+
+  renderPaginaModo() {
+    return <PaginaModo onReady={this.onModo} onBotonVolverClick={this.onPaginaModoBotonVolverClick} />;
   }
 
   renderPaginaDatosBasicos() {

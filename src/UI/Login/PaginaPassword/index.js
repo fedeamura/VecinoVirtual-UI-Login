@@ -123,6 +123,7 @@ class PaginaPassword extends React.Component {
           <Grid item xs={12}>
             <TextField
               fullWidth
+              autoFocus
               label="Contraseña"
               margin="dense"
               variant="outlined"

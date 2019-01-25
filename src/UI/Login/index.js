@@ -168,11 +168,19 @@ class Login extends React.Component {
   onPaginaUsernameBotonNuevoUsuarioClick = () => {
     this.setState({ visible: false }, () => {
       setTimeout(() => {
-        this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
+        this.props.redireccionar("/NuevoUsuario/" + this.state.codigo);
       }, 500);
     });
   };
 
+  onPaginaUsernameBotonLoginDniClick = () => {
+    this.setState({ visible: false }, () => {
+      setTimeout(() => {
+        this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
+      }, 500);
+    });
+  };
+  
   onPaginaUsernameBotonGenerarCuilClick = () => {
     this.cambiarPagina(PAGINA_GENERAR_CUIL);
   };
@@ -329,6 +337,7 @@ class Login extends React.Component {
         padding={padding}
         onCargando={this.onCargando}
         username={this.state.username != undefined ? this.state.username : ""}
+        onBotonLoginDniClick={this.onPaginaUsernameBotonLoginDniClick}
         onBotonNuevoUsuarioClick={this.onPaginaUsernameBotonNuevoUsuarioClick}
         onBotonSiguienteClick={this.onPaginaUsernameBotonSiguienteClick}
         onBotonGenerarCuil={this.onPaginaUsernameBotonGenerarCuilClick}
