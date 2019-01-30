@@ -7,7 +7,8 @@ import styles from "./styles";
 
 //Componentes
 import Webcam from "react-webcam";
-// import ImageJS from "image-js";
+import Cropper from "react-cropper";
+import "cropperjs/dist/cropper.css";
 import Typography from "@material-ui/core/Typography";
 import Button from "@material-ui/core/Button";
 
@@ -19,7 +20,6 @@ class PanelCamara extends React.Component {
     super(props);
 
     this.state = {
-      infoVisible: localStorage.getItem("camaraInfo") == undefined,
       camaraVisible: props.visible
     };
   }
@@ -48,7 +48,6 @@ class PanelCamara extends React.Component {
       this.setState({ width: w, height: h });
     }, 200);
 
-    // this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
     window.addEventListener("camara-capturar", this.onBotonCamaraClick);
   }
 
@@ -61,8 +60,8 @@ class PanelCamara extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (nextProps.visible != this.props.visible) {
       if (nextProps.visible) {
-        // this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
-        this.setState({ infoVisible: localStorage.getItem("camaraInfo") == undefined, camaraVisible: true });
+        this.props.onPuedeCapturar && this.props.onPuedeCapturar(true);
+        this.setState({ camaraVisible: true });
 
         this.intervaloCamara = setInterval(() => {
           this.setState({ camaraVisible: true });
@@ -75,11 +74,6 @@ class PanelCamara extends React.Component {
       }
     }
   }
-
-  onBotonCamaraInfoClick = () => {
-    localStorage.setItem("camaraInfo", "true");
-    this.setState({ infoVisible: false });
-  };
 
   onCamaraRef = webcam => {
     this.webcam = webcam;
@@ -94,80 +88,31 @@ class PanelCamara extends React.Component {
   };
 
   onBotonCamaraClick = () => {
-    // if (this.state.tomandoFoto == true) return;
+    if (this.state.tomandoFoto == true) return;
+    this.setState(
+      { tomandoFoto: true },
+      () => {
+        setTimeout(() => {
+          const base64 = this.webcam.getScreenshot();
+          if (base64 == undefined) {
+            this.mostrarDialogoError("Error al capturar la foto. Por favor intente nuevamente");
+            this.setState({
+              foto: undefined,
+              tomandoFoto: false
+            });
+            return;
+          }
 
-    // this.setState({ tomandoFoto: true }, () => {
-    //   setTimeout(() => {
-    //     const base64 = this.webcam.getScreenshot();
-    //     this.base64ToImage(base64)
-    //       .then(imagen => {
-    //         const { width, height } = this.state;
-
-    //         const contenedorWidth = this.encuadre.clientWidth;
-    //         const contenedorHeight = this.encuadre.clientHeight;
-    //         const contenedorAspectRatio = contenedorWidth / contenedorHeight;
-
-    //         const imagenWidth = imagen.width;
-    //         const imagenHeight = imagen.height;
-    //         const imagenAspectRatio = imagenWidth / imagenHeight;
-    //         const imagenWidth2 = imagenHeight * contenedorAspectRatio;
-    //         const diffWidth = (imagenWidth - imagenWidth2) / 2;
-
-    //         const encuadreLeft = (contenedorWidth - width) / 2;
-    //         const porcentajeLeft = encuadreLeft / contenedorWidth;
-    //         const encuadreTop = (contenedorHeight - height) / 2;
-    //         const porcentajeTop = encuadreTop / contenedorHeight;
-
-    //         let x = diffWidth + (imagen.width - diffWidth * 2) * porcentajeLeft;
-    //         let imagenCortada = imagen.crop({
-    //           x: x,
-    //           y: imagen.height * porcentajeTop,
-    //           width: imagen.width - x * 2,
-    //           height: imagen.height - imagen.height * porcentajeTop * 2
-    //         });
-    //         if (imagenCortada.width > 1000 || imagenCortada.height > 1000) {
-    //           imagenCortada = imagenCortada.resize({
-    //             width: 1000
-    //           });
-    //         }
-    //         const dniBase64 = imagenCortada.toDataURL("image/png");
-    //         this.setState({ miniatura: dniBase64 });
-    //         this.props.onDni && this.props.onDni(dniBase64);
-    //         this.setState({ tomandoFoto: false });
-    //       })
-    //       .catch(error => {
-    //         this.setState({ tomandoFoto: false });
-    //         this.mostrarDialogoError(error);
-    //       });
-    //   }, 300);
-    // });
+          this.setState({
+            foto: base64,
+            tomandoFoto: false,
+            camaraVisible: false
+          });
+        });
+      },
+      300
+    );
   };
-
-  // base64ToImage = foto => {
-  //   return new Promise((resolve, reject) => {
-  //     try {
-  //       var canvas = document.createElement("canvas");
-  //       var ctx = canvas.getContext("2d");
-
-  //       var image = new Image();
-  //       image.onload = () => {
-  //         ctx.drawImage(image, 0, 0);
-  //         canvas.width = image.width;
-  //         canvas.height = image.height;
-  //         ctx.drawImage(image, 0, 0, image.width, image.height);
-
-  //         let imagenJs = ImageJS.fromCanvas(canvas);
-  //         resolve(imagenJs);
-  //       };
-  //       image.onerror = () => {
-  //         reject("Error procesando la imagen. Por favor revise la selección realizada");
-  //       };
-  //       image.src = foto;
-  //     } catch (ex) {
-  //       reject("Error procesando la imagen. Por favor revise la selección realizada");
-  //     }
-  //   });
-  // };
 
   onBotonInfoClick = () => {
     localStorage.removeItem("camaraInfo");
@@ -180,20 +125,35 @@ class PanelCamara extends React.Component {
       dialogoErrorMensaje: mensaje
     });
   };
-  
+
   onDialogoErrorClose = () => {
     this.setState({ dialogoErrorVisible: false });
   };
 
+  crop = data => {
+    const base64 = this.refs.cropper
+      .getCroppedCanvas({
+        maxWidth: 1500,
+        maxHeight: 1500,
+        fillColor: "#fff"
+      })
+      .toDataURL();
+    this.props.onDni && this.props.onDni(base64);
+    this.setState({ foto: undefined });
+  };
+
   render() {
     const { classes, visible } = this.props;
-    let { infoVisible, width, height, tomandoFoto, camaraVisible } = this.state;
+    let { infoVisible, width, height, tomandoFoto, camaraVisible, foto } = this.state;
 
     const videoConstraints = {
       width: width,
       height: height,
       facingMode: "environment"
     };
+
+    const cropperVisible = foto != undefined;
+    camaraVisible = cropperVisible ? false : camaraVisible;
 
     const encuadreWidth = this.encuadre ? this.encuadre.clientWidth : 0;
     const encuadreHeight = this.encuadre ? this.encuadre.clientHeight : 0;
@@ -218,17 +178,39 @@ class PanelCamara extends React.Component {
             />
           )}
 
+          {cropperVisible && (
+            <Cropper
+              ref="cropper"
+              src={foto || ""}
+              viewMode={3}
+              dragMode="move"
+              style={{ height: "100%", width: "100%" }}
+              aspectRatio={8.5 / 5.5}
+              guides={false}
+              zoomOnWheel={false}
+              zoomOnTouch={false}
+              crop={this.crop}
+            />
+          )}
           <div
             className={classNames(classes.camaraEncuadreTop, visible && infoVisible == false && "visible")}
             style={{ height: encuadreTop + 4 }}
           />
           <div
             className={classNames(classes.camaraEncuadreLeft, visible && infoVisible == false && "visible")}
-            style={{ width: encuadreLeft + 4, top: encuadreTop + 4, bottom: encuadreTop + 4 }}
+            style={{
+              width: encuadreLeft + 4,
+              top: encuadreTop + 4,
+              bottom: encuadreTop + 4
+            }}
           />
           <div
             className={classNames(classes.camaraEncuadreRight, visible && infoVisible == false && "visible")}
-            style={{ width: encuadreLeft + 4, top: encuadreTop + 4, bottom: encuadreTop + 4 }}
+            style={{
+              width: encuadreLeft + 4,
+              top: encuadreTop + 4,
+              bottom: encuadreTop + 4
+            }}
           />
           <div
             className={classNames(classes.camaraEncuadreBottom, visible && infoVisible == false && "visible")}
@@ -255,7 +237,12 @@ class PanelCamara extends React.Component {
         <Button
           onClick={this.props.onBotonFileClick}
           variant="contained"
-          style={{ position: "absolute", top: 12, right: 12, backgroundColor: "white" }}
+          style={{
+            position: "absolute",
+            top: 12,
+            right: 12,
+            backgroundColor: "white"
+          }}
         >
           Prefiero subir un archivo
         </Button>

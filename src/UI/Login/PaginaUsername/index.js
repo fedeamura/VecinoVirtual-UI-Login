@@ -129,15 +129,15 @@ class PaginaUsername extends React.Component {
             </Button>
           </Grid>
 
-          <Grid item xs={12}>
+          {/* <Grid item xs={12}>
             <div style={{ width: "100%", backgroundColor: "rgba(0,0,0,0.1)", height: "1px", marginTop: "16px", marginBottom: "16px" }} />
-          </Grid>
-          <Grid item xs={12} className={classes.fixPadding} style={{ marginBottom: "16px" }}>
+          </Grid> */}
+          {/* <Grid item xs={12} className={classes.fixPadding} style={{ marginBottom: "16px" }}>
             <Button variant="outlined" color="primary" onClick={this.props.onBotonLoginDniClick}>
               <IconDNI style={{ marginRight: 8 }} />
               Acceder con DNI
             </Button>
-          </Grid>
+          </Grid> */}
         </Grid>
       </div>
     );

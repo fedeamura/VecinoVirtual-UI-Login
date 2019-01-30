@@ -10,7 +10,6 @@ const URL_WS_TEST = "https://srv-dev04.cordoba.local/WSVecinoVirtual_Bridge";
 const URL_WS_DEPLOY = "https://servicios2.cordoba.gov.ar/WSVecinoVirtual_Bridge";
 let URL_WS = URL_WS_DEPLOY;
 
-
 //Segun el entorno, cargo las variables
 switch (ENTORNO) {
   case LOCAL:
@@ -29,6 +28,8 @@ switch (ENTORNO) {
     }
     break;
 }
+
+// URL_WS = URL_WS_DEPLOY;
 
 var Config = {
   BASE_URL: "/VecinoVirtual/Login",

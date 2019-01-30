@@ -274,60 +274,6 @@ const metodos = {
         });
     });
   },
-  iniciarActivacionPorQR: comando => {
-    const url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta/QR";
-    comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
-
-    return new Promise((resolve, reject) => {
-      fetch(url, {
-        method: "PUT",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(comando)
-      })
-        .then(data => data.json())
-        .then(data => {
-          if (data.ok != true) {
-            reject(data.error);
-            return;
-          }
-
-          resolve(data.return);
-        })
-        .catch(error => {
-          reject("Error procesando la solicitud");
-        });
-    });
-  },
-  iniciarActivacionPorDatosQR: comando => {
-    const url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta/DatosQR";
-    comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
-
-    return new Promise((resolve, reject) => {
-      fetch(url, {
-        method: "PUT",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(comando)
-      })
-        .then(data => data.json())
-        .then(data => {
-          if (data.ok != true) {
-            reject(data.error);
-            return;
-          }
-
-          resolve(data.return);
-        })
-        .catch(error => {
-          reject("Error procesando la solicitud");
-        });
-    });
-  },
   procesarActivacionUsuario: codigo => {
     const url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta/Procesar?codigo=" + codigo;
     return new Promise((resolve, reject) => {
@@ -467,57 +413,7 @@ const metodos = {
     });
     localStorage.setItem("usuariosRecientes", JSON.stringify(usuarios));
   },
-  loginByQR: data => {
-    const url = window.Config.BASE_URL_WS + "/v2/Usuario/QR/Login";
-    return new Promise((resolve, reject) => {
-      fetch(url, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ data: data })
-      })
-        .then(data => data.json())
-        .then(data => {
-          if (data.ok != true) {
-            reject(data.error);
-            return;
-          }
-
-          resolve(data.return);
-        })
-        .catch(error => {
-          reject("Error procesando la solicitud");
-        });
-    });
-  },
-  loginByDatosQR: data => {
-    const url = window.Config.BASE_URL_WS + "/v2/Usuario/DatosQR/Login";
-    return new Promise((resolve, reject) => {
-      fetch(url, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(data)
-      })
-        .then(data => data.json())
-        .then(data => {
-          if (data.ok != true) {
-            reject(data.error);
-            return;
-          }
-
-          resolve(data.return);
-        })
-        .catch(error => {
-          reject("Error procesando la solicitud");
-        });
-    });
-  },
-  nuevoUsuarioQR: data => {
+  iniciarNuevoUsuarioQR: data => {
     const url = window.Config.BASE_URL_WS + "/v2/Usuario/QR/IniciarNuevoUsuario";
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -542,7 +438,7 @@ const metodos = {
         });
     });
   },
-  nuevoUsuarioByDataQR: data => {
+  iniciarNuevoUsuarioByDataQR: data => {
     const url = window.Config.BASE_URL_WS + "/v2/Usuario/DatosQR/IniciarNuevoUsuario";
     return new Promise((resolve, reject) => {
       fetch(url, {

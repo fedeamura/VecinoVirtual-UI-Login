@@ -17,6 +17,7 @@ import * as animScan from "@Resources/animaciones/anim_scan.json";
 
 //Mis componentes
 import DialogoMensaje from "@Componentes/MiDialogoMensaje";
+import { isMobile } from "react-device-detect";
 
 const lottieScan = {
   loop: true,
@@ -27,7 +28,7 @@ const lottieScan = {
   }
 };
 
-const MAX_SIZE = 2000;
+const MAX_SIZE = 1500;
 
 class PanelPicker extends React.Component {
   constructor(props) {
@@ -66,7 +67,6 @@ class PanelPicker extends React.Component {
       zoom: 1
     });
 
-    this.props.onPuedeCapturar && this.props.onPuedeCapturar(false);
     this.setState({ cargandoFotoSeleccionada: false });
     this.filePicker.value = "";
   };
@@ -85,6 +85,7 @@ class PanelPicker extends React.Component {
   };
 
   onBotonVolverClick = () => {
+    this.props.onPuedeCapturar && this.props.onPuedeCapturar(false);
     this.resetState();
   };
 
@@ -127,7 +128,13 @@ class PanelPicker extends React.Component {
   onBotonSeleccionarImagenClick = async () => {
     this.onCargando(true);
     setTimeout(() => {
-      const base64 = this.refs.cropper.getCroppedCanvas().toDataURL();
+      const base64 = this.refs.cropper
+        .getCroppedCanvas({
+          maxWidth: MAX_SIZE,
+          maxHeight: MAX_SIZE,
+          fillColor: "#fff"
+        })
+        .toDataURL();
       if (this.props.onDni) {
         this.props.onDni(base64);
       }
@@ -160,7 +167,7 @@ class PanelPicker extends React.Component {
 
     return (
       <div className={classNames(classes.root, visible && "visible")}>
-        <input style={{ display: "none" }} ref={this.onFilePickerRef} type="file" id="pickerFile" accept="image/*" />
+        <input style={{ display: "none" }} ref={this.onFilePickerRef} type="file" id="pickerFile" accept="image/*" capture="camera" />
 
         <div className={classNames(classes.contenedor, visible && "visible")}>
           <Lottie
@@ -171,7 +178,9 @@ class PanelPicker extends React.Component {
           />
 
           <Typography variant="title" className="hint" style={{ maxWidth: "300px" }}>
-            Suba una foto del último ejemplar de su DNI para validar su identidad
+            {isMobile
+              ? "Capture una foto del último ejemplar de su DNI para validar su identidad"
+              : "Seleccione una foto del último ejemplar de su DNI para validar su identidad"}
           </Typography>
 
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginTop: 16 }}>
@@ -185,7 +194,7 @@ class PanelPicker extends React.Component {
               style={{ display: "flex", flexDirection: "column" }}
             >
               <Button variant="contained" color="primary" onClick={this.onBotonSeleccionarArchivoClick}>
-                Seleccionar archivo
+                {isMobile ? "Capturar foto" : "Seleccionar foto"}
               </Button>
             </div>
           </div>
@@ -198,24 +207,25 @@ class PanelPicker extends React.Component {
               src={foto || ""}
               dragMode="move"
               style={{ height: "100%", width: "100%" }}
-              aspectRatio={8.5 / 5.5}
+              aspectRatio={3.0 / 0.8}
               guides={true}
               zoomOnWheel={true}
               zoomOnTouch={true}
               rotateTo={this.state.rotation || 0}
-              // zoom={1}
-              // viewMode={1}
-              // zoomTo={this.state.zoom || 1}
-              // scaleY={this.state.zoom || 1}
               crop={this.crop}
             />
           </div>
 
           <Typography variant="body2" className={classes.hint}>
-            Encuadre la tarjeta de su DNI
+            Encuadre el código de barras
           </Typography>
 
-          <Fab size="small" className={classes.botonVolver} onClick={this.onBotonVolverClick} style={{ left: 8, top: 8 }}>
+          <Fab
+            size="small"
+            className={classes.botonVolver}
+            onClick={this.onBotonVolverClick}
+            style={{ left: 8, top: 8, backgroundColor: "white" }}
+          >
             <Icon style={{ color: "black" }}>arrow_back</Icon>
           </Fab>
 

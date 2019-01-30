@@ -7,7 +7,8 @@ import styles from "./styles";
 
 //Compontes
 import _ from "lodash";
-import { Typography, Grid, Button, Icon } from "@material-ui/core";
+import Grid from "@material-ui/core/Grid";
+import Button from "@material-ui/core/Button";
 import LinearProgress from "@material-ui/core/LinearProgress";
 import Dialog from "@material-ui/core/Dialog";
 import TextField from "@material-ui/core/TextField";
@@ -15,6 +16,7 @@ import DialogActions from "@material-ui/core/DialogActions";
 import DialogContent from "@material-ui/core/DialogContent";
 import DialogTitle from "@material-ui/core/DialogTitle";
 import withMobileDialog from "@material-ui/core/withMobileDialog";
+import { InlineDatePicker as DatePicker } from "material-ui-pickers";
 
 import MiBaner from "@Componentes/MiBaner";
 import DateUtils from "@Componentes/Utils/Date";
@@ -33,7 +35,7 @@ class DialogoDni extends React.Component {
     this.state = {
       sexo: "",
       ejemplar: "",
-      fechaEmision: "",
+      fechaEmision: new Date(),
       dni: "",
       tramite: ""
     };
@@ -42,7 +44,7 @@ class DialogoDni extends React.Component {
   componentWillReceiveProps(nextProps) {
     //Visible
     if (nextProps.visible != this.props.visible && nextProps.visible) {
-      this.setState({ errorVisible: false, sexo: "", ejemplar: "", fechaEmision: "", dni: "", tramite: "" });
+      this.setState({ errorVisible: false, sexo: "", ejemplar: "", fechaEmision: new Date(), dni: "", tramite: "" });
     }
 
     //Error
@@ -98,6 +100,10 @@ class DialogoDni extends React.Component {
     this.setState({ [name]: value });
   };
 
+  onInputFechaEmisionChange = fecha => {
+    this.setState({ fechaEmision: fecha });
+  };
+
   onReady = () => {
     const { sexo, ejemplar, fechaEmision, dni, tramite } = this.state;
 
@@ -116,15 +122,12 @@ class DialogoDni extends React.Component {
       return;
     }
 
-    if (fechaEmision.trim() == "") {
-      this.mostrarError("Ingrese la fecha de emisión");
-      return;
-    }
-    var fecha = DateUtils.toDateArgentina(fechaEmision);
+    var fecha = DateUtils.toDateString(fechaEmision);
     if (fecha == undefined) {
       this.mostrarError("La fecha de emisión es inválida");
       return;
     }
+    console.log(fecha);
 
     if (dni.trim() == "") {
       this.mostrarError("Ingrese el N° de DNI");
@@ -141,7 +144,7 @@ class DialogoDni extends React.Component {
       this.props.onReady({
         sexoMasculino: sexo == "M",
         ejemplar: ejemplar,
-        fechaEmision: fechaEmision,
+        fechaEmision: fecha,
         dni: dni,
         tramite: tramite
       });
@@ -193,14 +196,17 @@ class DialogoDni extends React.Component {
     return (
       <React.Fragment>
         <Dialog open={this.props.visible || false} onClose={this.onClose} fullScreen={fullScreen} fullWidth maxWidth="md">
-          <MiBaner
-            visible={this.state.errorVisible}
-            mensaje={this.state.errorMensaje}
-            mostrarBoton={false}
-            modo="error"
-            mostrarBoton={true}
-            onBotonClick={this.onErrorClose}
-          />
+          <div>
+            <MiBaner
+              visible={this.state.errorVisible}
+              mensaje={this.state.errorMensaje}
+              mostrarBoton={false}
+              modo="error"
+              mostrarBoton={true}
+              onBotonClick={this.onErrorClose}
+            />
+          </div>
+
           <DialogTitle id="responsive-dialog-title">Ingrese los datos de su DNI</DialogTitle>
 
           <DialogContent>
@@ -221,6 +227,7 @@ class DialogoDni extends React.Component {
                       fullWidth
                       autoComplete="off"
                       label="Sexo"
+                      placeholder="M o F"
                       onChange={this.onChange}
                       value={this.state.sexo}
                       name="sexo"
@@ -236,6 +243,7 @@ class DialogoDni extends React.Component {
                       fullWidth
                       inputProps={{ maxLength: 1 }}
                       autoComplete="off"
+                      placeholder="A, B, C, D..."
                       label="Ejemplar"
                       name="ejemplar"
                       variant="outlined"
@@ -247,7 +255,29 @@ class DialogoDni extends React.Component {
                   </Grid>
 
                   <Grid item xs={12}>
-                    <TextField
+                    <DatePicker
+                      keyboard
+                      variant="outlined"
+                      fullWidth
+                      onFocus={this.onTextFieldFocus}
+                      onBlur={this.onTextFieldBlur}
+                      name="fechaEmision"
+                      margin="dense"
+                      label="Fecha de emisión"
+                      openToYearSelection={true}
+                      format="dd/MM/yyyy"
+                      labelFunc={this.renderLabelFecha}
+                      invalidDateMessage="Fecha inválida"
+                      maxDateMessage="Fecha inválida"
+                      minDateMessage="Fecha inválida"
+                      mask={value => (value ? [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/] : [])}
+                      value={this.state.fechaEmision}
+                      onChange={this.onInputFechaEmisionChange}
+                      disableOpenOnEnter
+                      animateYearScrolling={false}
+                    />
+
+                    {/* <TextField
                       fullWidth
                       autoComplete="off"
                       label="Fecha de Emisión"
@@ -257,7 +287,7 @@ class DialogoDni extends React.Component {
                       value={this.state.fechaEmision}
                       onFocus={this.onTextFieldFocus}
                       onBlur={this.onTextFieldBlur}
-                    />
+                    /> */}
                   </Grid>
 
                   <Grid item xs={12}>

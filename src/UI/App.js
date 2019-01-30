@@ -5,11 +5,11 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import { withStyles } from "@material-ui/core/styles";
 import "./style.css";
 import { MuiThemeProvider, createMuiTheme } from "@material-ui/core/styles";
-import 'react-virtualized/styles.css'
+import "react-virtualized/styles.css";
 
 //Router
 import { withRouter } from "react-router-dom";
-import { Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import { AnimatedSwitch } from "react-router-transition";
 
 //REDUX
@@ -57,22 +57,6 @@ const theme = createMuiTheme({
   }
 });
 
-// Promise.prototype.finally = function(callback) {
-//   return this.then(
-//     value => this.constructor.resolve(callback()).then(() => value),
-//     reason =>
-//       this.constructor.resolve(callback()).then(() => {
-//         throw reason;
-//       })
-//   );
-// };
-
-String.prototype.toTitleCase = function() {
-  return this.replace(/\w\S*/g, function(txt) {
-    return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-  });
-};
-
 class App extends React.Component {
   constructor(props) {
     super(props);
@@ -102,11 +86,11 @@ class App extends React.Component {
     return (
       <main className={classes.content}>
         <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
-          <Route path={`${base}/Login/:codigo`} component={Login} />
-          <Route path={`${base}/NuevoUsuario/:codigo`} component={NuevoUsuario} />
-          <Route path={`${base}/NuevoUsuarioDNI/:codigo`} component={NuevoUsuarioDNI} />
-          <Route path={`${base}/ProcesarRecuperarPassword`} component={ProcesarRecuperarPassword} />
-          <Route path={`${base}/ProcesarActivacionUsuario`} component={ProcesarActivacionUsuario} />
+          <Route exact path={`${base}/Login/:codigo`} component={Login} />
+          <Route exact path={`${base}/NuevoUsuario/:codigo`} component={NuevoUsuario} />
+          <Route exact path={`${base}/NuevoUsuarioDNI/:codigo`} component={NuevoUsuarioDNI} />
+          <Route exact path={`${base}/ProcesarRecuperarPassword`} component={ProcesarRecuperarPassword} />
+          <Route exact path={`${base}/ProcesarActivacionUsuario`} component={ProcesarActivacionUsuario} />
           <Route component={Pagina404} />
         </AnimatedSwitch>
       </main>

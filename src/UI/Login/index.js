@@ -108,6 +108,17 @@ class Login extends React.Component {
     }, 500);
   }
 
+  componentWillReceiveProps(nextProps) {
+    let codigoNuevo = nextProps.match.params.codigo;
+    if (codigoNuevo != this.state.codigo) {
+      this.setState({ visible: false }, () => {
+        setTimeout(() => {
+          window.location.reload();
+        }, 500);
+      });
+    }
+  }
+
   onCargando = cargando => {
     this.setState({ cargando: cargando || false });
   };
@@ -173,14 +184,6 @@ class Login extends React.Component {
     });
   };
 
-  onPaginaUsernameBotonLoginDniClick = () => {
-    this.setState({ visible: false }, () => {
-      setTimeout(() => {
-        this.props.redireccionar("/NuevoUsuarioDNI/" + this.state.codigo);
-      }, 500);
-    });
-  };
-  
   onPaginaUsernameBotonGenerarCuilClick = () => {
     this.cambiarPagina(PAGINA_GENERAR_CUIL);
   };
@@ -337,7 +340,6 @@ class Login extends React.Component {
         padding={padding}
         onCargando={this.onCargando}
         username={this.state.username != undefined ? this.state.username : ""}
-        onBotonLoginDniClick={this.onPaginaUsernameBotonLoginDniClick}
         onBotonNuevoUsuarioClick={this.onPaginaUsernameBotonNuevoUsuarioClick}
         onBotonSiguienteClick={this.onPaginaUsernameBotonSiguienteClick}
         onBotonGenerarCuil={this.onPaginaUsernameBotonGenerarCuilClick}
@@ -391,7 +393,6 @@ class Login extends React.Component {
     return (
       <PaginaRecuperarPassword
         padding={padding}
-        onBotonValidarDniClick={this.onPaginaUsernameBotonNuevoUsuarioClick}
         onBotonVolverClick={this.onPaginaRecuperarPasswordBotonVolverClick}
         onCargando={this.onCargando}
         username={username}

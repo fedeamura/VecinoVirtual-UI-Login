@@ -59,7 +59,8 @@ class PaginaRecuperarPassword extends React.Component {
 
     this.state = {
       cargando: true,
-      paginaActual: undefined
+      paginaActual: undefined,
+      dialogoContactoVisible: false
     };
   }
 
@@ -99,12 +100,12 @@ class PaginaRecuperarPassword extends React.Component {
     );
   };
 
-  mostrarDialogoValidarDni = () => {
-    this.setState({ dialogoValidarDniVisible: true });
+  mostrarDialogoContacto = () => {
+    this.setState({ dialogoContactoVisible: true });
   };
 
-  onDialogoValidarDniClose = () => {
-    this.setState({ dialogoValidarDniVisible: false });
+  onDialogoContactoClose = () => {
+    this.setState({ dialogoContactoVisible: false });
   };
 
   render() {
@@ -127,12 +128,11 @@ class PaginaRecuperarPassword extends React.Component {
         </ContentSwapper>
 
         <DialogoMensaje
-          mensaje="Si no recordás tu contraseña y tampoco tenés acceso a tu casilla de e-mail podes acceder al sistema validando tu DNI."
-          visible={this.state.dialogoValidarDniVisible}
-          onClose={this.onDialogoValidarDniClose}
-          textoSi="Validar con DNI"
-          onBotonSiClick={this.props.onBotonValidarDniClick}
-          textoNo="Cancelar"
+          mensaje="Si no recordás tu contraseña y tampoco tenés acceso a tu casilla de e-mail contactate con nosotros a serviciosvv@cordoba.gov.ar."
+          visible={this.state.dialogoContactoVisible || false}
+          onClose={this.onDialogoContactoClose}
+          botonNoVisible={false}
+          textoSi="Aceptar"
         />
       </div>
     );
@@ -144,15 +144,14 @@ class PaginaRecuperarPassword extends React.Component {
     return (
       <div className={classes.pagina}>
         <div className={classes.content}>
-
           <Lottie options={opcionesAnimExito} height={120} width={120} style={{ minHeight: 120 }} />
 
           <Typography variant="headline" className={classes.texto} style={{ fontSize: 20, marginBottom: 16 }}>
             Se ha enviado un e-mail a su casilla de correo con las instrucciones para recuperar tu contraseña
           </Typography>
 
-          <div style={{  }}>
-            <Button variant="outlined" color="primary" onClick={this.mostrarDialogoValidarDni}>
+          <div style={{}}>
+            <Button variant="outlined" color="primary" onClick={this.mostrarDialogoContacto}>
               ¿No tenes acceso a la casilla de e-mail?
             </Button>
           </div>

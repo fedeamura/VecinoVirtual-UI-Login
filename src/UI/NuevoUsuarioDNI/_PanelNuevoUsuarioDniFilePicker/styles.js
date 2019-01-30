@@ -22,8 +22,7 @@ const styles = theme => {
     },
     contenedor: {
       maxWidth: "100%",
-      borderTopLeftRadius: "16px",
-      borderTopRightRadius: "16px",
+
       overflow: "hidden",
       /* position: relative; */
       width: "100%",
@@ -41,6 +40,10 @@ const styles = theme => {
       opacity: 0,
       pointerEvents: "none",
       transition: "all 0.3s",
+      [theme.breakpoints.up("sm")]: {
+        borderTopLeftRadius: "16px",
+        borderTopRightRadius: "16px"
+      },
       "& .hint": {
         paddingLeft: 16,
         paddingRight: 16,

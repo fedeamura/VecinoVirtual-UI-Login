@@ -480,7 +480,7 @@ class NuevoUsuario extends React.Component {
           </div>
 
           <div className={classNames(classes.paginaExtra, this.state.paginaExtraActual == PAGINA_EXTRA_EXITO && "visible")}>
-            {this.renderPaginaExito()}
+            {this.state.paginaExtraActual == PAGINA_EXTRA_EXITO && this.renderPaginaExito()}
           </div>
         </div>
       </div>

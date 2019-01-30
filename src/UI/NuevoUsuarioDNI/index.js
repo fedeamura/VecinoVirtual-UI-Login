@@ -109,7 +109,7 @@ class PanelNuevoUsuario extends React.Component {
       setTimeout(() => {
         let url = this.state.infoLogin.url;
         //Si no esta validado lo mando a validar
-        if (user.validacionDNI === false) {
+        if (user.ValidacionRenaper === false) {
           let q = QueryString(window.location.href);
           if (q.url) {
             if (url.indexOf("?") != -1) {
@@ -139,31 +139,15 @@ class PanelNuevoUsuario extends React.Component {
 
   onFotoDniReady = base64 => {
     this.setState({ cargando: true, fotoDni: base64, datosDni: undefined }, () => {
-      Rules_Usuario.loginByQR(base64)
-        .then(dataUserLogeado => {
-          if (dataUserLogeado) {
-            this.setState({ cargando: false });
-            this.mostrarDialogoLogin(dataUserLogeado);
-          } else {
-            Rules_Usuario.nuevoUsuarioQR(base64)
-              .then(data => {
-                this.setState({ cargando: false });
-                this.mostrarDialogoScanExito(data);
-              })
-              .catch(error => {
-                this.setState({ cargando: false });
-                this.mostrarDialogoScanDniError(error);
-              });
-          }
+      Rules_Usuario.iniciarNuevoUsuarioQR(base64)
+        .then(data => {
+          this.mostrarDialogoScanExito(data);
         })
         .catch(error => {
+          this.mostrarDialogoScanDniError(error);
+        })
+        .finally(() => {
           this.setState({ cargando: false });
-
-          if (error == "Su usuario no está activado por e-mail") {
-            this.mostrarDialogoDebeActivarUsuario(base64);
-          } else {
-            this.mostrarDialogoScanDniError(error);
-          }
         });
     });
   };
@@ -227,138 +211,6 @@ class PanelNuevoUsuario extends React.Component {
     this.setState({ dialogoNuevoUsuarioExitoVisible: false });
   };
 
-  // Dialogo debe activar usuario
-  mostrarDialogoDebeActivarUsuario = data => {
-    this.setState({
-      dialogoNuevoUsuarioActivarUsuarioVisible: true,
-      dialogoNuevoUsuarioActivarUsuarioCargando: false,
-      dialogoNuevoUsuarioActivarUsuarioData: data
-    });
-  };
-
-  onDialogoDebeActivarUsuarioClose = () => {
-    let cargando = this.state.dialogoNuevoUsuarioActivarUsuarioCargando || false;
-    if (cargando == true) return;
-    this.setState({ dialogoNuevoUsuarioActivarUsuarioVisible: false });
-  };
-
-  onDialogoDebeActivarUsuarioBotonAceptarClick = () => {
-    this.setState({ dialogoNuevoUsuarioActivarUsuarioCargando: true }, () => {
-      let data = this.state.dialogoNuevoUsuarioActivarUsuarioData;
-
-      let pathname = window.location.pathname != "/" ? window.location.pathname : "";
-      const urlRetorno = window.location.origin + pathname + "/#/Login/" + this.state.codigo;
-
-      //Si es object voy por datos QR, sino por imagen QR
-      let promesa;
-      if (typeof data == "object") {
-        promesa = Rules_Usuario.iniciarActivacionPorDatosQR({
-          datosQR: data,
-          urlRetorno: urlRetorno
-        });
-      } else {
-        promesa = Rules_Usuario.iniciarActivacionPorQR({
-          data: data,
-          urlRetorno: urlRetorno
-        });
-      }
-      promesa
-        .then(email => {
-          this.setState({ dialogoNuevoUsuarioActivarUsuarioVisible: false });
-          this.mostrarDialogoEmailActivacionEnviado(email);
-        })
-        .catch(error => {
-          this.mostrarDialogoScanDniError(error);
-        })
-        .finally(() => {
-          this.setState({ dialogoNuevoUsuarioActivarUsuarioCargando: false });
-        });
-    });
-  };
-
-  //Dialogo E-mail Activacion enviado
-  mostrarDialogoEmailActivacionEnviado = email => {
-    this.setState({ dialogoNuevoUsuarioActivarUsuarioExitoVisible: true, dialogoNuevoUsuarioActivarUsuarioExitoEmail: email });
-  };
-
-  onDialogoEmailActivacionEnviadoBotonAceptarClick = () => {
-    this.setState({ dialogoNuevoUsuarioActivarUsuarioExitoVisible: false }, () => {
-      this.props.redireccionar("/Login/" + this.state.codigo);
-    });
-  };
-
-  onDialogoEmailActivacionEnviadoBotonCambiarEmailClick = () => {
-    this.setState({
-      dialogoNuevoUsuarioActivarUsuarioCambiarEmailErrorVisible: false,
-      dialogoNuevoUsuarioActivarUsuarioExitoVisible: false,
-      dialogoNuevoUsuarioActivarUsuarioCambiarEmailVisible: true
-    });
-  };
-
-  onDialogoEmailActivacionEnviadoClose = () => {
-    this.setState({
-      dialogoNuevoUsuarioActivarUsuarioExitoVisible: false
-    });
-  };
-
-  onNuevoEmail = email => {
-    if (email == undefined || email == "") {
-      this.setState({
-        dialogoNuevoUsuarioActivarUsuarioCambiarEmailError: "Ingrese el e-mail",
-        dialogoNuevoUsuarioActivarUsuarioCambiarEmailErrorVisible: true
-      });
-      return;
-    }
-
-    this.setState(
-      {
-        dialogoNuevoUsuarioActivarUsuarioCambiarEmailVisible: false,
-        dialogoNuevoUsuarioActivarUsuarioCambiarEmailErrorVisible: false,
-        dialogoNuevoUsuarioActivarUsuarioExitoVisible: false,
-        dialogoNuevoUsuarioActivarUsuarioVisible: true,
-        dialogoNuevoUsuarioActivarUsuarioCargando: true
-      },
-      () => {
-        let data = this.state.dialogoNuevoUsuarioActivarUsuarioData;
-
-        let pathname = window.location.pathname != "/" ? window.location.pathname : "";
-        const urlRetorno = window.location.origin + pathname + "/#/Login/" + this.state.codigo;
-
-        //Si es object voy por datos QR, sino por imagen QR
-        let promesa;
-        if (typeof data == "object") {
-          promesa = Rules_Usuario.iniciarActivacionPorDatosQR({
-            datosQR: data,
-            emailNuevo: email,
-            urlRetorno: urlRetorno
-          });
-        } else {
-          promesa = Rules_Usuario.iniciarActivacionPorQR({
-            data: data,
-            emailNuevo: email,
-            urlRetorno: urlRetorno
-          });
-        }
-
-        promesa
-          .then(email => {
-            this.setState({ dialogoNuevoUsuarioActivarUsuarioVisible: false });
-            this.mostrarDialogoEmailActivacionEnviado(email);
-          })
-          .catch(error => {
-            this.mostrarDialogoError(error);
-          })
-          .finally(() => {
-            this.setState({ dialogoNuevoUsuarioActivarUsuarioCargando: false });
-          });
-      }
-    );
-  };
-
-  onNuevoEmailClose = () => {
-    this.setState({ dialogoNuevoUsuarioActivarUsuarioCambiarEmailVisible: false });
-  };
-
   // Dialogo error escaneado DNI
   mostrarDialogoScanDniError = error => {
     this.setState({ dialogoNuevoUsuarioErrorVisible: true, dialogoNuevoUsuarioErrorMensaje: error });
@@ -397,37 +249,17 @@ class PanelNuevoUsuario extends React.Component {
     this.setState(
       { dialogoNuevoUsuarioManualCargando: true, dialogoNuevoUsuarioManualErrorVisible: false, datosDni: data, fotoDni: undefined },
       () => {
-        Rules_Usuario.loginByDatosQR(data)
-          .then(dataUserLogeado => {
-            if (dataUserLogeado) {
-              this.setState({ dialogoNuevoUsuarioManualVisible: false });
-              this.mostrarDialogoLogin(dataUserLogeado);
-            } else {
-              Rules_Usuario.nuevoUsuarioByDataQR(data)
-                .then(data => {
-                  this.setState({ dialogoNuevoUsuarioManualVisible: false });
-                  this.mostrarDialogoScanExito(data);
-                })
-                .catch(error => {
-                  this.setState({
-                    dialogoNuevoUsuarioManualCargando: false,
-                    dialogoNuevoUsuarioManualErrorVisible: true,
-                    dialogoNuevoUsuarioManualErrorMensaje: error
-                  });
-                });
-            }
+        Rules_Usuario.iniciarNuevoUsuarioByDataQR(data)
+          .then(data => {
+            this.setState({ dialogoNuevoUsuarioManualVisible: false });
+            this.mostrarDialogoScanExito(data);
           })
           .catch(error => {
-            if (error == "Su usuario no está activado por e-mail") {
-              this.setState({ dialogoNuevoUsuarioManualVisible: false });
-              this.mostrarDialogoDebeActivarUsuario(data);
-            } else {
-              this.setState({
-                dialogoNuevoUsuarioManualCargando: false,
-                dialogoNuevoUsuarioManualErrorVisible: true,
-                dialogoNuevoUsuarioManualErrorMensaje: error
-              });
-            }
+            this.setState({
+              dialogoNuevoUsuarioManualCargando: false,
+              dialogoNuevoUsuarioManualErrorVisible: true,
+              dialogoNuevoUsuarioManualErrorMensaje: error
+            });
           });
       }
     );
@@ -593,18 +425,6 @@ class PanelNuevoUsuario extends React.Component {
           errorMensaje={this.state.dialogoNuevoUsuarioManualErrorMensaje}
         />
 
-        {/* Dialogo  Nuevo usuario Login */}
-        <DialogoMensaje
-          visible={this.state.dialogoNuevoUsuarioLoginVisible || false}
-          mensaje={"Sus datos se han validado correctamente."}
-          icon={"check_circle_outline"}
-          iconColor="green"
-          onBotonSiClick={this.onLogin}
-          textoNo="Cancelar"
-          textoSi="Acceder al sistema"
-          onClose={this.onDialogoLoginClose}
-        />
-
         {/* Dialogo Nuevo Usuario Exito */}
         <DialogoMensaje
           visible={this.state.dialogoNuevoUsuarioExitoVisible || false}
@@ -617,41 +437,6 @@ class PanelNuevoUsuario extends React.Component {
           onClose={this.onDialogoScanExitoClose}
         />
 
-        {/* Dialogo Activar usuario */}
-        <DialogoMensaje
-          autoCerrarBotonSi={false}
-          cargando={this.state.dialogoNuevoUsuarioActivarUsuarioCargando || false}
-          visible={this.state.dialogoNuevoUsuarioActivarUsuarioVisible || false}
-          onClose={this.onDialogoDebeActivarUsuarioClose}
-          mensaje="Sus datos se han validado correctamente"
-          mensaje1="Pero su usuario no se encuentra validado por e-mail. Si lo desea puede solicitar nuevamente el e-mail de activación"
-          textoSi="Reenviar e-mail"
-          onBotonSiClick={this.onDialogoDebeActivarUsuarioBotonAceptarClick}
-          textoNo="Cancelar"
-        />
-
-        {/* Dialogo Activar usuario exito */}
-        <DialogoMensaje
-          visible={this.state.dialogoNuevoUsuarioActivarUsuarioExitoVisible || false}
-          mensaje={`Se ha enviado un e-mail a ${this.state.dialogoNuevoUsuarioActivarUsuarioExitoEmail ||
-            ""} con las instrucciones para la activacion de su usuario`}
-          icon={"check_circle_outline"}
-          iconColor="green"
-          onBotonSiClick={this.onDialogoEmailActivacionEnviadoBotonAceptarClick}
-          textoNo="Cancelar"
-          textoSi="Ir al inicio"
-          onClose={this.onDialogoEmailActivacionEnviadoClose}
-        >
-          <Button
-            onClick={this.onDialogoEmailActivacionEnviadoBotonCambiarEmailClick}
-            variant="outlined"
-            color="primary"
-            style={{ marginTop: 16 }}
-          >
-            ¿No podés acceder a esa casilla de e-mail?
-          </Button>
-        </DialogoMensaje>
-
         {/* Dialogo  error */}
         <DialogoMensaje
           visible={this.state.dialogoErrorVisible || false}
@@ -663,19 +448,6 @@ class PanelNuevoUsuario extends React.Component {
           textoSi="Aceptar"
         />
 
-        {/* Dialogo cambair email */}
-        <DialogoInput
-          titulo="Cambiar e-mail"
-          placeholder="E-Mail"
-          textoSi="Cambiar"
-          textoNo="Cancelar"
-          textoBaner={this.state.dialogoNuevoUsuarioActivarUsuarioCambiarEmailError}
-          mostrarBaner={this.state.dialogoNuevoUsuarioActivarUsuarioCambiarEmailErrorVisible}
-          autoCerrarBotonSi={false}
-          onClose={this.onNuevoEmailClose}
-          visible={this.state.dialogoNuevoUsuarioActivarUsuarioCambiarEmailVisible || false}
-          onBotonSiClick={this.onNuevoEmail}
-        />
       </React.Fragment>
     );
   }
