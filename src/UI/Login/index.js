@@ -30,6 +30,7 @@ import { QueryString } from "@Componentes/urlUtils";
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
+import { Typography } from "@material-ui/core";
 
 const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO = "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
 
@@ -241,17 +242,33 @@ class Login extends React.Component {
 
   render() {
     const { classes, width } = this.props;
-    const nombreSistema = this.state.infoLogin != undefined ? this.state.infoLogin.aplicacionNombre : "";
+    let nombreSistema = this.state.infoLogin != undefined ? this.state.infoLogin.aplicacionNombre : "";
     const cargando = this.state.cargando || this.state.validandoCodigo;
 
-    // padding = isWidthUp("sm", width) ? "2rem" : "1rem";
+    if (nombreSistema == window.Config.NOMBRE_SISTEMA) {
+      nombreSistema = "";
+    }
+
+    // if(nombreSistema==""){
+    //   nombreSistema = "Bienvenido"
+    // }
+
     padding = "1rem";
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCardLogin titulo="Vecino Virtual" subtitulo={nombreSistema} padding={padding} cargando={cargando} visible={this.state.visible}>
-            {this.renderContent()}
-          </MiCardLogin>
+          {/* <div style={{display:'flex', flexDirection:'column'}}> */}
+            <MiCardLogin
+              titulo={window.Config.NOMBRE_SISTEMA}
+              subtitulo={nombreSistema}
+              padding={padding}
+              cargando={cargando}
+              visible={this.state.visible}
+            >
+              {this.renderContent()}
+            </MiCardLogin>
+            {/* <Typography>holu</Typography>
+          </div> */}
         </div>
 
         {/* <Ayuda expandido={this.state.expandido} /> */}

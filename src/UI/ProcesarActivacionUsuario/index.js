@@ -95,7 +95,7 @@ class ProcesarActivacionUsuario extends React.Component {
       <React.Fragment>
         <div className={classes.root}>
           <MiCardLogin
-            titulo="Vecino Virtual"
+            titulo={window.Config.NOMBRE_SISTEMA}
             subtitulo="Activar usuario"
             cargando={this.state.cargando}
             visible={this.state.visible}

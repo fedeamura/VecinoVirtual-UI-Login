@@ -61,7 +61,7 @@ class PaginaDatosBasicos extends React.Component {
       nombre: datosIniciales.nombre || "",
       apellido: datosIniciales.apellido || "",
       dni: datosIniciales.dni || "",
-      fechaNacimiento: datosIniciales.fechaNacimiento || new Date(1900, 0, 1),
+      fechaNacimiento: datosIniciales.fechaNacimiento || null,
       fechaNacimientoKeyPress: false,
       idEstadoCivil: datosIniciales.idEstadoCivil || undefined,
       sexo: datosIniciales.sexoMasculino || true ? "m" : "f",
@@ -132,10 +132,8 @@ class PaginaDatosBasicos extends React.Component {
     let errores = [];
     errores["nombre"] = Validador.validar([Validador.requerido, Validador.min(nombre, 3), Validador.max(nombre, 50)], nombre);
     errores["apellido"] = Validador.validar([Validador.requerido, Validador.min(apellido, 3), Validador.max(apellido, 50)], apellido);
-
     errores["dni"] = Validador.validar([Validador.requerido, Validador.numericoEntero, Validador.min(dni, 7), Validador.max(dni, 8)], dni);
-
-    errores["fechaNacimiento"] = fechaNacimiento == undefined ? "Dato requerido" : undefined;
+    errores["fechaNacimiento"] = fechaNacimiento == undefined || fechaNacimiento == null ? "Dato requerido" : undefined;
 
     //Si hay errores, corto aca
     this.setState({ errores: errores });
@@ -292,6 +290,8 @@ class PaginaDatosBasicos extends React.Component {
                 keyboard
                 variant="outlined"
                 fullWidth
+                error={this.state.errores["fechaNacimiento"] !== undefined}
+                helperText={this.state.errores["fechaNacimiento"]}
                 margin="dense"
                 label="Fecha de nacimiento"
                 openToYearSelection={true}
@@ -302,7 +302,7 @@ class PaginaDatosBasicos extends React.Component {
                 maxDateMessage="Fecha inválida"
                 minDateMessage="Fecha inválida"
                 mask={value => (value ? [/\d/, /\d/, "/", /\d/, /\d/, "/", /\d/, /\d/, /\d/, /\d/] : [])}
-                value={this.state.fechaNacimiento}
+                value={this.state.fechaNacimiento || null}
                 onChange={this.onInputFechaNacimientoChange}
                 disableOpenOnEnter
                 animateYearScrolling={false}

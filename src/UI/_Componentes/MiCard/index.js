@@ -39,6 +39,8 @@ class MiCard extends React.PureComponent {
             {this.props.children}
           </CardContent>
         </Card>
+
+        {this.props.footer}
       </div>
     );
   }

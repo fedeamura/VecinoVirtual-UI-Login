@@ -4,7 +4,6 @@ const LOCAL = 3;
 const ENTORNO = DEPLOY;
 
 //WS Turnero
-// const URL_WS_LOCAL = "http://localhost:7294";
 const URL_WS_LOCAL = "http://localhost:1868";
 const URL_WS_TEST = "https://srv-dev04.cordoba.local/WSVecinoVirtual_Bridge";
 const URL_WS_DEPLOY = "https://servicios2.cordoba.gov.ar/WSVecinoVirtual_Bridge";
@@ -29,13 +28,12 @@ switch (ENTORNO) {
     break;
 }
 
-// URL_WS = URL_WS_DEPLOY;
-
 var Config = {
   BASE_URL: "/VecinoVirtual/Login",
   BASE_URL_WS: URL_WS,
   URL_VALIDAR_RENAPER: 'https://servicios2.cordoba.gov.ar/VecinoVirtual/Utils/ValidarRenaper',
-  WS_CORDOBA_GEO: "https://servicios2.cordoba.gov.ar/CordobaGeoApi"
+  WS_CORDOBA_GEO: "https://servicios2.cordoba.gov.ar/CordobaGeoApi",
+  NOMBRE_SISTEMA:'Muni Online'
 };
 
 module.exports = Config;

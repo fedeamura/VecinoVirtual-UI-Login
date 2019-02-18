@@ -290,7 +290,7 @@ class PanelNuevoUsuario extends React.Component {
             }}
             styleCargando={{ position: "absolute" }}
             headerVisible={false}
-            titulo="Vecino Virtual"
+            titulo={window.Config.NOMBRE_SISTEMA}
             cargando={cargando}
             visible={visible}
             padding={padding}

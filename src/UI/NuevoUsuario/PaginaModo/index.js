@@ -74,20 +74,20 @@ class PaginaModo extends React.Component {
 
             <Grid item xs={12}>
               <div className={classes.contenedorBotones}>
-                <Button variant="outlined" onClick={this.onBotonDniClick} className={"boton"}>
-                  <div>
-                    <Typography variant="body2" className="titulo">
-                      DNI
-                    </Typography>
-                    <Typography className="detalle">Use el último ejemplar de su DNI para validar su identidad</Typography>
-                  </div>
-                </Button>
                 <Button variant="outlined" onClick={this.onBotonManualClick} className={"boton"}>
                   <div>
                     <Typography variant="body2" className="titulo">
                       Manualmente
                     </Typography>
                     <Typography className="detalle">Ingrese manualmente sus datos personales</Typography>
+                  </div>
+                </Button>
+                <Button variant="outlined" onClick={this.onBotonDniClick} className={"boton"}>
+                  <div>
+                    <Typography variant="body2" className="titulo">
+                      Automáticamente
+                    </Typography>
+                    <Typography className="detalle">Use una foto del último ejemplar de su DNI para validar su identidad</Typography>
                   </div>
                 </Button>
               </div>

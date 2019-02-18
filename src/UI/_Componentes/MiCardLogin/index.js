@@ -25,13 +25,16 @@ class MiCardLogin extends React.PureComponent {
         styleRoot={this.props.styleRoot}
         rootClassName={classNames(classes.cardRoot, this.props.rootClassName, this.props.visible && "visible")}
         className={classNames(classes.cardContent)}
+        footer={this.renderFooter()}
       >
         <LinearProgress className={classNames(classes.progress, this.props.cargando && "visible")} style={this.props.styleCargando} />
 
         {headerVisible == true && (
           <div className={classes.header}>
             <div className={classes.imagenLogoMuni} />
-            <div className={classes.contenedorTextosSistema}>
+            <div className={classes.imagenLogoMuniOnline} />
+
+            {/* <div className={classes.contenedorTextosSistema}>
               <Typography variant="headline" noWrap style={{ fontWeight: 200 }}>
                 {this.props.titulo}
               </Typography>
@@ -40,7 +43,7 @@ class MiCardLogin extends React.PureComponent {
                   {this.props.subtitulo}
                 </Typography>
               )}
-            </div>
+            </div> */}
           </div>
         )}
 
@@ -55,6 +58,27 @@ class MiCardLogin extends React.PureComponent {
     const { classes } = this.props;
 
     return <div className={classes.root}>{this.props.children}</div>;
+  }
+
+  renderFooter() {
+    const { classes } = this.props;
+
+    return (
+      <div className={classes.footerInfo}>
+        {/* <div className="logo" /> */}
+        <Typography variant="body1" className="link">
+          Sobre Muni Online
+        </Typography>
+        <div className="separador" />
+        <Typography variant="body1" className="link">
+          Contacto
+        </Typography>
+        <div className="separador" />
+        <Typography variant="body1" className="link">
+          Términos y condiciones de uso
+        </Typography>
+      </div>
+    );
   }
 }
 

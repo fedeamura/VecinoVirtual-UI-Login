@@ -391,7 +391,7 @@ class NuevoUsuario extends React.Component {
             cargando={cargando}
             visible={this.state.visible}
             rootClassName={classes.cardRoot}
-            titulo="Vecino Virtual"
+            titulo={window.Config.NOMBRE_SISTEMA}
             subtitulo="Nuevo usuario"
           >
             {this.renderContent()}

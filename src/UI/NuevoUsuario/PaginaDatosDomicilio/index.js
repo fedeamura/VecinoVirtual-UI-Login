@@ -24,6 +24,7 @@ import MiSelect from "@Componentes/MiSelect";
 import Provincias from "./_provincias";
 import Ciudades from "./_ciudades";
 import MiBanerError from "@Componentes/MiBanerError";
+import StringUtils from "@Componentes/Utils/String";
 
 //Mis Rules
 import Rules_Barrios from "@Rules/Rules_Barrios";
@@ -61,7 +62,7 @@ class PaginaDatosDomicilio extends React.Component {
     }
 
     let provincias = Provincias.map(item => {
-      return { value: item.id, label: item.nombre.toTitleCase() };
+      return { value: item.id, label: StringUtils.toTitleCase(item.nombre) };
     });
 
     this.state = {
@@ -132,7 +133,7 @@ class PaginaDatosDomicilio extends React.Component {
         ciudades: _.filter(Ciudades, item => {
           return item.id_provincia == e.value;
         }).map(item => {
-          return { value: item.id, label: item.nombre.toTitleCase() };
+          return { value: item.id, label: StringUtils.toTitleCase(item.nombre) };
         })
       },
       () => {
@@ -193,7 +194,7 @@ class PaginaDatosDomicilio extends React.Component {
       .then(info => {
         this.setState({
           barrios: _.sortBy(info, "nombre").map(item => {
-            return { value: item.id, label: item.nombre.toTitleCase() };
+            return { value: item.id, label: StringUtils.toTitleCase(item.nombre) };
           })
         });
       })

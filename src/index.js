@@ -28,19 +28,4 @@ let MiApp = ()=>(
 hot(module)(MiApp);
 ReactDOM.render(<MiApp/> ,document.getElementById("root"));
 
-
-// hot(module)(App);
-// ReactDOM.render(
-//   <Provider store={Store}>
-//     <ConnectedRouter history={history}>
-//       <MuiThemeProvider theme={theme}>
-//         <MuiPickersUtilsProvider utils={DateFnsUtils} locale={arLocale}>
-//           <App />
-//         </MuiPickersUtilsProvider>
-//       </MuiThemeProvider>
-//     </ConnectedRouter>
-//   </Provider>,
-//   document.getElementById("root")
-// );
-
 registerServiceWorker();

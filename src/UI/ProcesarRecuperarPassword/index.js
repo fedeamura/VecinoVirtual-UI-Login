@@ -200,7 +200,7 @@ class ProcesarRecuperarPassword extends React.Component {
           <MiCardLogin
             visible={this.state.visible}
             cargando={this.state.cargando || this.state.validandoCodigo}
-            titulo="Vecino Virtual"
+            titulo={window.Config.NOMBRE_SISTEMA}
             subtitulo="Cambiar contraseña"
           >
             {this.renderContent()}
