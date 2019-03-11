@@ -9,7 +9,7 @@ import "react-virtualized/styles.css";
 
 //Router
 import { withRouter } from "react-router-dom";
-import { Route, Redirect } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { AnimatedSwitch } from "react-router-transition";
 
 //REDUX
@@ -19,8 +19,9 @@ import { ocultarAlerta } from "@Redux/Actions/alerta";
 //Componentes
 import Snackbar from "@material-ui/core/Snackbar";
 import SnackbarContent from "@material-ui/core/SnackbarContent";
-import { IconButton, Icon } from "@material-ui/core";
-import CloseIcon from "@material-ui/icons/Close";
+import IconButton from "@material-ui/core/IconButton";
+import Icon from "@material-ui/core/Icon";
+import CloseIcon from "@material-ui/icons/CloseOutlined";
 
 //Mis componentes
 import Login from "./Login/index";

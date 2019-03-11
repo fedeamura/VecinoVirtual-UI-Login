@@ -26,6 +26,7 @@ import PaginaDatosBasicos from "./PaginaDatosBasicos";
 import PaginaDatosAcceso from "./PaginaDatosAcceso";
 import PaginaDatosContacto from "./PaginaDatosContacto";
 import PaginaDatosDomicilio from "./PaginaDatosDomicilio";
+import PaginaDatosAdicionales from "./PaginaDatosAdicionales";
 import PaginaFoto from "./PaginaFoto";
 import PaginaConfirmacion from "./PaginaConfirmacion";
 
@@ -55,8 +56,9 @@ const PAGINA_DATOS_BASICOS = 1;
 const PAGINA_DATOS_ACCESO = 2;
 const PAGINA_DATOS_CONTACTO = 3;
 const PAGINA_DATOS_DOMICILIO = 4;
-const PAGINA_FOTO = 5;
-const PAGINA_CONFIRMACION = 6;
+const PAGINA_DATOS_ADICIONALES = 5;
+const PAGINA_FOTO = 6;
+const PAGINA_CONFIRMACION = 7;
 
 class NuevoUsuario extends React.Component {
   constructor(props) {
@@ -73,6 +75,7 @@ class NuevoUsuario extends React.Component {
       datosAcceso: undefined,
       datosContacto: undefined,
       datosDomicilio: undefined,
+      datosAdicionales: undefined,
       foto: undefined,
       //UI
       visible: false,
@@ -121,8 +124,7 @@ class NuevoUsuario extends React.Component {
                     apellido: data.apellido,
                     dni: "" + data.dni,
                     fechaNacimiento: data.fechaNacimiento,
-                    sexoMasculino: data.sexoMasculino,
-                    idEstadoCivil: undefined
+                    sexoMasculino: data.sexoMasculino
                   }
                 },
                 () => {
@@ -131,7 +133,6 @@ class NuevoUsuario extends React.Component {
               );
             } else {
               this.cambiarPagina(PAGINA_MODO);
-              // this.cambiarPagina(PAGINA_FOTO);
             }
           })
           .catch(error => {
@@ -163,7 +164,6 @@ class NuevoUsuario extends React.Component {
   };
 
   onModo = modo => {
-    console.log("modo");
     if (modo == "dni") {
       this.setState({ visible: false }, () => {
         setTimeout(() => {
@@ -202,6 +202,14 @@ class NuevoUsuario extends React.Component {
   onDatosDomicilioReady = datos => {
     this.setState({
       datosDomicilio: datos
+    });
+
+    this.cambiarPagina(PAGINA_DATOS_ADICIONALES);
+  };
+
+  onDatosAdicionalesReady = datos => {
+    this.setState({
+      datosAdicionales: datos
     });
 
     this.cambiarPagina(PAGINA_FOTO);
@@ -277,12 +285,23 @@ class NuevoUsuario extends React.Component {
           apellido: this.state.datosBasicos.apellido,
           dni: this.state.datosBasicos.dni,
           fechaNacimiento: this.convertirFechaNacimientoString(this.state.datosBasicos.fechaNacimiento),
-          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m",
-          idEstadoCivil: this.state.datosBasicos.idEstadoCivil
+          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m"
         };
       }
 
-      this.setState({ cargando: true }, () => {
+      if (this.state.datosAdicionales != undefined) {
+        comando.comando = {
+          ...comando.comando,
+          datosExtra: {
+            idEstadoCivil: this.state.datosAdicionales.idEstadoCivil,
+            idOcupacion: this.state.datosAdicionales.idOcupacion,
+            idEstudioAlcanzado: this.state.datosAdicionales.idEstudioAlcanzado,
+            cantidadHijos: this.state.datosAdicionales.cantidadHijos || null
+          }
+        };
+      }
+
+      this.setState({ cargando: true }, async () => {
         let promesa;
         if (this.state.desdeQR) {
           if (conFoto) {
@@ -294,27 +313,13 @@ class NuevoUsuario extends React.Component {
           promesa = Rules_Usuario.registrar(comando);
         }
 
-        promesa
-          .then(() => {
-            this.setState({ paginaExtraActual: PAGINA_EXTRA_EXITO });
-          })
-          .catch(error => {
-            this.setState({
-              errorRegistrando: error
-            });
-
-            this.setState({
-              paginaExtraActual: PAGINA_EXTRA_ERROR_REGISTRANDO
-            });
-          })
-          .finally(() => {
-            this.setState({ cargando: false });
-          });
+        await promesa;
+        this.setState({ paginaExtraActual: PAGINA_EXTRA_EXITO, cargando: false });
       });
     } catch (ex) {
       this.setState({
         cargando: false,
-        errorRegistrando: "Error procesando la solicitud"
+        errorRegistrando: typeof ex === "object" ? ex.message : "Error procesando la solicitud"
       });
       this.setState({ paginaExtraActual: PAGINA_EXTRA_ERROR_REGISTRANDO });
     }
@@ -363,8 +368,12 @@ class NuevoUsuario extends React.Component {
     this.cambiarPagina(PAGINA_DATOS_CONTACTO);
   };
 
-  onPaginaFotoBotonVolverClick = () => {
+  onPaginaDatosAdicionalesVolverClick = () => {
     this.cambiarPagina(PAGINA_DATOS_DOMICILIO);
+  };
+
+  onPaginaFotoBotonVolverClick = () => {
+    this.cambiarPagina(PAGINA_DATOS_ADICIONALES);
   };
 
   onPaginaConfirmacionBotonVolverClick = () => {
@@ -445,6 +454,13 @@ class NuevoUsuario extends React.Component {
             visible={"" + (this.state.paginaActual == PAGINA_DATOS_DOMICILIO)}
           >
             {this.renderPaginaDatosDomicilio()}
+          </div>
+          <div
+            key="paginaDatosAdicionales"
+            className={classes.contentSwapperContent}
+            visible={"" + (this.state.paginaActual == PAGINA_DATOS_ADICIONALES)}
+          >
+            {this.renderPaginaDatosAdicionales()}
           </div>
           <div key="paginaFoto" className={classes.contentSwapperContent} visible={"" + (this.state.paginaActual == PAGINA_FOTO)}>
             {this.renderPaginaFoto()}
@@ -537,6 +553,17 @@ class NuevoUsuario extends React.Component {
         onCargando={this.onCargando}
         onReady={this.onDatosDomicilioReady}
         onBotonVolverClick={this.onPaginaDatosDomicilioBotonVolverClick}
+      />
+    );
+  }
+
+  renderPaginaDatosAdicionales() {
+    return (
+      <PaginaDatosAdicionales
+        datosIniciales={this.state.datosAdicionales}
+        onCargando={this.onCargando}
+        onReady={this.onDatosAdicionalesReady}
+        onBotonVolverClick={this.onPaginaDatosAdicionalesVolverClick}
       />
     );
   }

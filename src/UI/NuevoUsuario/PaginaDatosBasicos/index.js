@@ -20,7 +20,6 @@ import TextField from "@material-ui/core/TextField";
 import FormHelperText from "@material-ui/core/FormHelperText";
 import FormControl from "@material-ui/core/FormControl";
 import { InlineDatePicker as DatePicker } from "material-ui-pickers";
-import MiSelect from "@Componentes/MiSelect";
 import Radio from "@material-ui/core/Radio";
 import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
@@ -34,7 +33,6 @@ import MiBanerError from "@Componentes/MiBanerError";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
-import Rules_EstadoCivil from "@Rules/Rules_EstadoCivil";
 
 const mapDispatchToProps = dispatch => ({});
 
@@ -54,7 +52,6 @@ class PaginaDatosBasicos extends React.Component {
     let datosIniciales = props.datosIniciales || {};
 
     this.state = {
-      estadosCiviles: undefined,
       errorEstadosCiviles: undefined,
       validandoUsuario: false,
       errorValidandoUsuario: undefined,
@@ -63,7 +60,6 @@ class PaginaDatosBasicos extends React.Component {
       dni: datosIniciales.dni || "",
       fechaNacimiento: datosIniciales.fechaNacimiento || null,
       fechaNacimientoKeyPress: false,
-      idEstadoCivil: datosIniciales.idEstadoCivil || undefined,
       sexo: datosIniciales.sexoMasculino || true ? "m" : "f",
       errores: [],
       error: undefined,
@@ -71,27 +67,7 @@ class PaginaDatosBasicos extends React.Component {
     };
   }
 
-  componentDidMount() {
-    this.props.onCargando(true);
-    this.setState({ errorEstadosCiviles: undefined }, () => {
-      Rules_EstadoCivil.get()
-        .then(data => {
-          let estadosCiviles = data.map(item => {
-            return { value: item.id, label: item.nombre };
-          });
-          // estadosCiviles.unshift({ value: -1, label: "Seleccione..." });
-          this.setState({
-            estadosCiviles: estadosCiviles
-          });
-        })
-        .catch(error => {
-          this.setState({ errorEstadosCiviles: error });
-        })
-        .finally(() => {
-          this.props.onCargando(false);
-        });
-    });
-  }
+  componentDidMount() {}
 
   onInputFechaNacimientoChange = fecha => {
     this.setState({ fechaNacimiento: fecha });
@@ -113,21 +89,12 @@ class PaginaDatosBasicos extends React.Component {
     this.setState({ fechaNacimiento: fecha });
   };
 
-  onInputEstadoCivilChange = e => {
-    if (e == undefined) {
-      this.setState({ idEstadoCivil: undefined, errores: { ...this.state.errores, estadoCivil: undefined } });
-      return;
-    }
-
-    this.setState({ idEstadoCivil: e.value, errores: { ...this.state.errores, estadoCivil: undefined } });
-  };
-
   onInputSexoChange = e => {
     this.setState({ sexo: e.target.value });
   };
 
   onBotonSiguienteClick = () => {
-    const { nombre, apellido, dni, fechaNacimiento, sexo, idEstadoCivil } = this.state;
+    const { nombre, apellido, dni, fechaNacimiento, sexo } = this.state;
 
     let errores = [];
     errores["nombre"] = Validador.validar([Validador.requerido, Validador.min(nombre, 3), Validador.max(nombre, 50)], nombre);
@@ -162,8 +129,7 @@ class PaginaDatosBasicos extends React.Component {
             apellido: apellido,
             dni: dni,
             fechaNacimiento: fechaNacimiento,
-            sexoMasculino: sexo,
-            idEstadoCivil: idEstadoCivil
+            sexoMasculino: sexo
           });
         })
         .catch(error => {
@@ -307,26 +273,6 @@ class PaginaDatosBasicos extends React.Component {
                 disableOpenOnEnter
                 animateYearScrolling={false}
               />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <FormControl
-                className={classes.formControl}
-                fullWidth
-                margin="dense"
-                error={this.state.errores["estadoCivil"] !== undefined}
-                aria-describedby="textoEstadoCivilError"
-              >
-                <MiSelect
-                  variant="outlined"
-                  value={this.state.idEstadoCivil}
-                  style={{ width: "100%" }}
-                  label="Estado civil"
-                  placeholder="Seleccione..."
-                  onChange={this.onInputEstadoCivilChange}
-                  options={this.state.estadosCiviles}
-                />
-                <FormHelperText id="textoEstadoCivilError">{this.state.errores["estadoCivil"]}</FormHelperText>
-              </FormControl>
             </Grid>
 
             <Grid item xs={12}>

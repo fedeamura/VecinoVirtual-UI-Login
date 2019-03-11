@@ -127,7 +127,6 @@ class DialogoDni extends React.Component {
       this.mostrarError("La fecha de emisión es inválida");
       return;
     }
-    console.log(fecha);
 
     if (dni.trim() == "") {
       this.mostrarError("Ingrese el N° de DNI");

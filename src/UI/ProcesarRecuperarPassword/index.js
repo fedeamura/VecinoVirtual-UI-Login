@@ -14,12 +14,9 @@ import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
 //Componentes
-import { Button } from "@material-ui/core";
-import Input from "@material-ui/core/Input";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
-import { Grid } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
+import Grid from "@material-ui/core/Grid";
+import TextField from "@material-ui/core/TextField";
 import Visibility from "@material-ui/icons/Visibility";
 import VisibilityOff from "@material-ui/icons/VisibilityOff";
 import InputAdornment from "@material-ui/core/InputAdornment";
@@ -53,8 +50,6 @@ const PAGINA_ERROR = "PAGINA_ERROR";
 class ProcesarRecuperarPassword extends React.Component {
   constructor(props) {
     super(props);
-
-    console.log(props.location.search.split("codigo=")[1]);
 
     this.state = {
       codigo: props.location.search.split("codigo=")[1],
@@ -122,7 +117,8 @@ class ProcesarRecuperarPassword extends React.Component {
 
   onInputChange = event => {
     this.setState({
-      error: undefined,
+      errorPassword: undefined,
+      errorPasswordRepeat: undefined,
       [event.target.name]: event.target.value
     });
   };
@@ -197,12 +193,7 @@ class ProcesarRecuperarPassword extends React.Component {
     return (
       <React.Fragment>
         <div className={classes.root}>
-          <MiCardLogin
-            visible={this.state.visible}
-            cargando={this.state.cargando || this.state.validandoCodigo}
-            titulo={window.Config.NOMBRE_SISTEMA}
-            subtitulo="Cambiar contraseña"
-          >
+          <MiCardLogin visible={this.state.visible} cargando={this.state.cargando || this.state.validandoCodigo}>
             {this.renderContent()}
           </MiCardLogin>
         </div>
@@ -212,8 +203,6 @@ class ProcesarRecuperarPassword extends React.Component {
 
   renderContent() {
     const { classes } = this.props;
-
-    console.log(this.state.paginaActual);
 
     return (
       <div className={classes.content}>
@@ -262,59 +251,62 @@ class ProcesarRecuperarPassword extends React.Component {
       <div className={classes.mainContent} style={{ padding: padding }}>
         <Grid container>
           <Grid item xs={12} className={classes.fixPadding}>
-            <FormControl
-              className={classes.formControl}
+            <TextField
               fullWidth
-              margin="normal"
+              variant="outlined"
+              margin="dense"
+              autoFocus
+              autoComplete="off"
+              variant="outlined"
+              label="Contraseña"
+              inputProps={{
+                maxLength: 20
+              }}
               error={this.state.errorPassword !== undefined}
-              aria-describedby="textoPasswordError"
-            >
-              <InputLabel htmlFor="inputPassword">Contraseña</InputLabel>
-              <Input
-                id="inputPassword"
-                autoFocus
-                value={this.state.password}
-                name="password"
-                type={this.state.showPassword ? "text" : "password"}
-                onKeyPress={this.onInputKeyPress}
-                onChange={this.onInputChange}
-                endAdornment={
+              helperText={this.state.errorPassword}
+              value={this.state.password}
+              name="password"
+              type={this.state.showPassword ? "text" : "password"}
+              onKeyPress={this.onInputKeyPress}
+              onChange={this.onInputChange}
+              InputProps={{
+                endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick}>
+                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordClick} tabIndex="-1">
                       {this.state.showPassword ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
-                }
-              />
-              <FormHelperText id="textoPasswordError">{this.state.errorPassword}</FormHelperText>
-            </FormControl>
+                )
+              }}
+            />
           </Grid>
           <Grid item xs={12} className={classes.fixPadding}>
-            <FormControl
-              className={classes.formControl}
+            <TextField
               fullWidth
-              margin="normal"
+              variant="outlined"
+              margin="dense"
+              autoComplete="off"
+              label="Repita su contraseña"
+              inputProps={{
+                maxLength: 20
+              }}
               error={this.state.errorPasswordRepeat !== undefined}
-              aria-describedby="textoPasswordRepeatError"
-            >
-              <InputLabel htmlFor="inputPasswordRepeat">Repetita la contraseña</InputLabel>
-              <Input
-                id="inputPasswordRepeat"
-                value={this.state.passwordRepeat}
-                name="passwordRepeat"
-                type={this.state.showPasswordRepeat ? "text" : "password"}
-                onKeyPress={this.onInputKeyPress}
-                onChange={this.onInputChange}
-                endAdornment={
+              helperText={this.state.errorPasswordRepeat}
+              value={this.state.passwordRepeat}
+              name="passwordRepeat"
+              type={this.state.showPasswordRepeat ? "text" : "password"}
+              onKeyPress={this.onInputKeyPress}
+              onChange={this.onInputChange}
+              InputProps={{
+                endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick}>
+                    <IconButton aria-label="Toggle password visibility" onClick={this.onBotonShowPasswordRepeatClick} tabIndex="-1">
                       {this.state.showPasswordRepeat ? <VisibilityOff /> : <Visibility />}
                     </IconButton>
                   </InputAdornment>
-                }
-              />
-              <FormHelperText id="textoPasswordRepeatError">{this.state.errorPasswordRepeat}</FormHelperText>
-            </FormControl>
+                )
+              }}
+            />
           </Grid>
         </Grid>
       </div>

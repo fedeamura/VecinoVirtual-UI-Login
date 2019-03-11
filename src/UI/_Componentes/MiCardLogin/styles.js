@@ -64,7 +64,7 @@ const styles = theme => {
           borderRadius: "16px !important"
         }
       },
-      ["@media (max-height:650px)"]: {
+      ["@media (max-height:550px)"]: {
         marginLeft: "0rem",
         marginRight: "0rem",
         maxWidth: "initial",
@@ -103,11 +103,6 @@ const styles = theme => {
         paddingLeft: theme.spacing.unit * 3,
         paddingRight: theme.spacing.unit * 3
       },
-      // ["@media (max-height:650px)"]: {
-      //   // eslint-disable-line no-useless-computed-key
-      //   paddingLeft: theme.spacing.unit * 3,
-      //   paddingRight: theme.spacing.unit * 3
-      // },
 
       display: "flex",
       alignItems: "center",
@@ -118,7 +113,7 @@ const styles = theme => {
       marginLeft: "16px"
     },
     imagenLogoMuni: {
-flex:1,
+      flex: 1,
       marginLeft: "9px",
       height: "48px",
       backgroundSize: "contain",
@@ -127,8 +122,9 @@ flex:1,
       backgroundPosition: "left center"
     },
     imagenLogoMuniOnline: {
-      width:200,
-      marginLeft: "9px",
+      width: 150,
+      marginLeft: theme.spacing.unit * 2,
+      marginRight: theme.spacing.unit * 1,
       height: "28px",
       backgroundSize: "contain",
       backgroundImage: `url(${escudoMuniOnlineAnchoVerde})`,
@@ -150,6 +146,8 @@ flex:1,
       display: "flex"
     },
     footerInfo: {
+      marginLeft: theme.spacing.unit * 4,
+      marginTop: theme.spacing.unit,
       display: "flex",
       alignItems: "center",
       padding: theme.spacing.unit,
