@@ -142,6 +142,7 @@ class MiSelect extends React.Component {
           value={opcionSeleccionada ? opcionSeleccionada.label : "Seleccione..."}
           ref={this.onTextFieldRef}
           variant={this.props.variant}
+          margin={this.props.margin || "dense"}
           label={this.props.label}
           fullWidth={this.props.fullWidth}
           error={this.props.error}

@@ -4,7 +4,7 @@ const styles = theme => {
       display: "flex",
       // alignItems: "center",
       backgroundColor: "rgba(0,0,0,0.05)",
-      height:'fit-content',
+      height: "fit-content",
       maxHeight: 0,
       minHeight: 0,
       paddingLeft: theme.spacing.unit * 2,
@@ -24,7 +24,9 @@ const styles = theme => {
       opacity: 0,
       transition: "max-height 0.3s 0.3s,min-height 0.3s 0.3s, margin 0.3s 0.3s, opacity 0.3s, padding 0.3s 0.3s",
       "&.visible": {
-        padding: theme.spacing.unit * 2,
+        // padding: theme.spacing.unit * 2,
+        paddingLeft: theme.spacing.unit * 2,
+        paddingRight: theme.spacing.unit * 2,
         transition: "max-height 0.3s, min-height 0.3s, margin 0.3s, opacity 0.3s 0.3s, padding 0.3s",
         maxHeight: "50rem",
         opacity: 1

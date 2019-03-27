@@ -14,7 +14,7 @@ import { connect } from "react-redux";
 import { push } from "connected-react-router";
 
 //Componentes
-import { Typography, Button } from "@material-ui/core";
+import { Typography, Button, Icon } from "@material-ui/core";
 import Lottie from "react-lottie";
 import * as animExito from "@Resources/animaciones/anim_success.json";
 
@@ -22,6 +22,9 @@ import * as animExito from "@Resources/animaciones/anim_success.json";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import ContentSwapper from "@Componentes/ContentSwapper";
 import DialogoMensaje from "@Componentes/MiDialogoMensaje";
+import DialogoInput from "@Componentes/MiDialogoInput";
+import DialogoForm from "@Componentes/MiDialogoForm";
+import DialogoNumeroTramiteAyuda from "../../_Dialogos/DialogoNumeroTramiteAyuda";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -83,6 +86,7 @@ class PaginaRecuperarPassword extends React.Component {
         })
           .then(() => {
             this.setState({
+              mensajeExito: "Se ha enviado un e-mail a su casilla de correo con las instrucciones para recuperar tu contraseña",
               paginaActual: PAGINA_OK
             });
           })
@@ -100,12 +104,77 @@ class PaginaRecuperarPassword extends React.Component {
     );
   };
 
-  mostrarDialogoContacto = () => {
-    this.setState({ dialogoContactoVisible: true });
+  onBotonSinAccesoEmailClick = () => {
+    this.setState(
+      {
+        cargando: true
+      },
+      async () => {
+        let activado = await Rules_Usuario.validarUsuarioActivadoByUsername(this.props.username);
+        if (activado == true) {
+          this.setState({ dialogoContactoVisible: true });
+        } else {
+          this.setState({ dialogoEmailVisible: true, dialogoEmailCargando: false, dialogoEmailErrorVisible: false });
+        }
+
+        this.setState({ cargando: false });
+      }
+    );
+  };
+
+  onDialogoEmailClose = () => {
+    let cargando = this.state.dialogoEmailCargando;
+    if (cargando == true) return;
+    this.setState({ dialogoEmailVisible: false, dialogoEmailErrorVisible: false });
   };
 
   onDialogoContactoClose = () => {
     this.setState({ dialogoContactoVisible: false });
+  };
+
+  onDialogoEmailBotonSiClick = async data => {
+    const { email, numeroTramite } = data;
+    if (numeroTramite == "") {
+      this.setState({ dialogoEmailErrorMensaje: "Ingrese el numero de trámite", dialogoEmailErrorVisible: true });
+      return;
+    }
+
+    if (email == "") {
+      this.setState({ dialogoEmailErrorMensaje: "Ingrese el e-mail", dialogoEmailErrorVisible: true });
+      return;
+    }
+
+    this.setState({ dialogoEmailErrorVisible: false, dialogoEmailCargando: true });
+
+    try {
+      var emailResultado = await Rules_Usuario.iniciarActivacionByNumeroTramite({
+        numeroTramite: numeroTramite,
+        emailNuevo: email,
+        urlRetorno: window.location.href
+      });
+
+      this.setState(
+        {
+          dialogoEmailVisible: false,
+          paginaActual: undefined
+        },
+        () => {
+          setTimeout(() => {
+            this.setState({
+              paginaActual: PAGINA_OK,
+              mensajeExito: "Se ha enviado un e-mail a " + emailResultado + " con las instrucciones para validar su usuario"
+            });
+          }, 300);
+        }
+      );
+    } catch (ex) {
+      let mensaje = typeof ex === "object" ? ex.message : ex;
+      this.setState({ dialogoEmailCargando: false, dialogoEmailErrorMensaje: mensaje, dialogoEmailErrorVisible: true });
+    }
+  };
+
+  onDialogoEmailBotonBanerClick = () => {
+    this.setState({ dialogoEmailErrorVisible: false });
   };
 
   render() {
@@ -127,12 +196,61 @@ class PaginaRecuperarPassword extends React.Component {
           </div>
         </ContentSwapper>
 
+        {/* Contacto  */}
         <DialogoMensaje
-          mensaje="Si no recordás tu contraseña y tampoco tenés acceso a tu casilla de e-mail contactate con nosotros a serviciosvv@cordoba.gov.ar."
           visible={this.state.dialogoContactoVisible || false}
-          onClose={this.onDialogoContactoClose}
+          textoSi="Solicitar ayuda"
           botonNoVisible={false}
-          textoSi="Aceptar"
+          onClose={this.onDialogoContactoClose}
+          onBotonSiClick={() => {
+            this.props.redireccionar("/Contacto");
+          }}
+          mensaje="Si no recuerda su contraseña y no tiene acceso a la casilla de correo asociada a su usuario por favor comuníquese con nosotros para poder ayudarlo"
+        />
+
+        {/* Activar usuario por numero de tramite */}
+        <DialogoForm
+          onClose={this.onDialogoEmailClose}
+          textoSi="Validar e-mail"
+          textoNo="Cancelar"
+          titulo="Usuario no validado"
+          mensaje="Para recuperar su contraseña primero debe validar su e-mail. Para ello ingrese el número de trámite de su DNI y su casilla de correo."
+          mensajeChildren={
+            <Button
+              variant="flat"
+              onClick={() => {
+                this.setState({ dialogoNumeroTramiteAyudeVisible: true });
+              }}
+            >
+              <Icon style={{ marginRight: 8 }}>help_outline_outlined</Icon>¿Necesitas ayuda con tu Nº de Trámite?
+            </Button>
+          }
+          inputs={[
+            {
+              key: "numeroTramite",
+              label: "Nª de trámite"
+            },
+            {
+              key: "email",
+              label: "E-mail nuevo"
+            }
+          ]}
+          mostrarBaner={this.state.dialogoEmailErrorVisible || false}
+          textoBaner={this.state.dialogoEmailErrorMensaje || ""}
+          onBotonBanerClick={this.onDialogoEmailBotonBanerClick}
+          autoCerrarBotonSi={false}
+          mostrarBotonBaner={true}
+          cargando={this.state.dialogoEmailCargando || false}
+          onBotonSiClick={this.onDialogoEmailBotonSiClick}
+          visible={this.state.dialogoEmailVisible}
+        />
+
+        {/* Ayuda numero de tramite */}
+        <DialogoNumeroTramiteAyuda
+          visible={this.state.dialogoNumeroTramiteAyudeVisible || false}
+          onClose={() => {
+            this.setState({ dialogoNumeroTramiteAyudeVisible: false });
+          }}
         />
       </div>
     );
@@ -147,11 +265,11 @@ class PaginaRecuperarPassword extends React.Component {
           <Lottie options={opcionesAnimExito} height={120} width={120} style={{ minHeight: 120 }} />
 
           <Typography variant="headline" className={classes.texto} style={{ fontSize: 20, marginBottom: 16 }}>
-            Se ha enviado un e-mail a su casilla de correo con las instrucciones para recuperar tu contraseña
+            {this.state.mensajeExito || ""}
           </Typography>
 
           <div style={{}}>
-            <Button variant="outlined" color="primary" onClick={this.mostrarDialogoContacto}>
+            <Button variant="outlined" color="primary" onClick={this.onBotonSinAccesoEmailClick}>
               ¿No tenes acceso a la casilla de e-mail?
             </Button>
           </div>

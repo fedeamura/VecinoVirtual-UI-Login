@@ -1,3 +1,5 @@
+import grey from "@material-ui/core/colors/grey";
+
 const styles = theme => {
   return {
     root: {
@@ -35,6 +37,18 @@ const styles = theme => {
         paddingLeft: theme.spacing.unit * 4,
         paddingRight: theme.spacing.unit * 4
       }
+    },
+    contenedorInfo:{
+      alignItems: 'center',
+      borderRadius: theme.spacing.unit,
+      padding: theme.spacing.unit,
+      overflow: "hidden",
+      backgroundColor: grey["200"],
+      display: "flex",
+      "& .texto": {
+        marginLeft:'0.5rem',
+        color: "black"
+      },
     }
   };
 };

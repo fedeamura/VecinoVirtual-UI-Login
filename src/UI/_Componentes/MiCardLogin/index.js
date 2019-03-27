@@ -5,6 +5,13 @@ import { withStyles } from "@material-ui/core/styles";
 import classNames from "classnames";
 import styles from "./styles";
 
+//Router
+import { withRouter } from "react-router-dom";
+
+//REDUX
+import { connect } from "react-redux";
+import { push } from "connected-react-router";
+
 //Compontentes
 import LinearProgress from "@material-ui/core/LinearProgress";
 import { Typography } from "@material-ui/core";
@@ -12,7 +19,25 @@ import { Typography } from "@material-ui/core";
 //Mis componentes
 import MiCard from "@Componentes/MiCard";
 
+const mapDispatchToProps = dispatch => ({
+  redireccionar: url => {
+    dispatch(push(url));
+  }
+});
+
+const mapStateToProps = state => {
+  return {};
+};
+
 class MiCardLogin extends React.PureComponent {
+  onBotonContactoClick = () => {
+    this.props.redireccionar("/Contacto");
+  };
+
+  onBotonAyudaClick = () => {
+    window.location.href = window.Config.URL_AYUDA;
+  };
+
   render() {
     const { classes } = this.props;
 
@@ -33,17 +58,6 @@ class MiCardLogin extends React.PureComponent {
           <div className={classes.header}>
             <div className={classes.imagenLogoMuni} />
             <div className={classes.imagenLogoMuniOnline} />
-
-            {/* <div className={classes.contenedorTextosSistema}>
-              <Typography variant="headline" noWrap style={{ fontWeight: 200 }}>
-                {this.props.titulo}
-              </Typography>
-              {this.props.subtitulo !== undefined && (
-                <Typography variant="title" noWrap>
-                  {this.props.subtitulo}
-                </Typography>
-              )}
-            </div> */}
           </div>
         )}
 
@@ -66,16 +80,15 @@ class MiCardLogin extends React.PureComponent {
     return (
       <div className={classes.footerInfo}>
         {/* <div className="logo" /> */}
-        <Typography variant="body1" className="link">
+        {/* <Typography variant="body1" className="link">
           Sobre Muni Online
+        </Typography> */}
+        <Typography variant="body1" className="link" onClick={this.onBotonAyudaClick}>
+          Ayuda
         </Typography>
         <div className="separador" />
-        <Typography variant="body1" className="link">
+        <Typography variant="body1" className="link" onClick={this.onBotonContactoClick}>
           Contacto
-        </Typography>
-        <div className="separador" />
-        <Typography variant="body1" className="link">
-          Términos y condiciones de uso
         </Typography>
       </div>
     );
@@ -84,4 +97,9 @@ class MiCardLogin extends React.PureComponent {
 
 let componente = MiCardLogin;
 componente = withStyles(styles)(componente);
+componente = withRouter(componente);
+componente = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(componente);
 export default componente;

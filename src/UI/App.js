@@ -9,7 +9,7 @@ import "react-virtualized/styles.css";
 
 //Router
 import { withRouter } from "react-router-dom";
-import { Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import { AnimatedSwitch } from "react-router-transition";
 
 //REDUX
@@ -27,6 +27,7 @@ import CloseIcon from "@material-ui/icons/CloseOutlined";
 import Login from "./Login/index";
 import NuevoUsuario from "./NuevoUsuario";
 import NuevoUsuarioDNI from "./NuevoUsuarioDNI";
+import Contacto from "./Contacto";
 
 import Pagina404 from "@UI/_Pagina404";
 import ProcesarRecuperarPassword from "@UI/ProcesarRecuperarPassword";
@@ -87,11 +88,14 @@ class App extends React.Component {
     return (
       <main className={classes.content}>
         <AnimatedSwitch atEnter={{ opacity: 0 }} atLeave={{ opacity: 0 }} atActive={{ opacity: 1 }} className={"switch-wrapper"}>
+          <Redirect exact from="/" to={window.Config.URL_DEFAULT} />
           <Route exact path={`${base}/Login/:codigo`} component={Login} />
           <Route exact path={`${base}/NuevoUsuario/:codigo`} component={NuevoUsuario} />
           <Route exact path={`${base}/NuevoUsuarioDNI/:codigo`} component={NuevoUsuarioDNI} />
           <Route exact path={`${base}/ProcesarRecuperarPassword`} component={ProcesarRecuperarPassword} />
           <Route exact path={`${base}/ProcesarActivacionUsuario`} component={ProcesarActivacionUsuario} />
+          <Route exact path={`${base}/Contacto`} component={Contacto} />
+
           <Route component={Pagina404} />
         </AnimatedSwitch>
       </main>

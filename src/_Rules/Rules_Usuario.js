@@ -5,7 +5,7 @@ const metodos = {
   registrar: comando => {
     comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
-    const url = window.Config.BASE_URL_WS + "/v1/Usuario";
+    const url = window.Config.BASE_URL_WS + "/v3/Usuario";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "POST",
@@ -32,7 +32,7 @@ const metodos = {
   registrarConQR: comando => {
     comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
-    const url = window.Config.BASE_URL_WS + "/v2/Usuario/QR";
+    const url = window.Config.BASE_URL_WS + "/v3/Usuario/QR";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "POST",
@@ -59,7 +59,7 @@ const metodos = {
   registrarConDatosQR: comando => {
     comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
-    const url = window.Config.BASE_URL_WS + "/v2/Usuario/DatosQR";
+    const url = window.Config.BASE_URL_WS + "/v3/Usuario/DatosQR";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "POST",
@@ -167,7 +167,7 @@ const metodos = {
     });
   },
   validarRenaper: comando => {
-    const url = window.Config.BASE_URL_WS + "/v1/Usuario/ValidarRenaper";
+    const url = window.Config.BASE_URL_WS + "/v2/Usuario/ValidarRenaper";
 
     return new Promise((resolve, reject) => {
       fetch(url, {
@@ -218,7 +218,32 @@ const metodos = {
     });
   },
   //Usuario activado
-  validarUsuarioActivado: (username, password) => {
+  validarUsuarioActivadoByUsername: username => {
+    let url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta/Validar/Username?username=" + username;
+
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "GET",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        }
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
+  },
+  validarUsuarioActivadoByUserPass: (username, password) => {
     let url = window.Config.BASE_URL_WS + "/v1/Usuario/ActivacionCuenta/Validar";
 
     return new Promise((resolve, reject) => {
@@ -228,10 +253,7 @@ const metodos = {
           Accept: "application/json",
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          username: username,
-          password: password
-        })
+        body: JSON.stringify({ username: username, password: password })
       })
         .then(data => data.json())
         .then(data => {
@@ -249,6 +271,33 @@ const metodos = {
   },
   iniciarActivacion: comando => {
     const url = window.Config.BASE_URL_WS + "/v2/Usuario/ActivacionCuenta";
+    comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
+
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(comando)
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
+  },
+  iniciarActivacionByNumeroTramite: comando => {
+    const url = window.Config.BASE_URL_WS + "/v3/Usuario/ActivacionCuenta/NumeroTramite";
     comando.urlServidor = window.location.origin + window.Config.BASE_URL + "/#/ProcesarActivacionUsuario";
 
     return new Promise((resolve, reject) => {
@@ -440,6 +489,31 @@ const metodos = {
   },
   iniciarNuevoUsuarioByDataQR: data => {
     const url = window.Config.BASE_URL_WS + "/v2/Usuario/DatosQR/IniciarNuevoUsuario";
+    return new Promise((resolve, reject) => {
+      fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
+        .then(data => data.json())
+        .then(data => {
+          if (data.ok != true) {
+            reject(data.error);
+            return;
+          }
+
+          resolve(data.return);
+        })
+        .catch(error => {
+          reject("Error procesando la solicitud");
+        });
+    });
+  },
+  contacto: data =>{
+    const url = window.Config.BASE_URL_WS + "/v2/Usuario/Contacto";
     return new Promise((resolve, reject) => {
       fetch(url, {
         method: "POST",

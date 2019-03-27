@@ -229,6 +229,7 @@ class PaginaDatosExtra extends React.Component {
                   <MiSelect
                     value={this.state.idEstadoCivil}
                     fullWidth
+                    margin="dense"
                     variant="outlined"
                     options={opcionesEstadoCivil}
                     onChange={this.onEstadoCivilChange}
@@ -239,18 +240,20 @@ class PaginaDatosExtra extends React.Component {
 
                 <Grid item xs={12} sm={6}>
                   <MiSelect
+                    margin="dense"
                     value={this.state.idOcupacion}
                     onChange={this.onOcupacionChange}
                     fullWidth
                     variant="outlined"
                     options={ocupaciones}
-                    label="Ocupación"
+                    label="Profesión / Oficio"
                     placeholder="Seleccione..."
                   />
                 </Grid>
 
                 <Grid item xs={12} sm={6}>
                   <MiSelect
+                    margin="dense"
                     fullWidth
                     value={this.state.idEstudioAlcanzado}
                     onChange={this.onEstudioAlcanzadoChange}

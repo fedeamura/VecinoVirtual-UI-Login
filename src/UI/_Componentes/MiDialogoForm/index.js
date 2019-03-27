@@ -108,6 +108,11 @@ class DialogoForm extends React.Component {
               <Grid item xs={12}>
                 {this.props.mensaje && <Typography variant="body1">{this.props.mensaje}</Typography>}
               </Grid>
+              {this.props.mensajeChildren != undefined && (
+                <Grid item xs={12}>
+                  {this.props.mensajeChildren}
+                </Grid>
+              )}
               {inputs &&
                 inputs.map((input, index) => {
                   return (

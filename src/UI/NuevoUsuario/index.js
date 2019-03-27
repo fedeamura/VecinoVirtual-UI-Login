@@ -285,7 +285,8 @@ class NuevoUsuario extends React.Component {
           apellido: this.state.datosBasicos.apellido,
           dni: this.state.datosBasicos.dni,
           fechaNacimiento: this.convertirFechaNacimientoString(this.state.datosBasicos.fechaNacimiento),
-          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m"
+          sexoMasculino: this.state.datosBasicos.sexoMasculino == "m",
+          numeroTramite: this.state.datosBasicos.numeroTramite==''?null:this.state.datosBasicos.numeroTramite
         };
       }
 

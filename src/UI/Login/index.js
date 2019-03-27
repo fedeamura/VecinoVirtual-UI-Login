@@ -5,7 +5,7 @@ import classNames from "classnames";
 //Styles
 import "@UI/transitions.css";
 import styles from "./styles";
-import withWidth, { isWidthUp } from "@material-ui/core/withWidth";
+import withWidth from "@material-ui/core/withWidth";
 
 //Router
 import { withRouter } from "react-router-dom";
@@ -30,7 +30,6 @@ import { QueryString } from "@Componentes/urlUtils";
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
 import Rules_Aplicacion from "@Rules/Rules_Aplicacion";
-import { Typography } from "@material-ui/core";
 
 const PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO = "PAGINA_EXTRA_ERROR_VALIDANDO_CODIGO";
 

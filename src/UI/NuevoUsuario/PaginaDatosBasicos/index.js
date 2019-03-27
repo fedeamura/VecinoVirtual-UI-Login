@@ -15,6 +15,8 @@ import { connect } from "react-redux";
 import Typography from "@material-ui/core/Typography";
 import Icon from "@material-ui/core/Icon";
 import Button from "@material-ui/core/Button";
+import IconButton from "@material-ui/core/IconButton";
+import InputAdornment from "@material-ui/core/InputAdornment";
 import Grid from "@material-ui/core/Grid";
 import TextField from "@material-ui/core/TextField";
 import FormHelperText from "@material-ui/core/FormHelperText";
@@ -25,11 +27,14 @@ import RadioGroup from "@material-ui/core/RadioGroup";
 import FormControlLabel from "@material-ui/core/FormControlLabel";
 import FormLabel from "@material-ui/core/FormLabel";
 import _ from "lodash";
+import IconHelpOutlined from "@material-ui/icons/HelpOutlineOutlined";
+import IconInfoOutlined from "@material-ui/icons/InfoOutlined";
 
 //Mis componentes
 import Validador from "@Componentes/_Validador";
 import MiPanelMensaje from "@Componentes/MiPanelMensaje";
 import MiBanerError from "@Componentes/MiBanerError";
+import MiDialogoNumeroTramiteAyuda from "../../_Dialogos/DialogoNumeroTramiteAyuda";
 
 //Mis Rules
 import Rules_Usuario from "@Rules/Rules_Usuario";
@@ -61,6 +66,7 @@ class PaginaDatosBasicos extends React.Component {
       fechaNacimiento: datosIniciales.fechaNacimiento || null,
       fechaNacimientoKeyPress: false,
       sexo: datosIniciales.sexoMasculino || true ? "m" : "f",
+      numeroTramite: datosIniciales.numeroTramite || "",
       errores: [],
       error: undefined,
       mostrarError: false
@@ -93,8 +99,8 @@ class PaginaDatosBasicos extends React.Component {
     this.setState({ sexo: e.target.value });
   };
 
-  onBotonSiguienteClick = () => {
-    const { nombre, apellido, dni, fechaNacimiento, sexo } = this.state;
+  onBotonSiguienteClick = async () => {
+    const { nombre, apellido, dni, fechaNacimiento, sexo, numeroTramite } = this.state;
 
     let errores = [];
     errores["nombre"] = Validador.validar([Validador.requerido, Validador.min(nombre, 3), Validador.max(nombre, 50)], nombre);
@@ -115,29 +121,30 @@ class PaginaDatosBasicos extends React.Component {
     if (conError) return;
 
     this.props.onCargando(true);
-    this.setState({ mostrarError: false }, () => {
-      Rules_Usuario.validarRenaper({
-        nombre: nombre,
-        apellido: apellido,
-        dni: dni,
-        fechaNacimiento: this.convertirFechaNacimientoString(fechaNacimiento),
-        sexoMasculino: sexo == "m"
-      })
-        .then(data => {
-          this.props.onReady({
-            nombre: nombre,
-            apellido: apellido,
-            dni: dni,
-            fechaNacimiento: fechaNacimiento,
-            sexoMasculino: sexo
-          });
-        })
-        .catch(error => {
-          this.setState({ error: error, mostrarError: true });
-        })
-        .finally(() => {
-          this.props.onCargando(false);
+    this.setState({ mostrarError: false }, async () => {
+      try {
+        await Rules_Usuario.validarRenaper({
+          nombre: nombre,
+          apellido: apellido,
+          dni: dni,
+          fechaNacimiento: this.convertirFechaNacimientoString(fechaNacimiento),
+          sexoMasculino: sexo == "m",
+          numeroTramite: numeroTramite == "" ? null : numeroTramite
         });
+        this.props.onReady({
+          nombre: nombre,
+          apellido: apellido,
+          dni: dni,
+          fechaNacimiento: fechaNacimiento,
+          sexoMasculino: sexo,
+          numeroTramite: numeroTramite == "" ? null : numeroTramite
+        });
+        this.props.onCargando(false);
+      } catch (ex) {
+        let mensaje = typeof ex === "object" ? ex.message : ex;
+        this.setState({ error: mensaje, mostrarError: true });
+        this.props.onCargando(false);
+      }
     });
   };
 
@@ -148,6 +155,14 @@ class PaginaDatosBasicos extends React.Component {
     if (mes < 10) mes = "0" + mes;
     let año = fecha.getFullYear();
     return dia + "/" + mes + "/" + año;
+  };
+
+  onBotonAyudaNumeroTramiteClick = () => {
+    this.setState({ dialogoInfoNumeroTramiteVisible: true });
+  };
+
+  onDialogoInfoNumeroTramiteClose = () => {
+    this.setState({ dialogoInfoNumeroTramiteVisible: false });
   };
 
   render() {
@@ -165,6 +180,7 @@ class PaginaDatosBasicos extends React.Component {
       <div className={classes.root}>
         {this.renderContent()}
         {this.renderFooter()}
+        {this.renderDialogos()}
       </div>
     );
   }
@@ -291,6 +307,41 @@ class PaginaDatosBasicos extends React.Component {
                 </RadioGroup>
               </FormControl>
             </Grid>
+
+            <Grid item xs={12}>
+              <div className={classes.contenedorInfo}>
+                <IconInfoOutlined />
+                <Typography variant="body1" className="texto">
+                  El Nº de trámite es un dato opcional, pero algunas gestiones pueden requerirlo.
+                </Typography>
+              </div>
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <TextField
+                fullWidth
+                margin="dense"
+                error={this.state.errores["numeroTramite"] !== undefined}
+                helperText={this.state.errores["numeroTramite"]}
+                label="N° de Tramite"
+                variant="outlined"
+                autoComplete="off"
+                value={this.state.numeroTramite}
+                name="numeroTramite"
+                type="text"
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton aria-label="Ayuda" onClick={this.onBotonAyudaNumeroTramiteClick}>
+                        <IconHelpOutlined />
+                      </IconButton>
+                    </InputAdornment>
+                  )
+                }}
+                onKeyPress={this.onInputKeyPress}
+                onChange={this.onInputChange}
+              />
+            </Grid>
           </Grid>
         </div>
       </div>
@@ -312,6 +363,15 @@ class PaginaDatosBasicos extends React.Component {
           Siguiente
         </Button>
       </div>
+    );
+  }
+
+  renderDialogos() {
+    return (
+      <MiDialogoNumeroTramiteAyuda
+        onClose={this.onDialogoInfoNumeroTramiteClose}
+        visible={this.state.dialogoInfoNumeroTramiteVisible || false}
+      />
     );
   }
 }

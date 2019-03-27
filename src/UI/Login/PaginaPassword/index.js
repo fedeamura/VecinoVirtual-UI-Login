@@ -52,30 +52,23 @@ class PaginaPassword extends React.Component {
     const password = this.state.password;
 
     this.props.onCargando(true);
-    this.setState({ error: undefined }, () => {
-      Rules_Usuario.validarUsuarioActivado(username, password)
-        .then(validado => {
-          if (validado === false) {
-            this.props.onCargando(false);
-            this.props.onUsuarioNoValidado(username, password);
-            return;
-          }
-
-          Rules_Usuario.acceder(username, password)
-            .then(data => {
-              this.props.onLogin(data);
-            })
-            .catch(error => {
-              this.setState({ error: error });
-            })
-            .finally(() => {
-              this.props.onCargando(false);
-            });
-        })
-        .catch(error => {
-          this.setState({ error: error });
+    this.setState({ error: undefined }, async () => {
+      try {
+        let validado = await Rules_Usuario.validarUsuarioActivadoByUserPass(username, password);
+        if (validado === false) {
           this.props.onCargando(false);
-        });
+          this.props.onUsuarioNoValidado(username, password);
+          return;
+        }
+
+        let data = await Rules_Usuario.acceder(username, password);
+        this.props.onCargando(false);
+        this.props.onLogin(data);
+      } catch (ex) {
+        let mensaje = typeof ex == "object" ? ex.message : ex;
+        this.setState({ error: mensaje });
+        this.props.onCargando(false);
+      }
     });
   };
 
